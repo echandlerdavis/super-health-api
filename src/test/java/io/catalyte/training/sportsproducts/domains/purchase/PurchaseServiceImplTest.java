@@ -165,6 +165,15 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
+    public void savePurchaseThrowsErrorIfCardExpirationDateIsNotCorrectFormat() {
+        // arrange
+        testCreditCard.setExpiration("12/2027");
+        testPurchase.setCreditCard(testCreditCard);
+        // act & assert
+        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
     public void savePurchaseThrowsErrorIfCardHolderIsNotNull() {
         // arrange
         testCreditCard.setCardholder(null);

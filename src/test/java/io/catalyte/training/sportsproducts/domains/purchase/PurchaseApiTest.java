@@ -210,6 +210,24 @@ public class PurchaseApiTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void savePurchaseWithCardWithExpriationDateNotCorrectFormatReturns400() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // set test purchase with card that has expiration not in format MM/YY
+        testCreditCard.setExpiration("04/2027");
+        testPurchase.setCreditCard(testCreditCard);
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     public void savePurchaseWithExpiredCardReturns400() throws Exception {
