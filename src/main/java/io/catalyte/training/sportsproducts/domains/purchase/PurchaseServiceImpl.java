@@ -55,7 +55,8 @@ public class PurchaseServiceImpl implements PurchaseService {
      * @return the persisted purchase with ids
      */
     public Purchase savePurchase(Purchase newPurchase) {
-        validateCreditCard(newPurchase);
+        CreditCard creditCard = newPurchase.getCreditCard();
+        validateCreditCard(creditCard);
         try {
             purchaseRepository.save(newPurchase);
         } catch (DataAccessException e) {
@@ -107,53 +108,84 @@ public class PurchaseServiceImpl implements PurchaseService {
      * <p>
      * Makes sure no fields are null and all credit card fields are valid
      * <p>
-     * To be called before saving a purchase
+     * Calls all other helper methods that validate each card field separately
      *
-     * @param purchase the purchase to validate credit card information for
+     * @param creditCard credit card to be validated
      */
-    private void validateCreditCard(Purchase purchase) {
-        CreditCard creditCard = purchase.getCreditCard();
-
-        // Check credit card is not null
-        if (creditCard == null)
-            throw new BadRequest("Credit Card must be provided");
-
-        // Check credit card number is not null and is 16 digits
-        String creditCardNumber = creditCard.getCardNumber();
-        if (creditCardNumber == null || creditCardNumber.length() != 16)
-            throw new BadRequest("Credit card number must be 16 digits in length");
-
-        // Check credit card cvv is not null and is 3 digits
-        String cvv = creditCard.getCvv();
-        if (cvv == null || cvv.length() != 3)
-            throw new BadRequest("CVV must be 3 digits long");
-
-        // Call Helper method to validate credit card expiration data
+    private void validateCreditCard(CreditCard creditCard) {
+        validateCreditCardProvided(creditCard);
+        validateCreditCardNumber(creditCard);
+        validateCreditCardCVV(creditCard);
+        validateCreditCardHolder(creditCard);
         validateCreditCardExpiration(creditCard);
+    }
 
-        // Check credit card holder not null
+    /**
+     * Helper method that checks credit card was given (not null)
+     *
+     * @param creditCard credit card to be validated
+     */
+    private void validateCreditCardProvided(CreditCard creditCard) {
+        if (creditCard == null) {
+            throw new BadRequest("Credit Card must be provided");
+        }
+    }
+
+    /**
+     * Helper method that checks credit card number is not null and is 16 digits
+     *
+     * @param creditCard credit card to be validated
+     */
+    private void validateCreditCardNumber(CreditCard creditCard) {
+        String creditCardNumber = creditCard.getCardNumber();
+        if (creditCardNumber == null || creditCardNumber.length() != 16) {
+            throw new BadRequest("Credit card number must be 16 digits in length");
+        }
+    }
+
+    /**
+     * Helper method that checks credit card CVV is not null and is 3 digits
+     *
+     * @param creditCard credit card to be validated
+     */
+    private void validateCreditCardCVV(CreditCard creditCard) {
+        String cvv = creditCard.getCvv();
+        if (cvv == null || cvv.length() != 3) {
+            throw new BadRequest("CVV must be 3 digits long");
+        }
+    }
+
+    /**
+     * Helper method that checks credit card holder not null
+     *
+     * @param creditCard credit card to be validated
+     */
+    public void validateCreditCardHolder(CreditCard creditCard) {
         String cardHolder = creditCard.getCardholder();
-        if (cardHolder == null) throw new BadRequest("Card Holder can not be null");
+        if (cardHolder == null) {
+            throw new BadRequest("Card Holder can not be null");
+        }
     }
 
     /**
      * Helper method that checks that a credit card's is not expired and is entered in pattern of MM/YY
-     * <p>
-     * To be called when validating a credit card
      *
-     * @param creditCard the creditCard to check the expiration date
+     * @param creditCard credit card to be validated
      */
     private void validateCreditCardExpiration(CreditCard creditCard) {
         String expiration = creditCard.getExpiration();
 
         // Check expiration data is not null
-        if (expiration == null)
+        if (expiration == null){
             throw new BadRequest("Expiration date can not be null");
+        }
 
         // Check expiration date is entered as MM/YY
         String expirationRegEx = "^(0[0-9]||1[0-2])/[0-9]{2}$";
         boolean expirationValidPattern = Pattern.matches(expirationRegEx, expiration);
-        if (!expirationValidPattern) throw new BadRequest("Expiration date must be passed as MM/YY");
+        if (!expirationValidPattern){
+            throw new BadRequest("Expiration date must be passed as MM/YY");
+        }
 
         // Parse expiration string to get values of the month and the year
         Integer expMonth = Integer.parseInt(expiration.substring(0, 2));
@@ -164,6 +196,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         Integer currYear = LocalDate.now().getYear();
 
         // Check that the expiration is not before the current year
+        // Or if it is the current year, the month is a future month
         if ((expYear < currYear) || (expYear.equals(currYear) && expMonth <= currMonth))
             throw new BadRequest("Card is Expired");
 
