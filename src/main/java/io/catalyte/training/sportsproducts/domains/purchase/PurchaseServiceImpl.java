@@ -127,7 +127,7 @@ public class PurchaseServiceImpl implements PurchaseService {
      */
     private void validateCreditCardProvided(CreditCard creditCard) {
         if (creditCard == null) {
-            throw new BadRequest("Credit Card must be provided");
+            throw new BadRequest(StringConstants.CARD_NOT_PROVIDED);
         }
     }
 
@@ -139,7 +139,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void validateCreditCardNumber(CreditCard creditCard) {
         String creditCardNumber = creditCard.getCardNumber();
         if (creditCardNumber == null || creditCardNumber.length() != 16) {
-            throw new BadRequest("Credit card number must be 16 digits in length");
+            throw new BadRequest(StringConstants.CARD_NUMBER_INVALID);
         }
     }
 
@@ -151,7 +151,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void validateCreditCardCVV(CreditCard creditCard) {
         String cvv = creditCard.getCvv();
         if (cvv == null || cvv.length() != 3) {
-            throw new BadRequest("CVV must be 3 digits long");
+            throw new BadRequest(StringConstants.CARD_CVV_INVALID);
         }
     }
 
@@ -163,7 +163,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public void validateCreditCardHolder(CreditCard creditCard) {
         String cardHolder = creditCard.getCardholder();
         if (cardHolder == null) {
-            throw new BadRequest("Card Holder can not be null");
+            throw new BadRequest(StringConstants.CARD_HOLDER_NULL);
         }
     }
 
@@ -184,7 +184,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         String expirationRegEx = "^(0[0-9]||1[0-2])/[0-9]{2}$";
         boolean expirationValidPattern = Pattern.matches(expirationRegEx, expiration);
         if (!expirationValidPattern){
-            throw new BadRequest("Expiration date must be passed as MM/YY");
+            throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
 
         // Parse expiration string to get values of the month and the year
@@ -198,8 +198,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         // Check that the expiration is not before the current year
         // Or if it is the current year, the month is a future month
         if ((expYear < currYear) || (expYear.equals(currYear) && expMonth <= currMonth))
-            throw new BadRequest("Card is Expired");
-
+            throw new BadRequest(StringConstants.CARD_EXPIRED);
     }
 
 }
