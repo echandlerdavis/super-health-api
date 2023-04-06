@@ -11,7 +11,7 @@ public class StringConstants {
 
   // Errors Messages - Credit Card Validation
   public static final String CARD_NOT_PROVIDED = "Credit was not provided";
-  public static final String CARD_NUMBER_INVALID = "Credit card number can not be null and must be 16 digits in length";
+  public static final String CARD_NUMBER_INVALID = "Credit card number can not be null and must be at least 16 digits in length";
   public static final String CARD_CVV_INVALID = "Credit card cvv can not be null and must be 3 digits in length";
   public static final String CARD_HOLDER_NULL = "Credit card holder can not be null";
   public static final String CARD_EXPIRATION_INVALID_FORMAT = "Credit card expiration date must be in format MM/YY";

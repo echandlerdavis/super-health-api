@@ -134,6 +134,16 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
+    public void savePurchaseReturnsPurchaseIfCardNumberIsGreaterThan16Digits() {
+        // arrange
+        testCreditCard.setCardNumber("12345678901234567");
+        testPurchase.setCreditCard(testCreditCard);
+        Purchase expected = testPurchase;
+        Purchase actual = purchaseServiceImpl.savePurchase(testPurchase);
+        assertEquals(expected,actual);
+    }
+
+    @Test
     public void savePurchaseThrowsErrorIfCardNumberContainsLetters() {
         // arrange
         testCreditCard.setCardNumber("12345abcde123456");
