@@ -43,6 +43,22 @@ public class PurchaseServiceImpl implements PurchaseService {
   }
 
   /**
+   * Search for all purchases made with the given email attached.
+   * @param email String
+   * @return List of Purchase objects
+   */
+
+  @Override
+  public List<Purchase> findByBillingAddressEmail(String email) {
+    try {
+      return purchaseRepository.findByBillingAddressEmail(email);
+    } catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServerError(e.getMessage());
+    }
+  }
+
+  /**
    * Persists a purchase to the database
    *
    * @param newPurchase - the purchase to persist
