@@ -72,6 +72,7 @@ public class PurchaseServiceImplTest {
     /**
      * Helper Method to initialize a test purchase with a billing address, delivery address, credit card info, and a random generated product
      */
+
     private void setTestPurchase() {
         BillingAddress testBillingAddress = new BillingAddress(
                 "123 No Name Street",
@@ -120,6 +121,15 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
+    public void savePurchaseThrowsErrorIfCardNumberContainsLetters() {
+        // arrange
+        testCreditCard.setCardNumber("12345abcde123456");
+        testPurchase.setCreditCard(testCreditCard);
+        // act & assert
+        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
     public void savePurchaseThrowsErrorIfCardNumberIsNull() {
         // arrange
         testCreditCard.setCardNumber(null);
@@ -132,6 +142,15 @@ public class PurchaseServiceImplTest {
     public void savePurchaseThrowsErrorIfCvvIsLessThan3Digits() {
         // arrange
         testCreditCard.setCvv("11");
+        testPurchase.setCreditCard(testCreditCard);
+        // act & assert
+        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
+    public void savePurchaseThrowsErrorIfCvvContainsLetters() {
+        // arrange
+        testCreditCard.setCvv("a2c");
         testPurchase.setCreditCard(testCreditCard);
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
@@ -177,6 +196,15 @@ public class PurchaseServiceImplTest {
     public void savePurchaseThrowsErrorIfCardHolderIsNotNull() {
         // arrange
         testCreditCard.setCardholder(null);
+        testPurchase.setCreditCard(testCreditCard);
+        // act & assert
+        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
+    public void savePurchaseThrowsErrorIfCardHolderIsNotAStringOfOnlyLetters() {
+        // arrange
+        testCreditCard.setCardholder("My N4me");
         testPurchase.setCreditCard(testCreditCard);
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));

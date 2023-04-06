@@ -138,7 +138,8 @@ public class PurchaseServiceImpl implements PurchaseService {
      */
     private void validateCreditCardNumber(CreditCard creditCard) {
         String creditCardNumber = creditCard.getCardNumber();
-        if (creditCardNumber == null || creditCardNumber.length() != 16) {
+
+        if (creditCardNumber == null || !creditCardNumber.matches("[0-9]{16}")) {
             throw new BadRequest(StringConstants.CARD_NUMBER_INVALID);
         }
     }
@@ -150,7 +151,7 @@ public class PurchaseServiceImpl implements PurchaseService {
      */
     private void validateCreditCardCVV(CreditCard creditCard) {
         String cvv = creditCard.getCvv();
-        if (cvv == null || cvv.length() != 3) {
+        if (cvv == null || cvv.length() != 3 || !cvv.matches("[0-9]{3}")) {
             throw new BadRequest(StringConstants.CARD_CVV_INVALID);
         }
     }
@@ -162,7 +163,7 @@ public class PurchaseServiceImpl implements PurchaseService {
      */
     public void validateCreditCardHolder(CreditCard creditCard) {
         String cardHolder = creditCard.getCardholder();
-        if (cardHolder == null) {
+        if (cardHolder == null || !cardHolder.matches("\\D+")) {
             throw new BadRequest(StringConstants.CARD_HOLDER_NULL);
         }
     }
@@ -176,14 +177,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         String expiration = creditCard.getExpiration();
 
         // Check expiration data is not null
-        if (expiration == null){
+        if (expiration == null) {
             throw new BadRequest("Expiration date can not be null");
         }
 
         // Check expiration date is entered as MM/YY
         String expirationRegEx = "^(0[0-9]||1[0-2])/[0-9]{2}$";
-        boolean expirationValidPattern = Pattern.matches(expirationRegEx, expiration);
-        if (!expirationValidPattern){
+        if (!expiration.matches(expirationRegEx)) {
             throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
 
