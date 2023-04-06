@@ -172,7 +172,7 @@ public class PurchaseApiTest {
     }
 
     @Test
-    public void savePurchasesWithInvalidCCNumberReturns400() throws Exception {
+    public void savePurchasesWithCCNumberLessThan16DigitsReturns400() throws Exception {
         // object mapper for creating a json string
         ObjectMapper mapper = new ObjectMapper();
 
@@ -190,9 +190,28 @@ public class PurchaseApiTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void savePurchasesWithCCNumberWithLettersReturns400() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set test purchase with credit card number less than 16 digits
+        testCreditCard.setCardNumber("123456abcde12345");
+        testPurchase.setCreditCard(testCreditCard);
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
     @Test
-    public void savePurchaseWithInvalidCVV() throws Exception {
+    public void savePurchaseWithCVVLessThan3Digits() throws Exception {
         // object mapper for creating a json string
         ObjectMapper mapper = new ObjectMapper();
 
@@ -211,7 +230,26 @@ public class PurchaseApiTest {
     }
 
     @Test
-    public void savePurchaseWithCardWithExpriationDateNotCorrectFormatReturns400() throws Exception {
+    public void savePurchaseWithCVVWithLettersReturns400() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set test purchase with credit card CVV less than 3 digits
+        testCreditCard.setCvv("01a");
+        testPurchase.setCreditCard(testCreditCard);
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void savePurchaseWithCardWithExpirationDateNotCorrectFormatReturns400() throws Exception {
         // object mapper for creating a json string
         ObjectMapper mapper = new ObjectMapper();
 
