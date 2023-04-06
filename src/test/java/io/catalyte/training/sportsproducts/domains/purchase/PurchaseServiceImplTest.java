@@ -3,6 +3,8 @@ package io.catalyte.training.sportsproducts.domains.purchase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.sportsproducts.data.ProductFactory;
@@ -15,6 +17,7 @@ import java.util.stream.Stream;
 
 import io.catalyte.training.sportsproducts.domains.product.ProductService;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
+import io.catalyte.training.sportsproducts.exceptions.ServerError;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.dao.DataAccessException;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,32 +51,41 @@ public class PurchaseServiceImplTest {
     public ExpectedException thrown = ExpectedException.none();
 
 
-    private Product testProduct;
+    Product testProduct;
 
-    private ProductFactory productFactory;
+    ProductFactory productFactory;
 
-    private CreditCard testCreditCard = new CreditCard("1234567890123456", "111", "04/30", "Visa");
+    CreditCard testCreditCard = new CreditCard("1234567890123456", "111", "04/30", "Visa");
 
-    private Purchase testPurchase = new Purchase();
+    Purchase testPurchase = new Purchase();
+
+    String testEmail = "test@validEmail.com";
+
+    ArrayList<Purchase> testPurchases = new ArrayList<>();
 
     @Before
     public void setUp() {
+
+        //Initialize Mocks
+        MockitoAnnotations.initMocks(this);
 
         // Set repository to return a random generated product when called to find by id
         productFactory = new ProductFactory();
         testProduct = productFactory.createRandomProduct();
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(testProduct));
-        // Initialize a test purchase instance
+
+        // Initialize a test purchase instance and list of purchases
         setTestPurchase();
-        //Initialize Mocks
-        MockitoAnnotations.initMocks(this);
+        testPurchases.add(testPurchase);
+
+        // Set repository to return list of test purchases when calling findByBillingAddressEmail
+        when(purchaseRepository.findByBillingAddressEmail(anyString())).thenReturn(testPurchases);
 
     }
 
     /**
      * Helper Method to initialize a test purchase with a billing address, delivery address, credit card info, and a random generated product
      */
-
     private void setTestPurchase() {
         BillingAddress testBillingAddress = new BillingAddress(
                 "123 No Name Street",
@@ -80,7 +93,7 @@ public class PurchaseServiceImplTest {
                 "No City",
                 "Virginia",
                 12345,
-                "bob@ross.com",
+                testEmail,
                 "800-555-5555");
 
         DeliveryAddress testDeliveryAddress = new DeliveryAddress(
@@ -217,6 +230,20 @@ public class PurchaseServiceImplTest {
         testPurchase.setCreditCard(testCreditCard);
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
+    public void findByBillingAddressEmailCallsPurchaseService(){
+
+        List<Purchase> actual = purchaseServiceImpl.findByBillingAddressEmail(testEmail);
+        assertEquals(testPurchases, actual);
+    }
+
+    @Test(expected = ServerError.class)
+    public void findByBillingAddressEmailCatchesDataAccessException(){
+        doThrow(new DataAccessException("Test exception"){}).when(purchaseRepository).findByBillingAddressEmail(testEmail);
+
+        List<Purchase> actual = purchaseServiceImpl.findByBillingAddressEmail(testEmail);
     }
 
 }

@@ -20,88 +20,102 @@ import org.springframework.stereotype.Service;
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
 
-    private final Logger logger = LogManager.getLogger(PurchaseServiceImpl.class);
+  private final Logger logger = LogManager.getLogger(PurchaseServiceImpl.class);
 
-    PurchaseRepository purchaseRepository;
-    ProductService productService;
-    LineItemRepository lineItemRepository;
+  PurchaseRepository purchaseRepository;
+  ProductService productService;
+  LineItemRepository lineItemRepository;
 
-    @Autowired
-    public PurchaseServiceImpl(PurchaseRepository purchaseRepository, ProductService productService,
-                               LineItemRepository lineItemRepository) {
-        this.purchaseRepository = purchaseRepository;
-        this.productService = productService;
-        this.lineItemRepository = lineItemRepository;
+  @Autowired
+  public PurchaseServiceImpl(PurchaseRepository purchaseRepository, ProductService productService,
+      LineItemRepository lineItemRepository) {
+    this.purchaseRepository = purchaseRepository;
+    this.productService = productService;
+    this.lineItemRepository = lineItemRepository;
+  }
+
+  /**
+   * Retrieves all purchases from the database
+   *
+   * @return
+   */
+  public List<Purchase> findAllPurchases() {
+    try {
+      return purchaseRepository.findAll();
+    } catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServerError(e.getMessage());
+    }
+  }
+
+  /**
+   * Search for all purchases made with the given email attached.
+   * @param email String
+   * @return List of Purchase objects
+   */
+
+  @Override
+  public List<Purchase> findByBillingAddressEmail(String email) {
+    try {
+      return purchaseRepository.findByBillingAddressEmail(email);
+    } catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServerError(e.getMessage());
+    }
+  }
+
+  /**
+   * Persists a purchase to the database
+   *
+   * @param newPurchase - the purchase to persist
+   * @return the persisted purchase with ids
+   */
+  public Purchase savePurchase(Purchase newPurchase) {
+    try {
+      purchaseRepository.save(newPurchase);
+    } catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServerError(e.getMessage());
     }
 
-    /**
-     * Retrieves all purchases from the database
-     *
-     * @return
-     */
-    public List<Purchase> findAllPurchases() {
+    // after the purchase is persisted and has an id, we need to handle its lineitems and persist them as well
+    handleLineItems(newPurchase);
+
+    return newPurchase;
+  }
+
+  /**
+   * This helper method retrieves product information for each line item and persists it
+   *
+   * @param purchase - the purchase object to handle lineitems for
+   */
+  private void handleLineItems(Purchase purchase) {
+    Set<LineItem> itemsList = purchase.getProducts();
+
+    if (itemsList != null) {
+      itemsList.forEach(lineItem -> {
+
+        // retrieve full product information from the database
+        Product product = productService.getProductById(lineItem.getProduct().getId());
+
+        // set the product info into the lineitem
+        if (product != null) {
+          lineItem.setProduct(product);
+        }
+
+        // set the purchase on the line item
+        lineItem.setPurchase(purchase);
+
+        // persist the populated lineitem
         try {
-            return purchaseRepository.findAll();
+          lineItemRepository.save(lineItem);
         } catch (DataAccessException e) {
-            logger.error(e.getMessage());
-            throw new ServerError(e.getMessage());
+          logger.error(e.getMessage());
+          throw new ServerError(e.getMessage());
         }
+      });
     }
-
-    /**
-     * Persists a purchase to the database
-     *
-     * @param newPurchase - the purchase to persist
-     * @return the persisted purchase with ids
-     */
-    public Purchase savePurchase(Purchase newPurchase) {
-        CreditCard creditCard = newPurchase.getCreditCard();
-        validateCreditCard(creditCard);
-        try {
-            purchaseRepository.save(newPurchase);
-        } catch (DataAccessException e) {
-            logger.error(e.getMessage());
-            throw new ServerError(e.getMessage());
-        }
-
-        // after the purchase is persisted and has an id, we need to handle its lineitems and persist them as well
-        handleLineItems(newPurchase);
-
-        return newPurchase;
-    }
-
-    /**
-     * This helper method retrieves product information for each line item and persists it
-     *
-     * @param purchase - the purchase object to handle lineitems for
-     */
-    private void handleLineItems(Purchase purchase) {
-        Set<LineItem> itemsList = purchase.getProducts();
-
-        if (itemsList != null) {
-            itemsList.forEach(lineItem -> {
-
-                // retrieve full product information from the database
-                Product product = productService.getProductById(lineItem.getProduct().getId());
-
-                // set the product info into the lineitem
-                if (product != null) {
-                    lineItem.setProduct(product);
-                }
-
-                // set the purchase on the line item
-                lineItem.setPurchase(purchase);
-
-                // persist the populated lineitem
-                try {
-                    lineItemRepository.save(lineItem);
-                } catch (DataAccessException e) {
-                    logger.error(e.getMessage());
-                    throw new ServerError(e.getMessage());
-                }
-            });
-        }
-    }
+  }
 
     /**
      * Helper method that checks the credit card within a purchase
