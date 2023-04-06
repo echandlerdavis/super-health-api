@@ -202,7 +202,7 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
-    public void savePurchaseThrowsErrorIfCardHolderIsNotAStringOfOnlyLetters() {
+    public void savePurchaseThrowsErrorIfCardHolderIsAStringOfOnlyLetters() {
         // arrange
         testCreditCard.setCardholder("My N4me");
         testPurchase.setCreditCard(testCreditCard);
