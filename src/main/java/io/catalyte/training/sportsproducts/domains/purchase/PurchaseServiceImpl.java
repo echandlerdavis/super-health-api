@@ -218,8 +218,6 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
 
-        System.out.println("expiry = " + expiry);
-
         // Set expired to be true or false if cards expiration date is before the current date
         boolean expired = expiry.before(new Date());
 
