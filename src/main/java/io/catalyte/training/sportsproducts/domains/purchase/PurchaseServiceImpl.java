@@ -150,14 +150,14 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     /**
-     * Helper method that checks credit card number is not null and is at least 16 digits
+     * Helper method that checks credit card number is not null and is 16 digits
      *
      * @param creditCard credit card to be validated
      */
     private void validateCreditCardNumber(CreditCard creditCard) {
         String creditCardNumber = creditCard.getCardNumber();
 
-        if (creditCardNumber == null || !creditCardNumber.matches("[0-9]{16,}")) {
+        if (creditCardNumber == null || !creditCardNumber.matches("[0-9]{16}")) {
             throw new BadRequest(StringConstants.CARD_NUMBER_INVALID);
         }
     }

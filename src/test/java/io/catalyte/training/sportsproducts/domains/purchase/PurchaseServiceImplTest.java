@@ -134,13 +134,12 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
-    public void savePurchaseReturnsPurchaseIfCardNumberIsGreaterThan16Digits() {
+    public void savePurchaseReturnsThrowsErrorIfCardNumberIsGreaterThan16Digits() {
         // arrange
         testCreditCard.setCardNumber("12345678901234567");
         testPurchase.setCreditCard(testCreditCard);
-        Purchase expected = testPurchase;
-        Purchase actual = purchaseServiceImpl.savePurchase(testPurchase);
-        assertEquals(expected,actual);
+        // act & assert
+        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
 
     @Test
@@ -216,7 +215,7 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
-    public void savePurchaseThrowsErrorIfCardHolderIsNotNull() {
+    public void savePurchaseThrowsErrorIfCardHolderIsNull() {
         // arrange
         testCreditCard.setCardholder(null);
         testPurchase.setCreditCard(testCreditCard);

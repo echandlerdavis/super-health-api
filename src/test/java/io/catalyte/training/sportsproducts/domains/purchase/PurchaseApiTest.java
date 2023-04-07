@@ -230,6 +230,26 @@ public class PurchaseApiTest {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    public void savePurchasesWithCCNumberGreaterThan16DigitsReturns400() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set test purchase with credit card number less than 16 digits
+        testCreditCard.setCardNumber("12345678901234567");
+        testPurchase.setCreditCard(testCreditCard);
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
     @Test
     public void savePurchasesWithCCNumberWithLettersReturns400() throws Exception {
         // object mapper for creating a json string
