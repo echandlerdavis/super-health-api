@@ -182,7 +182,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public void validateCreditCardHolder(CreditCard creditCard) {
         String cardHolder = creditCard.getCardholder();
         if (cardHolder == null || !cardHolder.matches("\\D+")) {
-            throw new BadRequest(StringConstants.CARD_HOLDER_NULL);
+            throw new BadRequest(StringConstants.CARD_HOLDER_INVALID);
         }
     }
 

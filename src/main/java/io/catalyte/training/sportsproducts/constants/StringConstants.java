@@ -13,7 +13,7 @@ public class StringConstants {
   public static final String CARD_NOT_PROVIDED = "Credit was not provided";
   public static final String CARD_NUMBER_INVALID = "Credit card number can not be null and must be 16 digits in length";
   public static final String CARD_CVV_INVALID = "Credit card cvv can not be null and must be 3 digits in length";
-  public static final String CARD_HOLDER_NULL = "Credit card holder can not be null";
+  public static final String CARD_HOLDER_INVALID = "Credit card holder can not be null and Can not contain numbers";
   public static final String CARD_EXPIRATION_INVALID_FORMAT = "Credit card expiration date must be in format MM/YY";
   public static final String CARD_EXPIRED = "Credit card is expired";
 
