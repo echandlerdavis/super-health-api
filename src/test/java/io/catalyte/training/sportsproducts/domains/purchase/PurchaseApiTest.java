@@ -86,13 +86,14 @@ public class PurchaseApiTest {
                 12345);
 
         // Generate random Products and save to repository
-        testProducts = productRepository.saveAll(productFactory.generateRandomProducts(3));
+        testProducts = productFactory.generateRandomProducts(3);
 
         // Get List of test products to add to purchase
         Set<LineItem> purchasesList = new HashSet<>();
 
         testProducts.forEach(product -> {
             product.setActive(true);
+            productRepository.save(product);
             LineItem purchaseLineItem = new LineItem();
             purchaseLineItem.setProduct(product);
             purchaseLineItem.setQuantity(1);
@@ -435,6 +436,7 @@ public class PurchaseApiTest {
 
         // Set all test products to inactive
         testProducts.forEach(product -> product.setActive(false));
+        productRepository.saveAll(testProducts);
 
         // Convert purchase to json string
         String JsonString = mapper.writeValueAsString(testPurchase);
@@ -453,6 +455,7 @@ public class PurchaseApiTest {
 
         // Set one test product to be inactive
         testProducts.get(2).setActive(false);
+        productRepository.save(testProducts.get(2));
 
         // Convert purchase to json string
         String JsonString = mapper.writeValueAsString(testPurchase);
@@ -489,6 +492,7 @@ public class PurchaseApiTest {
 
         // Set all test products active status to be null
         testProducts.forEach(product -> product.setActive(null));
+        productRepository.saveAll(testProducts);
 
         // Convert purchase to json string
         String JsonString = mapper.writeValueAsString(testPurchase);
@@ -507,6 +511,7 @@ public class PurchaseApiTest {
 
         // Set one product to null active status
         testProducts.get(0).setActive(null);
+        productRepository.save(testProducts.get(0));
 
         // Convert purchase to json string
         String JsonString = mapper.writeValueAsString(testPurchase);
