@@ -200,7 +200,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         // Check expiration date is entered as MM/YY
-        String expirationRegEx = "^(0[0-9]||1[0-2])/[0-9]{2}$";
+        String expirationRegEx = "^(0[1-9]||1[0-2])/[0-9]{2}$";
+
         if (!expiration.matches(expirationRegEx)) {
             throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
