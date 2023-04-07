@@ -1,5 +1,8 @@
 package io.catalyte.training.sportsproducts.domains.purchase;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,6 +21,7 @@ public class Purchase {
   private Long id;
 
   @OneToMany(mappedBy = "purchase")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Set<LineItem> products;
 
   private DeliveryAddress deliveryAddress;
