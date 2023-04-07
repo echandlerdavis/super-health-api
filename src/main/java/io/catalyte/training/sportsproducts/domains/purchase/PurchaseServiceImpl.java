@@ -73,8 +73,8 @@ public class PurchaseServiceImpl implements PurchaseService {
      * @return the persisted purchase with ids
      */
     public Purchase savePurchase(Purchase newPurchase) {
-      CreditCard creditCard = newPurchase.getCreditCard();
-      validateCreditCard(creditCard);
+        CreditCard creditCard = newPurchase.getCreditCard();
+        validateCreditCard(creditCard);
         try {
             purchaseRepository.save(newPurchase);
         } catch (DataAccessException e) {
@@ -103,8 +103,10 @@ public class PurchaseServiceImpl implements PurchaseService {
                 Product product = productService.getProductById(lineItem.getProduct().getId());
 
                 // set the product info into the lineitem
-                if (product != null) {
+                if (product != null && product.getActive() != null && product.getActive()) {
                     lineItem.setProduct(product);
+                } else {
+                    throw new BadRequest(StringConstants.PRODUCT_INACTIVE);
                 }
 
                 // set the purchase on the line item
@@ -118,6 +120,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                     throw new ServerError(e.getMessage());
                 }
             });
+        } else {
+            throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
         }
     }
 
@@ -210,18 +214,18 @@ public class PurchaseServiceImpl implements PurchaseService {
         Date expiry;
 
         // Attempt to parse the expiration string in MM/YY format
-        try{
+        try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yy");
             simpleDateFormat.setLenient(false);
             expiry = simpleDateFormat.parse(expiration);
-        } catch (ParseException e){
+        } catch (ParseException e) {
             throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
 
         // Set expired to be true or false if cards expiration date is before the current date
         boolean expired = expiry.before(new Date());
 
-        if(expired){
+        if (expired) {
             throw new BadRequest(StringConstants.CARD_EXPIRED);
         }
     }

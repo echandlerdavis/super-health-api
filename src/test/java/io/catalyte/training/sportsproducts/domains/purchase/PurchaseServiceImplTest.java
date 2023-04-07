@@ -2,8 +2,7 @@ package io.catalyte.training.sportsproducts.domains.purchase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -73,6 +72,12 @@ public class PurchaseServiceImplTest {
         // Set repository to return list of test purchases when calling findByBillingAddressEmail
         when(purchaseRepository.findByBillingAddressEmail(anyString())).thenReturn(testPurchases);
 
+        // Set consecutive mock calls for product service since Purchase service consecutively calls this for each item in a purchase
+        when(productService.getProductById(any()))
+                .thenReturn(testProducts.get(0))
+                .thenReturn(testProducts.get(1))
+                .thenReturn(testProducts.get(2));
+
     }
 
     /**
@@ -117,6 +122,7 @@ public class PurchaseServiceImplTest {
     @Test
     public void savePurchaseReturnsPurchaseForValidInfo() {
         Purchase expected = testPurchase;
+
         Purchase actual = purchaseServiceImpl.savePurchase(testPurchase);
         assertEquals(expected, actual);
     }
@@ -281,7 +287,7 @@ public class PurchaseServiceImplTest {
     @Test
     public void savePurchaseThrowsErrorIfAllProductActiveStatusIsNull() {
         // arrange
-        testProducts.get(1).setActive(false);
+        testProducts.forEach(product -> product.setActive(null));
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
@@ -289,7 +295,7 @@ public class PurchaseServiceImplTest {
     @Test
     public void savePurchaseThrowsErrorIfOneProductActiveStatusIsNull() {
         // arrange
-        testProducts.get(1).setActive(false);
+        testProducts.get(1).setActive(null);
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
