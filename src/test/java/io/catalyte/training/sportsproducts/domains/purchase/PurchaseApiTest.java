@@ -118,7 +118,6 @@ public class PurchaseApiTest {
         secondPurchase.setBillingAddress(secondEmail);
         purchaseRepository.save(secondPurchase);
         purchaseCounts.replace(emails[0], purchaseCounts.get(emails[0]) + 1);
-            System.out.println("purchaseRepository.findAll() = " + purchaseRepository.findAll());
     }
 
     @Test
@@ -332,7 +331,6 @@ public class PurchaseApiTest {
     public void dataBaseFixtureTest() throws Exception {
         saveTestPurchasesToRepositoryWithDifferentEmails();
         List<Purchase> testPurchases = purchaseRepository.findAll();
-        System.out.println("testPurchases = " + testPurchases);
         assertTrue(testPurchases.size() > 0);
     }
 
