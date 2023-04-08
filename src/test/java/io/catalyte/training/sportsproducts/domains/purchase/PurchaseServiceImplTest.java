@@ -15,6 +15,7 @@ import java.util.*;
 import io.catalyte.training.sportsproducts.domains.product.ProductService;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
+import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataAccessException;
+
+import javax.validation.ConstraintViolationException;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -213,6 +216,8 @@ public class PurchaseServiceImplTest {
         // arrange
         testCreditCard.setExpiration("12/2027");
         testPurchase.setCreditCard(testCreditCard);
+
+        System.out.println("purchaseServiceImpl.savePurchase(testPurchase) = " + purchaseServiceImpl.savePurchase(testPurchase));
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
@@ -271,8 +276,9 @@ public class PurchaseServiceImplTest {
     public void savePurchaseThrowsErrorIfAllProductsAreInactive() {
         // arrange
         testProducts.forEach(product -> product.setActive(false));
+        System.out.println("purchaseServiceImpl.savePurchase(testPurchase) = " + purchaseServiceImpl.savePurchase(testPurchase));
         // act & assert
-        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
 
 
@@ -281,7 +287,7 @@ public class PurchaseServiceImplTest {
         // arrange
         testProducts.get(1).setActive(false);
         // act & assert
-        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
 
     @Test

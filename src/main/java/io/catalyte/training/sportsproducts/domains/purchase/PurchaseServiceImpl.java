@@ -8,10 +8,12 @@ import io.catalyte.training.sportsproducts.exceptions.ServerError;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +77,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public Purchase savePurchase(Purchase newPurchase) {
         CreditCard creditCard = newPurchase.getCreditCard();
         validateCreditCard(creditCard);
+        validateProducts(newPurchase);
         try {
             purchaseRepository.save(newPurchase);
         } catch (DataAccessException e) {
@@ -103,10 +106,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 Product product = productService.getProductById(lineItem.getProduct().getId());
 
                 // set the product info into the lineitem
-                if (product != null && product.getActive() != null && product.getActive()) {
+                if (product != null) {
                     lineItem.setProduct(product);
-                } else {
-                    throw new BadRequest(StringConstants.PRODUCT_INACTIVE);
                 }
 
                 // set the purchase on the line item
@@ -120,8 +121,27 @@ public class PurchaseServiceImpl implements PurchaseService {
                     throw new ServerError(e.getMessage());
                 }
             });
-        } else {
-            throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
+        }
+    }
+
+
+    private void validateProducts(Purchase purchase) {
+        Set<LineItem> lineItemSet = purchase.getProducts();
+
+        List<Product> unprocessable = new ArrayList<>();
+
+        if (lineItemSet == null) throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
+
+        lineItemSet.forEach(lineItem -> {
+            Product product = lineItem.getProduct();
+
+            if (product.getActive() == null || !product.getActive()) {
+                unprocessable.add(product);
+            }
+        });
+
+        if (unprocessable.size() > 0) {
+            throw new UnprocessableContent(StringConstants.PRODUCT_INACTIVE, unprocessable);
         }
     }
 

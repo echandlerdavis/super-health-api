@@ -445,7 +445,7 @@ public class PurchaseApiTest {
                         .content(JsonString)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -464,7 +464,7 @@ public class PurchaseApiTest {
                         .content(JsonString)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -494,6 +494,8 @@ public class PurchaseApiTest {
         testProducts.forEach(product -> product.setActive(null));
         productRepository.saveAll(testProducts);
 
+
+
         // Convert purchase to json string
         String JsonString = mapper.writeValueAsString(testPurchase);
 
@@ -501,7 +503,7 @@ public class PurchaseApiTest {
                         .content(JsonString)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -520,7 +522,7 @@ public class PurchaseApiTest {
                         .content(JsonString)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
 }

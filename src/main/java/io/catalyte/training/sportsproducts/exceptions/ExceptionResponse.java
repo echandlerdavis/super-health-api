@@ -1,6 +1,7 @@
 package io.catalyte.training.sportsproducts.exceptions;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Describes an object to hold error information that the server will return to clients.
@@ -10,6 +11,7 @@ public class ExceptionResponse {
   private Date timestamp;
   private String error;
   private String errorMessage;
+  private List payload;
 
   public ExceptionResponse() {
   }
@@ -18,6 +20,12 @@ public class ExceptionResponse {
     this.error = error;
     this.timestamp = timestamp;
     this.errorMessage = errorMessage;
+  }
+  public ExceptionResponse(String error, Date timestamp, String errorMessage,List payload) {
+    this.error = error;
+    this.timestamp = timestamp;
+    this.errorMessage = errorMessage;
+    this.payload = payload;
   }
 
   public String getError() {
@@ -42,5 +50,13 @@ public class ExceptionResponse {
 
   public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public List getPayload() {
+    return payload;
+  }
+
+  public void setPayload(List payload) {
+    this.payload = payload;
   }
 }

@@ -8,6 +8,7 @@ public class StringConstants {
   public static final String CONFLICT = "409 Conflict";
   public static final String SERVER_ERROR = "500 An unexpected error occurred.";
   public static final String SERVICE_UNAVAILABLE = "503 Service Unavailable";
+  public static final String UNPROCESSABLE_ITEMS = "Unable to process the following Items";
 
   // Error Messages - Credit Card Validation
   public static final String CARD_NOT_PROVIDED = "Credit was not provided";
