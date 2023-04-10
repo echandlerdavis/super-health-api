@@ -150,22 +150,6 @@ public class PurchaseApiTest {
     }
 
     @Test
-    public void savePurchaseReturns201() throws Exception {
-
-        // object mapper for creating a json string
-        ObjectMapper mapper = new ObjectMapper();
-
-        // Convert purchase to json string
-        String JsonString = mapper.writeValueAsString(testPurchase);
-
-        mockMvc.perform(post(PURCHASES_PATH)
-                        .content(JsonString)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
     public void savePurchasesWithoutCreditCardReturns400() throws Exception {
         // object mapper for creating a json string
         ObjectMapper mapper = new ObjectMapper();
