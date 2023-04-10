@@ -217,7 +217,6 @@ public class PurchaseServiceImplTest {
         testCreditCard.setExpiration("12/2027");
         testPurchase.setCreditCard(testCreditCard);
 
-        System.out.println("purchaseServiceImpl.savePurchase(testPurchase) = " + purchaseServiceImpl.savePurchase(testPurchase));
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
@@ -276,7 +275,7 @@ public class PurchaseServiceImplTest {
     public void savePurchaseThrowsErrorIfAllProductsAreInactive() {
         // arrange
         testProducts.forEach(product -> product.setActive(false));
-        System.out.println("purchaseServiceImpl.savePurchase(testPurchase) = " + purchaseServiceImpl.savePurchase(testPurchase));
+
         // act & assert
         assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
@@ -295,7 +294,7 @@ public class PurchaseServiceImplTest {
         // arrange
         testProducts.forEach(product -> product.setActive(null));
         // act & assert
-        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
 
     @Test
@@ -303,7 +302,7 @@ public class PurchaseServiceImplTest {
         // arrange
         testProducts.get(1).setActive(null);
         // act & assert
-        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
 
 }

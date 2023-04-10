@@ -126,20 +126,28 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 
     private void validateProducts(Purchase purchase) {
+        // Get products from each line item
         Set<LineItem> lineItemSet = purchase.getProducts();
 
-        List<Product> unprocessable = new ArrayList<>();
-
+        // If no products throw bad request
         if (lineItemSet == null) throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
 
-        lineItemSet.forEach(lineItem -> {
-            Product product = lineItem.getProduct();
+        // Set list of products that are not able to be processed
+        List<Product> unprocessable = new ArrayList<>();
 
+        // Loop through each lineItem for purchase to get product info
+        lineItemSet.forEach(lineItem -> {
+
+            // retrieve full product information from the database
+            Product product = productService.getProductById(lineItem.getProduct().getId());
+
+            // if product status is not active add the product to list of items unable to be processed
             if (product.getActive() == null || !product.getActive()) {
                 unprocessable.add(product);
             }
         });
 
+        // If unprocessable list has items throw Unprocessable Content error with list of products
         if (unprocessable.size() > 0) {
             throw new UnprocessableContent(StringConstants.PRODUCT_INACTIVE, unprocessable);
         }
