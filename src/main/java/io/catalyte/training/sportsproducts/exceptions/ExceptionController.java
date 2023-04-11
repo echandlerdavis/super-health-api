@@ -3,6 +3,7 @@ package io.catalyte.training.sportsproducts.exceptions;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -60,8 +61,13 @@ public class ExceptionController {
     @ExceptionHandler(BadRequest.class)
     protected ResponseEntity<ExceptionResponse> badRequest(BadRequest exception) {
         ExceptionResponse response = new ExceptionResponse(BAD_REQUEST, new Date(), exception.getMessage());
-
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnprocessableContent.class)
+    protected ResponseEntity<ExceptionResponse> unprocessableContent(UnprocessableContent exception) throws JsonProcessingException {
+        ExceptionResponse response = new ExceptionResponse(UNPROCESSABLE_ITEMS, new Date(),exception.getMessage(), exception.getUnprocessed() );
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     /**

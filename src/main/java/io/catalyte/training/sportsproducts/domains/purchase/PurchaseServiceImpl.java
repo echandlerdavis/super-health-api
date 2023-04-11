@@ -8,10 +8,12 @@ import io.catalyte.training.sportsproducts.exceptions.ServerError;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,8 +75,9 @@ public class PurchaseServiceImpl implements PurchaseService {
      * @return the persisted purchase with ids
      */
     public Purchase savePurchase(Purchase newPurchase) {
-      CreditCard creditCard = newPurchase.getCreditCard();
-      validateCreditCard(creditCard);
+        CreditCard creditCard = newPurchase.getCreditCard();
+        validateCreditCard(creditCard);
+        validateProducts(newPurchase);
         try {
             purchaseRepository.save(newPurchase);
         } catch (DataAccessException e) {
@@ -118,6 +121,35 @@ public class PurchaseServiceImpl implements PurchaseService {
                     throw new ServerError(e.getMessage());
                 }
             });
+        }
+    }
+
+
+    private void validateProducts(Purchase purchase) {
+        // Get products from each line item
+        Set<LineItem> lineItemSet = purchase.getProducts();
+
+        // If no products throw bad request
+        if (lineItemSet == null) throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
+
+        // Set list of products that are not able to be processed
+        List<Product> unprocessable = new ArrayList<>();
+
+        // Loop through each lineItem for purchase to get product info
+        lineItemSet.forEach(lineItem -> {
+
+            // retrieve full product information from the database
+            Product product = productService.getProductById(lineItem.getProduct().getId());
+
+            // if product status is not active add the product to list of items unable to be processed
+            if (product.getActive() == null || !product.getActive()) {
+                unprocessable.add(product);
+            }
+        });
+
+        // If unprocessable list has items throw Unprocessable Content error with list of products
+        if (unprocessable.size() > 0) {
+            throw new UnprocessableContent(StringConstants.PRODUCT_INACTIVE, unprocessable);
         }
     }
 
@@ -179,7 +211,7 @@ public class PurchaseServiceImpl implements PurchaseService {
      *
      * @param creditCard credit card to be validated
      */
-    public void validateCreditCardHolder(CreditCard creditCard) {
+    private void validateCreditCardHolder(CreditCard creditCard) {
         String cardHolder = creditCard.getCardholder();
         if (cardHolder == null || !cardHolder.matches("\\D+")) {
             throw new BadRequest(StringConstants.CARD_HOLDER_INVALID);
@@ -210,18 +242,18 @@ public class PurchaseServiceImpl implements PurchaseService {
         Date expiry;
 
         // Attempt to parse the expiration string in MM/YY format
-        try{
+        try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yy");
             simpleDateFormat.setLenient(false);
             expiry = simpleDateFormat.parse(expiration);
-        } catch (ParseException e){
+        } catch (ParseException e) {
             throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
 
         // Set expired to be true or false if cards expiration date is before the current date
         boolean expired = expiry.before(new Date());
 
-        if(expired){
+        if (expired) {
             throw new BadRequest(StringConstants.CARD_EXPIRED);
         }
     }

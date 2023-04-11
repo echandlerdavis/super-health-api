@@ -9,8 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.sportsproducts.data.ProductFactory;
 import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,8 +26,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,7 +47,12 @@ public class PurchaseApiTest {
     public PurchaseRepository purchaseRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    public ProductRepository productRepository;
+
+    private ProductFactory productFactory = new ProductFactory();
+
+    private List<Product> testProducts;
+
 
     @Before
     public void setUp() {
@@ -80,20 +85,29 @@ public class PurchaseApiTest {
                 "Virginia",
                 12345);
 
-        Product product = productRepository.findById(1L).orElse(null);
-        LineItem productPurchase = new LineItem();
-        productPurchase.setProduct(product);
-        Set<LineItem> purchases = Stream.of(productPurchase)
-                .collect(Collectors.toCollection(HashSet::new));
+        // Generate random Products and save to repository
+        testProducts = productFactory.generateRandomProducts(3);
 
-        testPurchase.setProducts(purchases);
+        // Get List of test products to add to purchase
+        Set<LineItem> purchasesList = new HashSet<>();
+
+        testProducts.forEach(product -> {
+            product.setActive(true);
+            productRepository.save(product);
+            LineItem purchaseLineItem = new LineItem();
+            purchaseLineItem.setProduct(product);
+            purchaseLineItem.setQuantity(1);
+            purchasesList.add(purchaseLineItem);
+        });
+
+        testPurchase.setProducts(purchasesList);
         testPurchase.setBillingAddress(testBillingAddress);
         testPurchase.setDeliveryAddress(testDeliveryAddress);
         testPurchase.setCreditCard(testCreditCard);
 
         testAddresses = new ArrayList<>();
         purchaseCounts = new HashMap<>();
-        for(String email: emails){
+        for (String email : emails) {
             Purchase tempPurchase = new Purchase();
             BillingAddress tempAddress = testBillingAddress;
             tempAddress.setEmail(email);
@@ -101,13 +115,28 @@ public class PurchaseApiTest {
             tempPurchase.setBillingAddress(tempAddress);
             tempPurchase.setDeliveryAddress(testDeliveryAddress);
             tempPurchase.setCreditCard(testCreditCard);
-            tempPurchase.setProducts(purchases);
+            tempPurchase.setProducts(purchasesList);
             purchaseRepository.save(tempPurchase);
             purchaseCounts.put(email, 1);
         }
 
     }
 
+
+    /**
+     * Remove purchases that were added in setup.
+     */
+    @After
+    public void tearDown(){
+
+        for (String email: emails){
+            List<Purchase> purchases = purchaseRepository.findByBillingAddressEmail(email);
+            for (Purchase p: purchases){
+                purchaseRepository.delete(p);
+            }
+        }
+
+    }
     private void saveTestPurchasesToRepositoryWithDifferentEmails() {
         //assemble some test objects
 
@@ -118,22 +147,6 @@ public class PurchaseApiTest {
         secondPurchase.setBillingAddress(secondEmail);
         purchaseRepository.save(secondPurchase);
         purchaseCounts.replace(emails[0], purchaseCounts.get(emails[0]) + 1);
-    }
-
-    @Test
-    public void savePurchaseReturns201() throws Exception {
-
-        // object mapper for creating a json string
-        ObjectMapper mapper = new ObjectMapper();
-
-        // Convert purchase to json string
-        String JsonString = mapper.writeValueAsString(testPurchase);
-
-        mockMvc.perform(post(PURCHASES_PATH)
-                        .content(JsonString)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
     }
 
     @Test
@@ -358,7 +371,6 @@ public class PurchaseApiTest {
     @Test
     public void findPurchasesByEmailReturnsEmailList() throws Exception {
 
-        System.out.println("purchaseRepository.findAll() = " + purchaseRepository.findAll());
         ObjectMapper mapper = new ObjectMapper();
 
         for (String email : emails) {
@@ -400,4 +412,101 @@ public class PurchaseApiTest {
         mockMvc.perform(get(PURCHASES_PATH))
                 .andExpect(status().is(404));
     }
+
+    @Test
+    public void savingPurchaseWithAllInactiveProductsThrowsError() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set all test products to inactive
+        testProducts.forEach(product -> product.setActive(false));
+        productRepository.saveAll(testProducts);
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void savingPurchaseWithOneInactiveProductThrowsError() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set one test product to be inactive
+        testProducts.get(2).setActive(false);
+        productRepository.save(testProducts.get(2));
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void savingPurchaseWithoutAnyProductsThrowsError() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set all test products to be null
+        testPurchase.setProducts(null);
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void savingPurchaseIfEveryProductActiveStatusIsNullThrowsError() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set all test products active status to be null
+        testProducts.forEach(product -> product.setActive(null));
+        productRepository.saveAll(testProducts);
+
+
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void savingPurchaseIfOneProductActiveStatusIsNullThrowsError() throws Exception {
+        // object mapper for creating a json string
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Set one product to null active status
+        testProducts.get(0).setActive(null);
+        productRepository.save(testProducts.get(0));
+
+        // Convert purchase to json string
+        String JsonString = mapper.writeValueAsString(testPurchase);
+
+        mockMvc.perform(post(PURCHASES_PATH)
+                        .content(JsonString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
 }

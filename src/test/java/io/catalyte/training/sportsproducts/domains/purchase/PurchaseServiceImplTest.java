@@ -2,8 +2,7 @@ package io.catalyte.training.sportsproducts.domains.purchase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -12,16 +11,13 @@ import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.catalyte.training.sportsproducts.domains.product.ProductService;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
+import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,13 +26,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataAccessException;
 
+import javax.validation.ConstraintViolationException;
+
 
 @RunWith(MockitoJUnitRunner.class)
 @WebMvcTest(PurchaseServiceImpl.class)
 public class PurchaseServiceImplTest {
 
     @InjectMocks
-    private PurchaseServiceImpl purchaseServiceImpl ;
+    private PurchaseServiceImpl purchaseServiceImpl;
 
     @Mock
     private PurchaseRepository purchaseRepository;
@@ -47,13 +45,9 @@ public class PurchaseServiceImplTest {
     @Mock
     private ProductRepository productRepository;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    private ProductFactory productFactory = new ProductFactory();
 
-
-    Product testProduct;
-
-    ProductFactory productFactory;
+    private List<Product> testProducts;
 
     CreditCard testCreditCard = new CreditCard("1234567890123456", "111", "04/30", "Visa");
 
@@ -69,10 +63,10 @@ public class PurchaseServiceImplTest {
         //Initialize Mocks
         MockitoAnnotations.initMocks(this);
 
-        // Set repository to return a random generated product when called to find by id
+        // Generate list of test products to add to a purchase
         productFactory = new ProductFactory();
-        testProduct = productFactory.createRandomProduct();
-        when(productRepository.findById(anyLong())).thenReturn(Optional.of(testProduct));
+        testProducts = productFactory.generateRandomProducts(3);
+
 
         // Initialize a test purchase instance and list of purchases
         setTestPurchase();
@@ -80,6 +74,12 @@ public class PurchaseServiceImplTest {
 
         // Set repository to return list of test purchases when calling findByBillingAddressEmail
         when(purchaseRepository.findByBillingAddressEmail(anyString())).thenReturn(testPurchases);
+
+        // Set consecutive mock calls for product service since Purchase service consecutively calls this for each item in a purchase
+        when(productService.getProductById(any()))
+                .thenReturn(testProducts.get(0))
+                .thenReturn(testProducts.get(1))
+                .thenReturn(testProducts.get(2));
 
     }
 
@@ -105,23 +105,29 @@ public class PurchaseServiceImplTest {
                 "Virginia",
                 12345);
 
-        Product product = productRepository.findById(1L).orElse(null);
-        LineItem productPurchase = new LineItem();
-        productPurchase.setProduct(product);
-        Set<LineItem> purchases = Stream.of(productPurchase)
-                .collect(Collectors.toCollection(HashSet::new));
+        // Get List of test products to add to purchase
+        Set<LineItem> purchasesList = new HashSet<>();
 
-        testPurchase.setProducts(purchases);
+        testProducts.forEach(product -> {
+            product.setActive(true);
+            LineItem purchaseLineItem = new LineItem();
+            purchaseLineItem.setProduct(product);
+            purchaseLineItem.setQuantity(1);
+            purchasesList.add(purchaseLineItem);
+        });
+
+        testPurchase.setProducts(purchasesList);
         testPurchase.setBillingAddress(testBillingAddress);
         testPurchase.setDeliveryAddress(testDeliveryAddress);
         testPurchase.setCreditCard(testCreditCard);
     }
 
     @Test
-    public void savePurchaseReturnsPurchaseForValidInfo(){
+    public void savePurchaseReturnsPurchaseForValidInfo() {
         Purchase expected = testPurchase;
+
         Purchase actual = purchaseServiceImpl.savePurchase(testPurchase);
-        assertEquals(expected,actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -210,6 +216,7 @@ public class PurchaseServiceImplTest {
         // arrange
         testCreditCard.setExpiration("12/2027");
         testPurchase.setCreditCard(testCreditCard);
+
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
@@ -242,17 +249,60 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
-    public void findByBillingAddressEmailCallsPurchaseService(){
+    public void findByBillingAddressEmailCallsPurchaseService() {
 
         List<Purchase> actual = purchaseServiceImpl.findByBillingAddressEmail(testEmail);
         assertEquals(testPurchases, actual);
     }
 
     @Test(expected = ServerError.class)
-    public void findByBillingAddressEmailCatchesDataAccessException(){
-        doThrow(new DataAccessException("Test exception"){}).when(purchaseRepository).findByBillingAddressEmail(testEmail);
+    public void findByBillingAddressEmailCatchesDataAccessException() {
+        doThrow(new DataAccessException("Test exception") {
+        }).when(purchaseRepository).findByBillingAddressEmail(testEmail);
 
         List<Purchase> actual = purchaseServiceImpl.findByBillingAddressEmail(testEmail);
+    }
+
+    @Test
+    public void savePurchaseThrowsErrorIfProductsAreNull() {
+        // arrange
+        testPurchase.setProducts(null);
+        // act & assert
+        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
+    public void savePurchaseThrowsErrorIfAllProductsAreInactive() {
+        // arrange
+        testProducts.forEach(product -> product.setActive(false));
+
+        // act & assert
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+
+    @Test
+    public void savePurchaseThrowsErrorIfOneProductIsInactive() {
+        // arrange
+        testProducts.get(1).setActive(false);
+        // act & assert
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
+    public void savePurchaseThrowsErrorIfAllProductActiveStatusIsNull() {
+        // arrange
+        testProducts.forEach(product -> product.setActive(null));
+        // act & assert
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
+    public void savePurchaseThrowsErrorIfOneProductActiveStatusIsNull() {
+        // arrange
+        testProducts.get(1).setActive(null);
+        // act & assert
+        assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
 
 }
