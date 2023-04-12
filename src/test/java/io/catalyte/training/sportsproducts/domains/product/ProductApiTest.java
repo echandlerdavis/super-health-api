@@ -27,65 +27,6 @@ public class ProductApiTest {
 
   private MockMvc mockMvc;
 
-  private final String  testProducts =
-          "[{\n" +
-          "\"id\": 1001,\n" +
-          "        \"brand\": null,\n" +
-          "        \"imageSrc\": null,\n" +
-          "        \"material\": null,\n" +
-          "        \"price\": null,\n" +
-          "        \"quantity\": null,\n" +
-          "        \"name\": null,\n" +
-          "        \"description\": null,\n" +
-          "        \"demographic\": \"Kids\",\n" +
-          "        \"category\": \"Casual\",\n" +
-          "        \"type\": \"Short\",\n" +
-          "        \"releaseDate\": null,\n" +
-          "        \"primaryColorCode\": null,\n" +
-          "        \"secondaryColorCode\": null,\n" +
-          "        \"styleNumber\": \"sc97545\",\n" +
-          "        \"globalProductCode\": \"po-7258282\",\n" +
-          "        \"active\": null\n" +
-          "    }," +
-          "    {\n" +
-          "        \"id\": 1002,\n" +
-          "        \"brand\": null,\n" +
-          "        \"imageSrc\": null,\n" +
-          "        \"material\": null,\n" +
-          "        \"price\": null,\n" +
-          "        \"quantity\": null,\n" +
-          "        \"name\": null,\n" +
-          "        \"description\": null,\n" +
-          "        \"demographic\": \"Kids\",\n" +
-          "        \"category\": \"Running\",\n" +
-          "        \"type\": \"Tall\",\n" +
-          "        \"releaseDate\": null,\n" +
-          "        \"primaryColorCode\": null,\n" +
-          "        \"secondaryColorCode\": null,\n" +
-          "        \"styleNumber\": \"sc97545\",\n" +
-          "        \"globalProductCode\": \"po-7258282\",\n" +
-          "        \"active\": null\n" +
-          "    }," +
-          "    {\n" +
-          "        \"id\": 1003,\n" +
-          "        \"brand\": null,\n" +
-          "        \"imageSrc\": null,\n" +
-          "        \"material\": null,\n" +
-          "        \"price\": null,\n" +
-          "        \"quantity\": null,\n" +
-          "        \"name\": null,\n" +
-          "        \"description\": null,\n" +
-          "        \"demographic\": \"Kids\",\n" +
-          "        \"category\": \"Hiking\",\n" +
-          "        \"type\": \"Wide\",\n" +
-          "        \"releaseDate\": null,\n" +
-          "        \"primaryColorCode\": null,\n" +
-          "        \"secondaryColorCode\": null,\n" +
-          "        \"styleNumber\": \"sc97545\",\n" +
-          "        \"globalProductCode\": \"po-7258282\",\n" +
-          "        \"active\": null\n" +
-          "    }]";
-
 
   @Before
   public void setUp() {
@@ -119,25 +60,44 @@ public class ProductApiTest {
   @Test
   public void getDistinctTypesReturnsAllAndOnlyUniqueTypes()throws Exception {
 
-    //POST testProducts to database temporarily
-    mockMvc.perform((post(PRODUCTS_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(testProducts)))
-            .andExpect(status().isCreated());
     //GET categories and check if it is returning each unique type, only once.
     mockMvc.perform(get(PRODUCTS_PATH + "/types"))
-            .andExpect(ResultMatcher.matchAll(jsonPath("$.length()", Matchers.is(3))));
+            .andExpect(ResultMatcher.matchAll(jsonPath("$", Matchers.containsInAnyOrder(
+                "Pant",
+                "Short",
+                "Shoe",
+                "Glove",
+                "Jacket",
+                "Tank Top",
+                "Sock",
+                "Sunglasses",
+                "Hat",
+                "Helmet",
+                "Belt",
+                "Visor",
+                "Shin Guard",
+                "Elbow Pad",
+                "Headband",
+                "Wristband",
+                "Hoodie",
+                "Flip Flop",
+                "Pool Noodle"))));
   }
 
   @Test
   public void getDistinctCategoriesReturnsAllAndOnlyUniqueCategories()throws Exception {
 
-    //POST testProducts to database temporarily
-    mockMvc.perform((post(PRODUCTS_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(testProducts)))
-            .andExpect(status().isCreated());
+
     //GET categories and check if it is returning each unique category, only once.
-    mockMvc.perform(get(PRODUCTS_PATH + "/categories")).andExpect(ResultMatcher.matchAll(jsonPath("$.length()", Matchers.is(3))));
+    mockMvc.perform(get(PRODUCTS_PATH + "/categories")).andExpect(ResultMatcher.matchAll(jsonPath("$", Matchers.containsInAnyOrder("Golf",
+        "Soccer",
+        "Basketball",
+        "Hockey",
+        "Football",
+        "Running",
+        "Baseball",
+        "Skateboarding",
+        "Boxing",
+        "Weightlifting"))));
   }
 }

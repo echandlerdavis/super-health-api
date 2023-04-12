@@ -1,6 +1,7 @@
 package io.catalyte.training.sportsproducts.data;
 
 import io.catalyte.training.sportsproducts.domains.product.Product;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,30 @@ import org.apache.commons.lang3.RandomStringUtils;
  * This class provides tools for random generation of products.
  */
 public class ProductFactory {
+  private static final String[] brands = {
+      "Nike",
+      "Brooks",
+      "Adidas",
+      "Champion",
+      "Hoka",
+      "Lululemon",
+      "Athleta",
+      "New Balance",
+      "Under Armor",
+      "Puma",
+      "Alo"
+  };
 
+  private static final String[] materials = {
+      "Cotton",
+      "Nylon",
+      "Microfiber",
+      "Polyester",
+      "Gore-Tex",
+      "Spandex",
+      "Merino Wool",
+      "Fleece"
+  };
   private static final String[] colors = {
       "#000000", // white
       "#ffffff", // black
@@ -84,14 +108,88 @@ public class ProductFactory {
       "Pool Noodle"
   };
 
+  private static final Random randomGenerator = new Random();
+  /**
+   * Returns a random brand from the list of brands.
+   *
+   * @return - a brand string
+   */
+  public static String getBrand(){
+    return brands[randomGenerator.nextInt(brands.length)];
+  }
+
+  /**
+   * Returns a random material from the list of materials.
+   *
+   * @return - a material string
+   */
+  public static String getMaterial(){
+    return materials[randomGenerator.nextInt(materials.length)];
+  }
+
+  /**
+   * Returns a random double between minimum and maximum parameters to two decimal places.
+   * @param min - a double minimum value
+   * @param max - a double maximum value
+   * @return - a double between minimum and maximum values as the price to two decimal places.
+   */
+  public static Double getPrice(double min, double max){
+    DecimalFormat df = new DecimalFormat("0.00");
+    return Double.valueOf(df.format((randomGenerator.nextDouble() * (max-min)) + min));
+  }
+
+  /**
+   * Returns a random integer below a maximum value
+   *
+   * @param max - a maximum value integer
+   * @return - an integer representing quantity
+   */
+  public static Integer getQuantity(int max){
+    return randomGenerator.nextInt(max);
+  }
   /**
    * Returns a random demographic from the list of demographics.
    *
    * @return - a demographic string
    */
   public static String getDemographic() {
-    Random randomGenerator = new Random();
     return demographics[randomGenerator.nextInt(demographics.length)];
+  }
+
+  /**
+   * Returns a random category from the list of categories.
+   *
+   * @return - a category string
+   */
+  public static String getCategory(){
+    return categories[randomGenerator.nextInt(categories.length)];
+  }
+
+  /**
+   * Returns a random type from the list of types.
+   *
+   * @return - a type string
+   */
+  public static String getType(){
+    return types[randomGenerator.nextInt(types.length)];
+  }
+
+  /**
+   * Returns a random adjective from the list of adjectives.
+   *
+   * @return - an adjective string
+   */
+  public static String getAdjective(){
+    return adjectives[randomGenerator.nextInt(adjectives.length)];
+  }
+
+  /**
+   * Returns a random color code from the list of color codes.
+   *
+   * @return - a color code string
+   */
+  public static String getColorCode(){
+    return colors[randomGenerator.nextInt(colors.length)];
   }
 
   /**
@@ -129,6 +227,16 @@ public class ProductFactory {
     return LocalDate.ofEpochDay(randomDay);
   }
 
+  /**
+   * Generates a random boolean
+   *
+   * @return - a boolean
+   */
+  private static boolean isActive(){
+    Random randomGenerator = new Random();
+    return randomGenerator.nextBoolean();
+  }
+
 
   /**
    * Generates a number of random products based on input.
@@ -154,13 +262,30 @@ public class ProductFactory {
    */
   public Product createRandomProduct() {
     Product product = new Product();
+//    Strings that need to be reused
     String demographic = ProductFactory.getDemographic();
-    product.setCategory("Running");
-    product.setType("Short");
-
+    String category = ProductFactory.getCategory();
+    String type = ProductFactory.getType();
+    String space = " ";
+    String comma = ", ";
+//    Setters
+    product.setBrand(ProductFactory.getBrand());
+    product.setImageSrc("www.myimageurl.com");
+    product.setPrice(ProductFactory.getPrice(1.0, 300.0));
+    product.setQuantity(ProductFactory.getQuantity(100));
+    product.setMaterial(ProductFactory.getMaterial());
     product.setDemographic(demographic);
+    product.setCategory(category);
+    product.setType(type);
+    product.setDescription(category + comma + demographic + comma + ProductFactory.getAdjective());
+    product.setName(ProductFactory.getAdjective() + space + category + space + type);
+    product.setPrimaryColorCode(ProductFactory.getColorCode());
+    product.setSecondaryColorCode(ProductFactory.getColorCode());
     product.setGlobalProductCode(ProductFactory.getRandomProductId());
     product.setStyleNumber(ProductFactory.getStyleCode());
+    product.setReleaseDate(String.valueOf(
+        ProductFactory.between(LocalDate.parse("2000-01-01"), LocalDate.now())));
+    product.setActive(ProductFactory.isActive());
 
     return product;
   }
