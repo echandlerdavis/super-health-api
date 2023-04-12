@@ -1,21 +1,24 @@
 package io.catalyte.training.sportsproducts.domains.purchase;
 
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.sportsproducts.data.ProductFactory;
 import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
-
-import java.util.*;
-
 import io.catalyte.training.sportsproducts.domains.product.ProductService;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
 import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,9 +28,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataAccessException;
-
-import javax.validation.ConstraintViolationException;
-
 
 @RunWith(MockitoJUnitRunner.class)
 @WebMvcTest(PurchaseServiceImpl.class)
@@ -81,6 +81,23 @@ public class PurchaseServiceImplTest {
                 .thenReturn(testProducts.get(1))
                 .thenReturn(testProducts.get(2));
 
+        //Set repository to return a copy of testPurchase with an id when calling save
+        when(purchaseRepository.save(any(Purchase.class))).thenAnswer((p) ->{
+            Purchase copyPurchase = new Purchase();
+            Purchase passedPurchase = p.getArgument(0);
+            copyPurchase.setId(9L);
+            copyPurchase.setCreditCard(passedPurchase.getCreditCard());
+            copyPurchase.setBillingAddress(passedPurchase.getBillingAddress());
+            copyPurchase.setDeliveryAddress(passedPurchase.getDeliveryAddress());
+
+            return copyPurchase;
+        });
+
+        //Set lineItemRepository.save to add product to testPurchased
+        when(lineItemRepository.findByPurchase(any(Purchase.class))).thenAnswer((l) -> {
+            return testPurchase.getProducts();
+        });
+
     }
 
     /**
@@ -123,7 +140,8 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
-    public void savePurchaseReturnsPurchaseForValidInfo() {
+    public void savePurchaseReturnsPurchaseForValidInfo(){
+
         Purchase expected = testPurchase;
 
         Purchase actual = purchaseServiceImpl.savePurchase(testPurchase);
@@ -216,7 +234,6 @@ public class PurchaseServiceImplTest {
         // arrange
         testCreditCard.setExpiration("12/2027");
         testPurchase.setCreditCard(testCreditCard);
-
         // act & assert
         assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
     }
@@ -249,16 +266,15 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
-    public void findByBillingAddressEmailCallsPurchaseService() {
+    public void findByBillingAddressEmailCallsPurchaseService(){
 
         List<Purchase> actual = purchaseServiceImpl.findByBillingAddressEmail(testEmail);
         assertEquals(testPurchases, actual);
     }
 
     @Test(expected = ServerError.class)
-    public void findByBillingAddressEmailCatchesDataAccessException() {
-        doThrow(new DataAccessException("Test exception") {
-        }).when(purchaseRepository).findByBillingAddressEmail(testEmail);
+    public void findByBillingAddressEmailCatchesDataAccessException(){
+        doThrow(new DataAccessException("Test exception"){}).when(purchaseRepository).findByBillingAddressEmail(testEmail);
 
         List<Purchase> actual = purchaseServiceImpl.findByBillingAddressEmail(testEmail);
     }
@@ -303,6 +319,20 @@ public class PurchaseServiceImplTest {
         testProducts.get(1).setActive(null);
         // act & assert
         assertThrows(UnprocessableContent.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test(expected = ServerError.class)
+    public void lineItemRepositoryErrorThrowsServerError(){
+        doThrow(new DataAccessException("Test exception"){}).when(lineItemRepository).save(any(LineItem.class));
+        Purchase savedPurchase = purchaseServiceImpl.savePurchase(testPurchase);
+        fail(); //this should never run
+    }
+
+    @Test(expected = ServerError.class)
+    public void savePurchaseThrowsServerError(){
+        doThrow(new DataAccessException("Test exception"){}).when(purchaseRepository).save(testPurchase);
+        Purchase copy = purchaseServiceImpl.savePurchase(testPurchase);
+        fail(); //this should never run
     }
 
 }
