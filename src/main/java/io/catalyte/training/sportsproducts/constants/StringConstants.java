@@ -11,7 +11,7 @@ public class StringConstants {
   public static final String UNPROCESSABLE_ITEMS = "Unable to process the following Items";
 
   // Error Messages - Credit Card Validation
-  public static final String CARD_NOT_PROVIDED = "Credit was not provided";
+  public static final String CARD_NOT_PROVIDED = "creditCard cannot be null";
   public static final String CARD_NUMBER_INVALID = "Credit card number can not be null and must be 16 digits in length";
   public static final String CARD_CVV_INVALID = "Credit card cvv can not be null and must be 3 digits in length";
   public static final String CARD_HOLDER_INVALID = "Credit card holder can not be null and Can not contain numbers";
