@@ -1,5 +1,4 @@
 package io.catalyte.training.sportsproducts.domains.product;
-
 import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
 import java.util.List;
@@ -61,6 +60,50 @@ public class ProductServiceImpl implements ProductService {
     } else {
       logger.info("Get by id failed, it does not exist in the database: " + id);
       throw new ResourceNotFound("Get by id failed, it does not exist in the database: " + id);
+    }
+  }
+
+  /**
+   *
+   * @return a list of unique Types in the database
+   */
+  public List<String> getDistinctTypes() {
+   try {
+     return productRepository.findDistinctTypes();
+   }
+   catch (DataAccessException e) {
+     logger.error(e.getMessage());
+     throw new ServerError(e.getMessage());
+   }
+  }
+
+  /**
+   *
+   * @return a list of unique Categories in the database
+   */
+    public List<String> getDistinctCategories() {
+      try {
+        return productRepository.findDistinctCategories();
+      }
+      catch (DataAccessException e) {
+        logger.error(e.getMessage());
+        throw new ServerError(e.getMessage());
+      }
+  }
+
+  /**
+   * Adds a product to the database
+   *
+   * @param products - list of product objects
+   * @return list of product objects that are added to database
+   */
+  public List<Product> addProducts(List<Product> products) {
+    try {
+      return productRepository.saveAll(products);
+    }
+    catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServerError(e.getMessage());
     }
   }
 }
