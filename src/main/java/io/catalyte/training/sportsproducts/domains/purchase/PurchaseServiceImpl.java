@@ -5,15 +5,13 @@ import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductService;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
-
+import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,28 +73,37 @@ public class PurchaseServiceImpl implements PurchaseService {
      * @return the persisted purchase with ids
      */
     public Purchase savePurchase(Purchase newPurchase) {
-        CreditCard creditCard = newPurchase.getCreditCard();
-        validateCreditCard(creditCard);
-        validateProducts(newPurchase);
-        try {
-            purchaseRepository.save(newPurchase);
-        } catch (DataAccessException e) {
-            logger.error(e.getMessage());
-            throw new ServerError(e.getMessage());
-        }
+      //credit card validation
+      CreditCard creditCard = newPurchase.getCreditCard();
+      validateCreditCard(creditCard);
+      //product validation
+      validateProducts(newPurchase);
+      //Handle ID received from UI and create savedPurchase
+      newPurchase.setId(null);
+      Purchase savedPurchase;
+      //get the saved purchase
+      try {
+        savedPurchase = purchaseRepository.save(newPurchase);
+      } catch (DataAccessException e) {
+        logger.error(e.getMessage());
+        throw new ServerError(e.getMessage());
+      }
+      //update the id on newPurchase
+      newPurchase.setId(savedPurchase.getId());
 
-        // after the purchase is persisted and has an id, we need to handle its lineitems and persist them as well
-        handleLineItems(newPurchase);
+      // after the purchase is persisted and has an id, we need to handle its lineitems and persist them as well
+      handleLineItems(newPurchase);
+      savedPurchase.setProducts(lineItemRepository.findByPurchase(newPurchase));
 
-        return newPurchase;
-    }
+    return savedPurchase;
+  }
 
     /**
-     * This helper method retrieves product information for each line item and persists it
+     * This helper method retrieves produ  ct information for each line item and persists it
      *
-     * @param purchase - the purchase object to handle lineitems for
+     * @param purchase - the purchase obj  ect to handle lineitems for
      */
-    private void handleLineItems(Purchase purchase) {
+    private void handleLineItems(Purchase   purchase) {
         Set<LineItem> itemsList = purchase.getProducts();
 
         if (itemsList != null) {

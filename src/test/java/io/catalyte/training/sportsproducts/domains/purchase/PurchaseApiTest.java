@@ -2,6 +2,7 @@ package io.catalyte.training.sportsproducts.domains.purchase;
 
 import static io.catalyte.training.sportsproducts.constants.Paths.PURCHASES_PATH;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -12,6 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.sportsproducts.data.ProductFactory;
 import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +31,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -371,6 +376,7 @@ public class PurchaseApiTest {
     @Test
     public void findPurchasesByEmailReturnsEmailList() throws Exception {
 
+        System.out.println("purchaseRepository.findAll() = " + purchaseRepository.findAll());
         ObjectMapper mapper = new ObjectMapper();
 
         for (String email : emails) {
@@ -509,4 +515,26 @@ public class PurchaseApiTest {
                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void postPurchasesReturnsPurchaseObject() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletResponse response =
+            mockMvc.perform(
+                    post(PURCHASES_PATH)
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(testPurchase)))
+                .andReturn().getResponse();
+        System.out.println(response.getContentAsString());
+        Purchase returnedPurchase = mapper.readValue(response.getContentAsString(), Purchase.class);
+
+        assertTrue(twoPurchasesEqualExceptId(testPurchase, returnedPurchase));
+        assertNotNull(returnedPurchase.getId());
+    }
+    public boolean twoPurchasesEqualExceptId(Purchase p1, Purchase p2){
+        if(p1 == null && p2 != null) {return false;}
+        if(p1 != null && p2 == null) {return false;}
+        if(!p1.getDeliveryAddress().equals(p2.getDeliveryAddress())) {return false;}
+        if(!p1.getBillingAddress().equals(p2.getBillingAddress())) {return false;}
+        return p1.getCreditCard().equals(p2.getCreditCard());
+    }
 }

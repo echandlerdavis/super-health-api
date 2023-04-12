@@ -1,5 +1,6 @@
 package io.catalyte.training.sportsproducts.domains.purchase;
 
+import java.util.Objects;
 import javax.persistence.Embeddable;
 
 /**
@@ -82,5 +83,40 @@ public class DeliveryAddress {
 
   public void setDeliveryZip(int deliveryZip) {
     this.deliveryZip = deliveryZip;
+  }
+
+  @Override
+  public String toString() {
+    return "DeliveryAddress{" +
+        "firstName='" + firstName + '\'' +
+        ", lastName='" + lastName + '\'' +
+        ", deliveryStreet='" + deliveryStreet + '\'' +
+        ", deliveryStreet2='" + deliveryStreet2 + '\'' +
+        ", deliveryCity='" + deliveryCity + '\'' +
+        ", deliveryState='" + deliveryState + '\'' +
+        ", deliveryZip=" + deliveryZip +
+        '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof DeliveryAddress)) {
+      return false;
+    }
+    DeliveryAddress that = (DeliveryAddress) o;
+    return deliveryZip == that.deliveryZip && Objects.equals(firstName, that.firstName)
+        && Objects.equals(lastName, that.lastName) && Objects.equals(
+        deliveryStreet, that.deliveryStreet) && Objects.equals(deliveryStreet2,
+        that.deliveryStreet2) && Objects.equals(deliveryCity, that.deliveryCity)
+        && Objects.equals(deliveryState, that.deliveryState);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(firstName, lastName, deliveryStreet, deliveryStreet2, deliveryCity,
+        deliveryState, deliveryZip);
   }
 }
