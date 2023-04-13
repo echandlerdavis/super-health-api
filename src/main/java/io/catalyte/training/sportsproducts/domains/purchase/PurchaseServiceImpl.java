@@ -137,7 +137,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         Set<LineItem> lineItemSet = purchase.getProducts();
 
         // If no products throw bad request
-        if (lineItemSet == null) throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
+        if (lineItemSet == null || lineItemSet.size() ==0 ) throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
 
         // Set list of products that are not able to be processed
         List<Product> unprocessable = new ArrayList<>();
