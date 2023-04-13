@@ -288,6 +288,15 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
+    public void savePurchaseThrowsErrorIfProductsIsAnEmptyObject() {
+        Set<LineItem> products = new HashSet<>();
+        // arrange
+        testPurchase.setProducts(products);
+        // act & assert
+        assertThrows(BadRequest.class, () -> purchaseServiceImpl.savePurchase(testPurchase));
+    }
+
+    @Test
     public void savePurchaseThrowsErrorIfAllProductsAreInactive() {
         // arrange
         testProducts.forEach(product -> product.setActive(false));
