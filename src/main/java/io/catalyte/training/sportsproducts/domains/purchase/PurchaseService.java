@@ -8,4 +8,6 @@ public interface PurchaseService {
 
   List<Purchase> findAllPurchases();
 
+  List<Purchase> findByBillingAddressEmail(String email);
+
 }
