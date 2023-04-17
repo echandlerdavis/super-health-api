@@ -27,6 +27,11 @@ public class ProductController {
   @Autowired
   private ProductService productService;
 
+  /**
+   * Handles a GET request to /products - returns all products in the database.
+   * @param product - optional product example to be passed
+   * @return all products in the database.
+   */
   @GetMapping
   public ResponseEntity<List<Product>> getProducts(Product product) {
     logger.info("Request received for getProducts");
@@ -35,8 +40,10 @@ public class ProductController {
   }
 
   /**
-   * GET request - returns a single product based on an id defined in the path variable
-   * */
+   * Handles a GET request to /products/{id}- returns a single product based on an id defined in the path variable
+   * @param - path variable id
+   * @return a single product from the product's id.
+   */
   @GetMapping(value = "/{id}")
   @ResponseStatus(value = HttpStatus.OK)
   public ResponseEntity<Product> getProductById(@PathVariable Long id) {
@@ -47,7 +54,8 @@ public class ProductController {
 
   /**
    *
-   * GET request - returns all unique values of type
+   * Handles a GET request to /types- returns all unique values of type
+   * @return unique type values
    */
   @GetMapping(value = "/types")
   @ResponseStatus(value = HttpStatus.OK)
@@ -60,7 +68,8 @@ public class ProductController {
 
   /**
    *
-   * GET request - returns all unique values of category
+   * Handles a GET request to /categories- returns all unique values of category
+   * @return unique category values
    */
   @GetMapping(value = "/categories")
   @ResponseStatus(value = HttpStatus.OK)
