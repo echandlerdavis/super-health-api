@@ -1,18 +1,14 @@
 package io.catalyte.training.sportsproducts.domains.product;
 import static io.catalyte.training.sportsproducts.constants.Paths.PRODUCTS_PATH;
+
+import java.util.HashMap;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -22,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping(value = PRODUCTS_PATH)
 public class ProductController {
 
-  Logger logger = LogManager.getLogger(ProductController.class);
+    Logger logger = LogManager.getLogger(ProductController.class);
 
-  @Autowired
-  private ProductService productService;
+    @Autowired
+    private ProductService productService;
 
   /**
    * Handles a GET request to /products - returns all products in the database.
@@ -36,8 +32,8 @@ public class ProductController {
   public ResponseEntity<List<Product>> getProducts(Product product) {
     logger.info("Request received for getProducts");
 
-    return new ResponseEntity<>(productService.getProducts(product), HttpStatus.OK);
-  }
+        return new ResponseEntity<>(productService.getProducts(product), HttpStatus.OK);
+    }
 
   /**
    * Handles a GET request to /products/{id}- returns a single product based on an id defined in the path variable
@@ -89,6 +85,22 @@ public class ProductController {
   public ResponseEntity<List> postProduct(@RequestBody List<Product> products){
     productService.addProducts(products);
     return new ResponseEntity<>(productService.addProducts(products), HttpStatus.CREATED);
+  }
+
+  /**
+   *
+   * Handles a GET request to /products/filters. This retrieves all products in the database with applied query.
+   * Methods have been implemented to handle the following query params: brand, category, priceMin, priceMax, material, primaryColor, and demographic
+   * For multiple values passed into a query param the URL-Encoded character for |, "%7C" should be placed in between in url request
+   * Example: '/filter?priceMin=0&priceMax=50&brand=nike%7Cchampion' requests to filter by brands Nike or Champion and price between 0 and 50
+   * @param filters - the filters to be read from the request parameters
+   * @return product(s) found matching the given filters
+   */
+  @GetMapping(value = "/filter")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<List> getProductsByFilters(@RequestParam HashMap<String, String> filters){
+    logger.info("Request received for getProductsByFilters: " + filters.toString());
+    return new ResponseEntity<>(productService.getProductsByFilters(filters), HttpStatus.OK);
   }
 
 }
