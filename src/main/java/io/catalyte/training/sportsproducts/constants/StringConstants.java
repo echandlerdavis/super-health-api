@@ -22,6 +22,8 @@ public class StringConstants {
   public static final String PRODUCT_INACTIVE = "Product(s) must be active in order to be purchased";
   public static final String PURCHASE_HAS_NO_PRODUCTS = "Purchase must have products";
 
+  // Error Messages - Filters
+  public static final String UNIMPLEMENTED_FILTERS = "Filters not implemented: ";
 
   // Google Client ID
   public static final String GOOGLE_CLIENT_ID = "912899852587-7996nh9mlpvpa2446q0il4f9hj5o492h.apps.googleusercontent.com";
