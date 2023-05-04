@@ -1,5 +1,6 @@
 package io.catalyte.training.sportsproducts.domains.user;
 
+import java.util.Date;
 import javax.persistence.*;
 
 /**
@@ -16,6 +17,8 @@ public class User {
   String role;
   String firstName;
   String lastName;
+
+  Date lastActive;
 
   public User() {}
 
@@ -73,6 +76,14 @@ public class User {
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
+  public Date getLastActive() {
+    return lastActive;
+  }
+
+  public void setLastActive(Date lastActive) {
+    this.lastActive = lastActive;
+  }
+
 
   @Override
   public String toString() {

@@ -1,6 +1,9 @@
 package io.catalyte.training.sportsproducts.domains.user;
 
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.UPDATE_LAST_ACTIVE;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.UPDATE_USER_REQUEST;
 import static io.catalyte.training.sportsproducts.constants.Paths.USERS_PATH;
+import static io.catalyte.training.sportsproducts.constants.StringConstants.AUTHORIZATION_HEADER;
 
 import org.apache.logging.log4j.*;
 import org.springframework.beans.factory.annotation.*;
@@ -53,10 +56,24 @@ public class UserController {
   public ResponseEntity<User> updateUser(
       @PathVariable Long id,
       @RequestBody User user,
-      @RequestHeader("Authorization") String bearerToken
+      @RequestHeader(AUTHORIZATION_HEADER) String bearerToken
   ) {
-    logger.info("Request received for updateUser");
+    logger.info(UPDATE_USER_REQUEST);
     return new ResponseEntity<>(userService.updateUser(bearerToken, id, user), HttpStatus.OK);
+  }
+  @PutMapping(path = "/{id}/updateLastActive")
+  public ResponseEntity<Boolean> updateLastActive(
+      @PathVariable Long id,
+      @RequestHeader(AUTHORIZATION_HEADER) String bearerToken,
+      @RequestBody User user
+  ) {
+    logger.info(UPDATE_LAST_ACTIVE);
+    User savedUser = userService.updateLastActive(bearerToken, id, user);
+    if (savedUser != null) {
+      return new ResponseEntity<>(Boolean.TRUE ,HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(Boolean.FALSE, HttpStatus.OK);
   }
 
   /**

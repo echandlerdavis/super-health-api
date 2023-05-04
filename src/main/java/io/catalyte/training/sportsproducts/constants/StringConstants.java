@@ -27,4 +27,7 @@ public class StringConstants {
 
   // Google Client ID
   public static final String GOOGLE_CLIENT_ID = "912899852587-7996nh9mlpvpa2446q0il4f9hj5o492h.apps.googleusercontent.com";
+
+  //Header key for google authorization
+  public static final String AUTHORIZATION_HEADER = "Authorization";
 }
