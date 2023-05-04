@@ -1,10 +1,19 @@
 package io.catalyte.training.sportsproducts.domains.user;
 
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.EMAIL_NULL;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.EMAIL_TAKEN;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.GOOGLE_AUTHENTICATION_FAILURE;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.NO_EXISTING_USER_FORMAT;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.NO_USER_WITH_EMAIL_FORMAT;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.UPDATED_LAST_ACTIVE_FORMAT;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.UPDATED_USER_FORMAT;
 import static io.catalyte.training.sportsproducts.constants.Roles.CUSTOMER;
 
 import io.catalyte.training.sportsproducts.auth.GoogleAuthService;
 import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
+import io.catalyte.training.sportsproducts.constants.LoggingConstants;
+import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class UserServiceImpl implements UserService {
 
-  private final Logger logger = LogManager.getLogger(UserController.class);
+  private final Logger logger = LogManager.getLogger(UserServiceImpl.class);
   private final UserRepository userRepository;
   private final GoogleAuthService googleAuthService;
 
@@ -46,9 +55,9 @@ public class UserServiceImpl implements UserService {
     boolean isAuthenticated = googleAuthService.authenticateUser(bearerToken, updatedUser);
 
     if (!isAuthenticated) {
-      logger.error("Email in the request body does not match email from JWT");
+      logger.error(GOOGLE_AUTHENTICATION_FAILURE);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          "Email in the request body does not match email from JWT Token");
+          GOOGLE_AUTHENTICATION_FAILURE);
     }
 
     // UPDATES USER
@@ -62,8 +71,8 @@ public class UserServiceImpl implements UserService {
     }
 
     if (existingUser == null) {
-      logger.error("User with id: " + id + " does not exist");
-      throw new ResourceNotFound("User with id: " + id + " does not exist");
+      logger.error(String.format(NO_EXISTING_USER_FORMAT, id));
+      throw new ResourceNotFound(String.format(NO_EXISTING_USER_FORMAT, id));
     }
 
     // TEMPORARY LOGIC TO PREVENT USER FROM UPDATING THEIR ROLE
@@ -75,13 +84,20 @@ public class UserServiceImpl implements UserService {
     }
 
     try {
-      logger.info("Saved user to");
+      logger.info(String.format(UPDATED_USER_FORMAT, updatedUser.id));
       return userRepository.save(updatedUser);
     } catch (DataAccessException dae) {
       logger.error(dae.getMessage());
       throw new ServerError(dae.getMessage());
     }
 
+  }
+
+  @Override
+  public User updateLastActive(String bearerToken, Long id, User user){
+    logger.info(String.format(UPDATED_LAST_ACTIVE_FORMAT, id));
+    user.setLastActive(new Date());
+    return updateUser(bearerToken, id, user );
   }
 
   /**
@@ -97,8 +113,8 @@ public class UserServiceImpl implements UserService {
 
     // CHECK TO MAKE SURE EMAIL EXISTS ON INCOMING USER
     if (email == null) {
-      logger.error("User must have an email field");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User must have an email field");
+      logger.error(EMAIL_NULL);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, EMAIL_NULL);
     }
 
     // CHECK TO MAKE SURE USER EMAIL IS NOT TAKEN
@@ -112,8 +128,8 @@ public class UserServiceImpl implements UserService {
     }
 
     if (existingUser != null) {
-      logger.error("Email is taken");
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is taken");
+      logger.error(EMAIL_TAKEN);
+      throw new ResponseStatusException(HttpStatus.CONFLICT, EMAIL_TAKEN);
     }
 
     // SET DEFAULT ROLE TO CUSTOMER
@@ -122,9 +138,14 @@ public class UserServiceImpl implements UserService {
     user.setRole(CUSTOMER);
     // }
 
+    // Set lastActive
+    if (user.getLastActive() == null){
+      user.setLastActive(new Date());
+    }
+
     // SAVE USER
     try {
-      logger.info("Saved user");
+      logger.info(LoggingConstants.SAVED_USER);
       return userRepository.save(user);
     } catch (DataAccessException dae) {
       logger.error(dae.getMessage());
@@ -152,7 +173,7 @@ public class UserServiceImpl implements UserService {
     }
 
     if (user == null) {
-      throw new ResourceNotFound("User with email " + email + " does not exist.");
+      throw new ResourceNotFound(String.format(NO_USER_WITH_EMAIL_FORMAT, email));
     }
 
     return user;
