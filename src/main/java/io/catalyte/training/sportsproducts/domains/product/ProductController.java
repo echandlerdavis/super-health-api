@@ -76,15 +76,75 @@ public class ProductController {
 
   /**
    *
+   * Handles a GET request to /categories- returns all unique values of category
+   * @return unique category values
+   */
+  @GetMapping(value = "/brands")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<List> getDistinctBrands(){
+    logger.info("Request received for getDistinctBrands");
+    return new ResponseEntity<>(productService.getDistinctBrands(), HttpStatus.OK);
+  }
+
+  /**
+   *
+   * Handles a GET request to /categories- returns all unique values of category
+   * @return unique category values
+   */
+  @GetMapping(value = "/materials")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<List> getDistinctMaterials(){
+    logger.info("Request received for getDistinctMaterials");
+    return new ResponseEntity<>(productService.getDistinctMaterials(), HttpStatus.OK);
+  }
+
+  /**
+   *
+   * Handles a GET request to /demographics- returns all unique values of category
+   * @return unique category values
+   */
+  @GetMapping(value = "/demographics")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<List> getDistinctDemographics(){
+    logger.info("Request received for getDistinctDemographics");
+    return new ResponseEntity<>(productService.getDistinctDemographics(), HttpStatus.OK);
+  }
+
+  /**
+   *
+   * Handles a GET request to /primarycolors- returns all unique values of category
+   * @return unique category values
+   */
+  @GetMapping(value = "/primarycolors")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<List> getDistinctPrimaryColors(){
+    logger.info("Request received for getDistinctPrimaryColors");
+    return new ResponseEntity<>(productService.getDistinctPrimaryColors(), HttpStatus.OK);
+  }
+
+  /**
+   *
+   * Handles a GET request to /secondarycolors- returns all unique values of category
+   * @return unique category values
+   */
+  @GetMapping(value = "/secondarycolors")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<List> getDistinctSecondaryColors(){
+    logger.info("Request received for getDistinctSecondaryColors");
+    return new ResponseEntity<>(productService.getDistinctSecondaryColors(), HttpStatus.OK);
+  }
+
+  /**
+   *
    * Handles a POST request to /products. This creates a new product object that gets saved to the database.
-   * @param products - list of product object(s)
+   * @param product - product object
    * @return product(s) added to database
    */
   @PostMapping
   @ResponseStatus(value = HttpStatus.OK)
-  public ResponseEntity<List> postProduct(@RequestBody List<Product> products){
-    productService.addProducts(products);
-    return new ResponseEntity<>(productService.addProducts(products), HttpStatus.CREATED);
+  public ResponseEntity<Product> postProduct(@RequestBody Product product){
+    logger.info("Request recieved for postProduct");
+    return new ResponseEntity<>(productService.saveProduct(product), HttpStatus.CREATED);
   }
 
   /**
@@ -102,5 +162,4 @@ public class ProductController {
     logger.info("Request received for getProductsByFilters: " + filters.toString());
     return new ResponseEntity<>(productService.getProductsByFilters(filters), HttpStatus.OK);
   }
-
 }
