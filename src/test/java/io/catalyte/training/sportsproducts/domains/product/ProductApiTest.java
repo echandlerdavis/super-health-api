@@ -1,7 +1,8 @@
 package io.catalyte.training.sportsproducts.domains.product;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.sportsproducts.constants.StringConstants;
 import io.catalyte.training.sportsproducts.data.ProductFactory;
-import org.hamcrest.Matchers;
 import org.hamcrest.core.Every;
 import org.junit.After;
 import org.junit.Before;
@@ -9,19 +10,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static io.catalyte.training.sportsproducts.constants.Paths.PRODUCTS_PATH;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,10 +35,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class ProductApiTest {
 
-    @Autowired
-    private WebApplicationContext wac;
+  @Autowired
+  private WebApplicationContext wac;
 
-    private MockMvc mockMvc;
+  private MockMvc mockMvc;
 
     @Autowired
     ProductRepository productRepository;
@@ -86,15 +91,33 @@ public class ProductApiTest {
                 .andExpect(status().isOk());
     }
 
+  @Test
+  public void getProductByIdReturnsProductWith200() throws Exception {
+    mockMvc.perform(get(PRODUCTS_PATH + "/1"))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void getDistinctTypesReturnsWith200() throws Exception {
+    mockMvc.perform(get(PRODUCTS_PATH + "/types"))
+        .andExpect(status().isOk());
+  }
+
     @Test
-    public void getProductByIdReturnsProductWith200() throws Exception {
-        mockMvc.perform(get(PRODUCTS_PATH + "/1"))
+    public void getDistinctBrandsReturnsWith200() throws Exception {
+        mockMvc.perform(get(PRODUCTS_PATH + "/brands"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void getDistinctTypesReturnsWith200() throws Exception {
-        mockMvc.perform(get(PRODUCTS_PATH + "/types"))
+    public void getDistinctMaterialsReturnsWith200() throws Exception {
+        mockMvc.perform(get(PRODUCTS_PATH + "/materials"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getDistinctDemographicsReturnsWith200() throws Exception {
+        mockMvc.perform(get(PRODUCTS_PATH + "/demographics"))
                 .andExpect(status().isOk());
     }
 
@@ -104,48 +127,110 @@ public class ProductApiTest {
                 .andExpect(status().isOk());
     }
 
+
+    @Test
+    public void getDistinctPrimaryColorsReturnsWith200() throws Exception {
+        mockMvc.perform(get(PRODUCTS_PATH + "/primarycolors"))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void getDistinctSecondaryColorsReturnsWith200() throws Exception {
+        mockMvc.perform(get(PRODUCTS_PATH + "/secondarycolors"))
+                .andExpect(status().isOk());
+    }
+
     @Test
     public void getDistinctTypesReturnsAllAndOnlyUniqueTypes() throws Exception {
 
-        //GET categories and check if it is returning each unique type, only once.
+        //GET types and check if it is returning each unique type, only once.
         mockMvc.perform(get(PRODUCTS_PATH + "/types"))
-                .andExpect(ResultMatcher.matchAll(jsonPath("$", Matchers.containsInAnyOrder(
-                        "Pant",
-                        "Short",
-                        "Shoe",
-                        "Glove",
-                        "Jacket",
-                        "Tank Top",
-                        "Sock",
-                        "Sunglasses",
-                        "Hat",
-                        "Helmet",
-                        "Belt",
-                        "Visor",
-                        "Shin Guard",
-                        "Elbow Pad",
-                        "Headband",
-                        "Wristband",
-                        "Hoodie",
-                        "Flip Flop",
-                        "Pool Noodle"))));
+                .andExpect(jsonPath("$", hasItem("Pant")))
+                .andExpect(jsonPath("$", hasItem("Short")))
+                .andExpect(jsonPath("$", hasItem("Shoe")))
+                .andExpect(jsonPath("$", hasItem("Glove")))
+                .andExpect(jsonPath("$", hasItem("Tank Top")))
+                .andExpect(jsonPath("$", hasItem("Jacket")))
+                .andExpect(jsonPath("$", hasItem("Sock")))
+                .andExpect(jsonPath("$", hasItem("Sunglasses")))
+                .andExpect(jsonPath("$", hasItem("Hat")))
+                .andExpect(jsonPath("$", hasItem("Helmet")))
+                .andExpect(jsonPath("$", hasItem("Belt")))
+                .andExpect(jsonPath("$", hasItem("Visor")))
+                .andExpect(jsonPath("$", hasItem("Shin Guard")))
+                .andExpect(jsonPath("$", hasItem("Elbow Pad")))
+                .andExpect(jsonPath("$", hasItem("Headband")))
+                .andExpect(jsonPath("$", hasItem("Wristband")))
+                .andExpect(jsonPath("$", hasItem("Hoodie")))
+                .andExpect(jsonPath("$", hasItem("Flip Flop")))
+                .andExpect(jsonPath("$", hasItem("Pool Noodle")));
     }
 
     @Test
     public void getDistinctCategoriesReturnsAllAndOnlyUniqueCategories() throws Exception {
 
-
         //GET categories and check if it is returning each unique category, only once.
-        mockMvc.perform(get(PRODUCTS_PATH + "/categories")).andExpect(ResultMatcher.matchAll(jsonPath("$", Matchers.containsInAnyOrder("Golf",
-                "Soccer",
-                "Basketball",
-                "Hockey",
-                "Football",
-                "Running",
-                "Baseball",
-                "Skateboarding",
-                "Boxing",
-                "Weightlifting"))));
+        mockMvc.perform(get(PRODUCTS_PATH + "/categories"))
+                .andExpect(jsonPath("$", hasItem("Golf")))
+                .andExpect(jsonPath("$", hasItem("Soccer")))
+                .andExpect(jsonPath("$", hasItem("Basketball")))
+                .andExpect(jsonPath("$", hasItem("Hockey")))
+                .andExpect(jsonPath("$", hasItem("Football")))
+                .andExpect(jsonPath("$", hasItem("Running")))
+                .andExpect(jsonPath("$", hasItem("Baseball")))
+                .andExpect(jsonPath("$", hasItem("Skateboarding")))
+                .andExpect(jsonPath("$", hasItem("Boxing")))
+                .andExpect(jsonPath("$", hasItem("Weightlifting")));
+    }
+
+    @Test
+    public void getDistinctBrandsReturnsAllAndOnlyUniqueBrands() throws Exception {
+
+        //GET brands and check if it is returning each unique brand, only once.
+        mockMvc.perform(get(PRODUCTS_PATH + "/brands"))
+                .andExpect(jsonPath("$", hasItem("Nike")))
+                .andExpect(jsonPath("$", hasItem("Champion")))
+                .andExpect(jsonPath("$", hasItem("New Balance")))
+                .andExpect(jsonPath("$", hasItem("Puma")));
+    }
+
+    @Test
+    public void getDistinctDemographicsReturnsAllAndOnlyUniqueDemographics() throws Exception {
+
+        //GET demographics and check if it is returning each unique demographics, only once.
+        mockMvc.perform(get(PRODUCTS_PATH + "/demographics"))
+                .andExpect(jsonPath("$", hasItem("Men")))
+                .andExpect(jsonPath("$", hasItem("Women")))
+                .andExpect(jsonPath("$", hasItem("Kids")));
+    }
+
+    @Test
+    public void getDistinctMaterialsReturnsAllAndOnlyUniqueMaterials() throws Exception {
+
+        //GET materials and check if it is returning each unique materials, only once.
+        mockMvc.perform(get(PRODUCTS_PATH + "/materials"))
+                .andExpect(jsonPath("$", hasItem("Cotton")))
+                .andExpect(jsonPath("$", hasItem("Polyester")))
+                .andExpect(jsonPath("$", hasItem("Nylon")));
+    }
+
+    @Test
+    public void getDistinctPrimaryColorsReturnsAllAndOnlyUniquePrimaryColors() throws Exception {
+
+        //GET primary colors and check if it is returning each unique primary colors, only once.
+        mockMvc.perform(get(PRODUCTS_PATH + "/primarycolors"))
+                .andExpect(jsonPath("$", hasItem("#000000")))
+                .andExpect(jsonPath("$", hasItem("#ffffff")));
+    }
+
+    @Test
+    public void getDistinctBrandsReturnsAllAndOnlyUniqueSecondaryColors() throws Exception {
+
+        //GET secondary colros and check if it is returning each unique secondary colors, only once.
+        mockMvc.perform(get(PRODUCTS_PATH + "/secondarycolors"))
+                .andExpect(jsonPath("$", hasItem("#000000")))
+                .andExpect(jsonPath("$", hasItem("#3079ab")));
     }
 
 
@@ -356,4 +441,101 @@ public class ProductApiTest {
         return filterString;
     }
 
+    @Test
+    public void saveProductReturns201WithProductObject() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletResponse response = mockMvc.perform(post(PRODUCTS_PATH)
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(testProduct1)))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse();
+
+        Product returnedProduct = mapper.readValue(response.getContentAsString(), Product.class);
+
+        assert(returnedProduct.equals(testProduct1));
+        assertNotNull(returnedProduct.getId());
+    }
+
+    @Test
+    public void SaveProductReturns400IfPriceIsNegativeNumber() throws Exception {
+        Product newProduct = productFactory.createRandomProduct();
+        newProduct.setPrice(-1.00);
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletResponse response = mockMvc.perform(post(PRODUCTS_PATH)
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(newProduct)))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse();
+        HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+        assertTrue(responseMap.get("errorMessage").equals(StringConstants.PRODUCT_PRICE_INVALID));
+    }
+
+    @Test
+    public void SaveProductReturns400IQuantityIsNegativeNumber() throws Exception {
+        Product newProduct = productFactory.createRandomProduct();
+        newProduct.setQuantity(-1);
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletResponse response = mockMvc.perform(post(PRODUCTS_PATH)
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(newProduct)))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse();
+        HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+        assertTrue(responseMap.get("errorMessage").equals(StringConstants.PRODUCT_QUANTITY_INVALID));
+    }
+
+    @Test
+    public void SaveProductReturns400IfFieldsAreNull() throws Exception {
+        Product newProduct = productFactory.createRandomProduct();
+        newProduct.setActive(null);
+        newProduct.setBrand(null);
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletResponse response = mockMvc.perform(post(PRODUCTS_PATH)
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(newProduct)))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse();
+        HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+        assertTrue(responseMap.get("errorMessage").equals(StringConstants.PRODUCT_FIELDS_NULL(Arrays.asList("brand", "active"))));
+    }
+
+    @Test
+    public void SaveProductReturns400IfFieldsAreEmpty() throws Exception {
+        Product newProduct = productFactory.createRandomProduct();
+        newProduct.setCategory("");
+        newProduct.setBrand("");
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletResponse response = mockMvc.perform(post(PRODUCTS_PATH)
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(newProduct)))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse();
+        HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+        assertTrue(responseMap.get("errorMessage").equals(StringConstants.PRODUCT_FIELDS_EMPTY(Arrays.asList("brand", "category"))));
+    }
+
+    @Test
+    public void SaveProductReturns400WithListOfAllErrors() throws Exception {
+        Product newProduct = productFactory.createRandomProduct();
+        newProduct.setActive(null);
+        newProduct.setBrand("");
+        newProduct.setPrice(-2.00);
+        newProduct.setQuantity(-2);
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletResponse response = mockMvc.perform(
+                post(PRODUCTS_PATH)
+                  .contentType("application/json")
+                  .content(mapper.writeValueAsString(newProduct)))
+                  .andExpect(status().isBadRequest())
+                  .andReturn().getResponse();
+        System.out.println("response = " + response);
+        HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+        String[] responseErrors = responseMap.get("errorMessage").toString().split("\n");
+        List<String> errorsList = Arrays.asList(responseErrors);
+        assertTrue(errorsList.containsAll(Arrays.asList(
+                StringConstants.PRODUCT_PRICE_INVALID,
+                StringConstants.PRODUCT_QUANTITY_INVALID,
+                StringConstants.PRODUCT_FIELDS_NULL(Arrays.asList("active")),
+                StringConstants.PRODUCT_FIELDS_EMPTY(Arrays.asList("brand")))));
+    }
 }

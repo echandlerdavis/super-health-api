@@ -1,5 +1,6 @@
 package io.catalyte.training.sportsproducts.domains.product;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.sportsproducts.constants.StringConstants;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
 import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
@@ -11,10 +12,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 
 import static io.catalyte.training.sportsproducts.domains.product.ProductFilterTypes.*;
 
@@ -98,6 +97,66 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
+     * @return a list of unique Brands in the database
+     */
+    public List<String> getDistinctBrands() {
+        try {
+            return productRepository.findDistinctBrands();
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+    }
+
+    /**
+     * @return a list of unique Materials in the database
+     */
+    public List<String> getDistinctMaterials() {
+        try {
+            return productRepository.findDistinctMaterials();
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+    }
+
+    /**
+     * @return a list of unique Demographics in the database
+     */
+    public List<String> getDistinctDemographics() {
+        try {
+            return productRepository.findDistinctDemographics();
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+    }
+
+    /**
+     * @return a list of unique Primary Colors in the database
+     */
+    public List<String> getDistinctPrimaryColors() {
+        try {
+            return productRepository.findDistinctPrimaryColors();
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+    }
+
+    /**
+     * @return a list of unique Primary Colors in the database
+     */
+    public List<String> getDistinctSecondaryColors() {
+        try {
+            return productRepository.findDistinctSecondaryColors();
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+    }
+
+    /**
      * Adds a product to the database
      *
      * @param products - list of product objects
@@ -110,6 +169,124 @@ public class ProductServiceImpl implements ProductService {
             logger.error(e.getMessage());
             throw new ServerError(e.getMessage());
         }
+    }
+
+    /**
+     * Adds a product to the database
+     *
+     * @param product - product object
+     * @return list of product objects that are added to database
+     */
+    public Product saveProduct(Product product) {
+        List<String> productErrors = getProductErrors(product);
+
+        if (!productErrors.isEmpty()){
+            throw new BadRequest(String.join("\n", productErrors));
+        }
+
+        try {
+            return productRepository.save(product);
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+    }
+
+    /**
+     * Helper method that reads a product and validateds it's properties
+     * @param product product to be validated
+     * @return a list of errrors
+     */
+    public List<String> getProductErrors(Product product) {
+        List<String> errors = new ArrayList<>();
+        Boolean priceIsValid = validateProductPrice(product);
+        List<String> emptyFields = getFieldsEmptyOrNull(product).get("emptyFields");
+        List<String> nullFields = getFieldsEmptyOrNull(product).get("nullFields");
+        Boolean quantityIsValid = validateProductQuantity(product);
+
+        if (!nullFields.isEmpty()) {
+            errors.add(StringConstants.PRODUCT_FIELDS_NULL(nullFields));
+        }
+
+        if (!emptyFields.isEmpty()) {
+            errors.add(StringConstants.PRODUCT_FIELDS_EMPTY(emptyFields));
+        }
+
+        if (!priceIsValid) {
+            errors.add(StringConstants.PRODUCT_PRICE_INVALID);
+        }
+
+        if (!quantityIsValid) {
+            errors.add(StringConstants.PRODUCT_QUANTITY_INVALID);
+        }
+
+        return errors;
+    }
+
+    /**
+     * Checks price is a double value greater than zero
+     * and does not have more than 2 digits after the decimal
+     *
+     * Because price is stored as a double, regardless of input the product will always have 1 digit after the decimal
+     * even if input as an integer, or with 2 zeros after decimal
+     *
+     * @param product product to be validated
+     * @return boolean if product price is valid
+     */
+    public Boolean validateProductPrice(Product product) {
+        if (product.getPrice() != null) {
+        //Split price by the decimal
+        String[] priceString = String.valueOf(product.getPrice()).split("\\.");
+        Boolean priceMoreThan2Decimals = priceString[1].length() > 2;
+        Boolean priceLessThanZero = product.getPrice() > 0;
+        return priceLessThanZero || priceMoreThan2Decimals;
+        }
+        return false;
+    }
+
+    /**
+     * Validates a products quantity is not a negative number
+     * @param product product to be validated
+     * @return boolean if product has valid quantity
+     */
+    public Boolean validateProductQuantity(Product product) {
+        if (product.getQuantity() != null) {
+            return product.getQuantity() >= 0;
+        }
+        return false;
+    }
+
+    /**
+     * Reads a products fields and checks for fields that are empty or null
+     * @param product product to be validated
+     * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
+     */
+    public HashMap<String, List<String>> getFieldsEmptyOrNull(Product product) {
+        List<Field> productFields = Arrays.asList(Product.class.getDeclaredFields());
+        List<String> productFieldNames = new ArrayList<>();
+        List<String> emptyFields = new ArrayList<>();
+        List<String> nullFields = new ArrayList<>();
+        HashMap<String, List<String>> results = new HashMap<>();
+        //Get product field names
+        productFields.forEach((field -> productFieldNames.add(field.getName())));
+        //Remove id as product will not have an id before it is saved
+        productFieldNames.remove("id");
+        //Convert product to a HashMap
+        ObjectMapper mapper = new ObjectMapper();
+        Map productMap = mapper.convertValue(product, HashMap.class);
+        //Loop through each fieldName to retrieve each product mapping value of the field
+        productFieldNames.forEach((field) -> {
+            //Check if the value for the product's field is null or empty and place in the corresponding list
+            if (productMap.get(field) == null) {
+                nullFields.add(field);
+            } else if (productMap.get(field).toString().trim() == "") {
+                emptyFields.add(field);
+            }
+        });
+        //place each list in the results
+        results.put("emptyFields", emptyFields);
+        results.put("nullFields", nullFields);
+        return results;
     }
 
     /**
@@ -179,7 +356,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Log all filters that are not implemented
-        if(!unImplementedFilters.isEmpty()){
+        if (!unImplementedFilters.isEmpty()) {
             logger.info(StringConstants.UNIMPLEMENTED_FILTERS + unImplementedFilters);
         }
 
@@ -264,7 +441,7 @@ public class ProductServiceImpl implements ProductService {
             max = Double.valueOf(priceMax);
         } catch (NumberFormatException e) {
             logger.error(e.getMessage());
-            throw new BadRequest("prices must be a number");
+            throw new BadRequest(StringConstants.PRODUCT_PRICE_INVALID);
         }
 
 
