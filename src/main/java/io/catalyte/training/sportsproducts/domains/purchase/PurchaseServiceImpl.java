@@ -253,6 +253,15 @@ public class PurchaseServiceImpl implements PurchaseService {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yy");
             simpleDateFormat.setLenient(false);
             expiry = simpleDateFormat.parse(expiration);
+            int expMonth =  expiry.getMonth();
+            int expYear = expiry.getYear();
+            expMonth += 1;
+            if (expMonth == 13) {
+                expMonth = 1;
+                expYear +=1;
+            }
+            expiry.setMonth(expMonth);
+            expiry.setYear(expYear);
         } catch (ParseException e) {
             throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
