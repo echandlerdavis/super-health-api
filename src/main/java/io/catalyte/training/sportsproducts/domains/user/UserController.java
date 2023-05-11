@@ -9,6 +9,7 @@ import org.apache.logging.log4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 /**
  * Rest controller for the user entity
@@ -41,6 +42,7 @@ public class UserController {
       @RequestHeader("Authorization") String bearerToken
   ) {
     logger.info("Request received for createUser");
+
     return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
   }
 
@@ -89,5 +91,4 @@ public class UserController {
     logger.info("Request received for getUserByEmail");
     return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
   }
-
 }

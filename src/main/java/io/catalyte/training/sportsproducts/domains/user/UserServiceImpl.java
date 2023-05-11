@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     }
 
     try {
-      logger.info(String.format(UPDATED_USER_FORMAT, updatedUser.id));
+      logger.info(String.format(UPDATED_USER_FORMAT, updatedUser.getId()));
       return userRepository.save(updatedUser);
     } catch (DataAccessException dae) {
       logger.error(dae.getMessage());

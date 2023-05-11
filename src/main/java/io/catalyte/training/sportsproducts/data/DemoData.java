@@ -95,8 +95,29 @@ public class DemoData implements CommandLineRunner {
     Purchase purchase4 = new Purchase();
     billingAddress.setEmail("blah");
 
-    User user = new User("amir@amir.com", "Customer", "Amir", "Sharapov");
+    User user = new User("amir@amir.com", "Customer", "Amir", "Sharapov",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA",98101));
     userRepository.save(user);
+
+    User user1 = new User("cgandy@catalyte.io", "Casey", "Gandy",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user1);
+
+    User user2 = new User("cdavis@catalyte.io","Chandler", "Davis",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user2);
+
+    User user3 = new User("dduval@catalyte.io","Devin", "Duval",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user3);
+
+    User user4 = new User("bmiller@catalyte.io","Blake", "Miller",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user4);
+
+    User user5 = new User("kfreeman@catalyte.io", "Kaschae", "Freeman",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user5);
 
     purchase4.setBillingAddress(billingAddress);
 

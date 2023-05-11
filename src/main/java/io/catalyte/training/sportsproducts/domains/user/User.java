@@ -2,6 +2,8 @@ package io.catalyte.training.sportsproducts.domains.user;
 
 import java.util.Date;
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * User entity in database
@@ -12,29 +14,42 @@ public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  Long id;
-  String email;
-  String role;
-  String firstName;
-  String lastName;
+  private Long id;
+  private String email;
+  private String role;
+  private String firstName;
+  private String lastName;
+  @Embedded
+  private BillingAddress billingAddress;
 
-  Date lastActive;
+  private Date lastActive;
 
-  public User() {}
+  public User() {
+    // Empty Constructor
+  }
 
-  public User(Long id, String email, String role, String firstName, String lastName) {
+  public User(String email, String firstName, String lastName, BillingAddress billingAddress) {
+    this.email = email;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.billingAddress = billingAddress;
+  }
+
+  public User(Long id, String email, String role, String firstName, String lastName, BillingAddress billingAddress) {
     this.id = id;
     this.email = email;
     this.role = role;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.billingAddress = billingAddress;
   }
 
-  public User(String email, String role, String firstName, String lastName) {
+  public User(String email, String role, String firstName, String lastName, BillingAddress billingAddress) {
     this.email = email;
     this.role = role;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.billingAddress = billingAddress;
   }
 
   public Long getId() {
@@ -84,6 +99,14 @@ public class User {
     this.lastActive = lastActive;
   }
 
+
+  public BillingAddress getBillingAddress() {
+    return billingAddress;
+  }
+
+  public void setBillingAddress(BillingAddress billingAddress) {
+    this.billingAddress = billingAddress;
+  }
 
   @Override
   public String toString() {
