@@ -1,9 +1,15 @@
 package io.catalyte.training.sportsproducts.domains.product;
 
+import io.catalyte.training.sportsproducts.domains.review.Review;
+import io.micrometer.core.lang.Nullable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * This class is a representation of a sports apparel product.
@@ -47,6 +53,10 @@ public class Product {
 
   private Boolean active;
 
+  @OneToMany(mappedBy = "product")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Review> reviews;
+
   public Product() {
   }
 
@@ -55,7 +65,7 @@ public class Product {
       String type, String releaseDate,
       String brand,String imageSrc, String material,
       Integer quantity, Double price, Boolean active, String globalProductCode,
-      String styleNumber, String secondaryColorCode, String primaryColorCode) {
+      String styleNumber, String secondaryColorCode, String primaryColorCode, List<Review> reviews) {
     this.name = name;
     this.description = description;
     this.demographic = demographic;
@@ -72,6 +82,7 @@ public class Product {
     this.styleNumber = styleNumber;
     this.secondaryColorCode = secondaryColorCode;
     this.primaryColorCode = primaryColorCode;
+    this.reviews = reviews;
   }
 
   public Long getId() {
@@ -206,6 +217,14 @@ public class Product {
     this.price = price;
   }
 
+  public List<Review> getReviews() {
+    return reviews;
+  }
+
+  public void setReviews(List<Review> reviews) {
+    this.reviews = reviews;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -325,6 +344,7 @@ public class Product {
         ", material'" + material + '\'' +
         ", price'" + price + '\'' +
       ", quantity'" + quantity + '\'' +
+            ", reviews'" + reviews + '\''+
         '}';
   }
 }

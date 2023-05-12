@@ -277,9 +277,9 @@ public class ProductServiceImpl implements ProductService {
         //Loop through each fieldName to retrieve each product mapping value of the field
         productFieldNames.forEach((field) -> {
             //Check if the value for the product's field is null or empty and place in the corresponding list
-            if (productMap.get(field) == null) {
+            if (productMap.get(field) == null && field != "reviews") {
                 nullFields.add(field);
-            } else if (productMap.get(field).toString().trim() == "") {
+            } else if (field != "reviews" && productMap.get(field).toString().trim() == "") {
                 emptyFields.add(field);
             }
         });

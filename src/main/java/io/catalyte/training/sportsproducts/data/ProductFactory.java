@@ -1,6 +1,7 @@
 package io.catalyte.training.sportsproducts.data;
 
 import io.catalyte.training.sportsproducts.domains.product.Product;
+import io.catalyte.training.sportsproducts.domains.review.Review;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -106,6 +107,32 @@ public class ProductFactory {
       "Hoodie",
       "Flip Flop",
       "Pool Noodle"
+  };
+
+  private static final String[] reviews = {
+      "I loved it!",
+      "I loved it, and let me explain to you why I loved it. The fit? Phenomenal. Performance? Unreal! Don't even get me started on the look. Got compliments all day. Double takes.",
+      "10 out of 10 would recommend",
+      "This was such an amazing product, and also received excellent customer service. Thanks, sports apparel website!"
+  };
+
+  private static final String[] reviewUserNames = {
+      "Bob Ross",
+      "Dolly Parton",
+      "Halle Berry",
+      "Michael Phelps",
+      "Meg Rapinoe",
+      "Jess Fishlock",
+      "Anne Bonny",
+      "Mary Read",
+      "Jane Doe",
+      "John Doe",
+      "John Smith",
+      "Bon Jovi",
+      "Britta Filter",
+      "Alyssa Edwards",
+      "Taylor Swift",
+      "Michelle Obama"
   };
 
   private static final Random randomGenerator = new Random();
@@ -233,10 +260,71 @@ public class ProductFactory {
    * @return - a boolean
    */
   private static boolean isActive(){
-    Random randomGenerator = new Random();
     return randomGenerator.nextBoolean();
   }
 
+  /**
+   * Generates random review content.
+   *
+   * @return - a string of review content.
+   */
+  public static String getReviewContent(){
+    return reviews[randomGenerator.nextInt(reviews.length)];
+  }
+
+  /**
+   * Generates a random userName for a review.
+   *
+   * @return - a string user name
+   */
+  public static String getReviewUserName(){
+    return reviewUserNames[randomGenerator.nextInt(reviewUserNames.length)];
+  }
+
+  /**
+   * Generates random rating between 1 and 5.
+   *
+   * @return - an integer between 1 and 5.
+   */
+  public static int getReviewRating(){
+    return randomGenerator.nextInt(4) + 1;
+  }
+
+  /**
+   * Generates a list of random review objects, length of list between 0 and 10.
+   * @param product - the product the list of reviews will belong to.
+   * @return an array list of review objects.
+   */
+  public List<Review> generateRandomReviews(Product product){
+
+    List<Review> reviewList = new ArrayList<>();
+    int numberOfReviews = randomGenerator.nextInt(10);
+
+    for(int i = 0; i < numberOfReviews; i++){
+      reviewList.add(createRandomReview(product, (i + 1)));
+    }
+
+    return reviewList;
+  }
+
+  /**
+   * Generates a single Review object.
+   * @param product - the product the review belongs to
+   * @param number - a number to add to the title.
+   * @return a single Review object.
+   */
+  public static Review createRandomReview(Product product, int number){
+    Review review = new Review();
+    review.setTitle("Review #" + number);
+    review.setReview(getReviewContent());
+    review.setRating(getReviewRating());
+    review.setUserName(getReviewUserName());
+    review.setCreatedAt(String.valueOf(
+        between(LocalDate.parse(product.getReleaseDate()), LocalDate.now())));
+    review.setProduct(product);
+
+    return review;
+  }
 
   /**
    * Generates a number of random products based on input.
@@ -263,7 +351,7 @@ public class ProductFactory {
   public Product createRandomProduct() {
     Product product = new Product();
 //    Strings that need to be reused
-    String demographic = ProductFactory.getDemographic();
+    String demographic = getDemographic();
     String category = ProductFactory.getCategory();
     String type = ProductFactory.getType();
     String space = " ";
