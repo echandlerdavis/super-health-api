@@ -98,9 +98,9 @@ public class PurchaseApiTest {
 
         testProducts.forEach(product -> {
             product.setActive(true);
-            productRepository.save(product);
+            Product savedProduct = productRepository.save(product);
             LineItem purchaseLineItem = new LineItem();
-            purchaseLineItem.setProduct(product);
+            purchaseLineItem.setProduct(savedProduct);
             purchaseLineItem.setQuantity(1);
             purchasesList.add(purchaseLineItem);
         });
