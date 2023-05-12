@@ -363,6 +363,16 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
+    @Override
+    public List<Product> getProductsByIds(List<Long> ids) {
+        try{
+            return productRepository.findByIdIn(ids);
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+    }
+
     /**
      * Helper Method filters list of products by brands
      *

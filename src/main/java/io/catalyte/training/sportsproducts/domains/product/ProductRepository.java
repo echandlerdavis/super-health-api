@@ -26,4 +26,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = "SELECT DISTINCT p.secondary_color_code FROM product p", nativeQuery = true)
     List<String> findDistinctSecondaryColors();
+
+    List<Product> findByIdIn(List<Long> ids);
 }
