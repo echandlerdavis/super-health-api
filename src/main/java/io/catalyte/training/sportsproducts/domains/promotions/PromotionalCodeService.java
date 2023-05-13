@@ -25,4 +25,7 @@ public interface PromotionalCodeService {
     List<PromotionalCode> getAllPromotionalCodes();
 
     PromotionalCode getPromotionalCodeByTitle(String title);
+    void deletePromotionalCode(PromotionalCode code);
+
+    boolean promotionalCodeIsActive(String title);
 }

@@ -93,8 +93,7 @@ public class LineItem {
 
   @Override
   public int hashCode() {
-    int result = purchase != null ? purchase.hashCode() : 0;
-    result = 31 * result + (product != null ? product.hashCode() : 0);
+    int result = 31 * (product != null ? product.hashCode() : 0);
     result = 31 * result + quantity;
     return result;
   }

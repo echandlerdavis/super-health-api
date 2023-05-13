@@ -524,7 +524,7 @@ public class PurchaseApiTest {
                         .contentType("application/json")
                         .content(mapper.writeValueAsString(testPurchase)))
                 .andReturn().getResponse();
-        System.out.println(response.getContentAsString());
+
         Purchase returnedPurchase = mapper.readValue(response.getContentAsString(), Purchase.class);
 
         assertTrue(twoPurchasesEqualExceptId(testPurchase, returnedPurchase));
