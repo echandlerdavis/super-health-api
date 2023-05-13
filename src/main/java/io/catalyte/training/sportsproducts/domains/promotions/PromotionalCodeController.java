@@ -1,11 +1,20 @@
 package io.catalyte.training.sportsproducts.domains.promotions;
 
+import io.catalyte.training.sportsproducts.constants.LoggingConstants;
+import io.catalyte.training.sportsproducts.constants.Paths;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
+import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
+import java.util.Locale;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -16,9 +25,11 @@ import java.math.BigDecimal;
  * related to promotional codes.
  */
 @RestController
+@RequestMapping(value = Paths.PROMOCODE_PATH)
 public class PromotionalCodeController {
 
     private final PromotionalCodeService promotionalCodeService;
+    private final Logger logger = LogManager.getLogger(PromotionalCodeController.class);
 
     /**
      * Creates a new {@code PromotionalCodeController} instance with the specified
@@ -42,7 +53,7 @@ public class PromotionalCodeController {
      * @return a {@code ResponseEntity} containing the created promotional code and the HTTP status code
      * @throws IllegalArgumentException if the promotional code already exists
      */
-    @PostMapping("/promotionalCodes")
+    @PostMapping
     public ResponseEntity<PromotionalCode> createPromotionalCode(@Valid @RequestBody PromotionalCodeDTO dto) {
         if(dto.getType() == null || dto.getRate() == null) {
             throw new BadRequest("Type and rate must not be null");
@@ -57,6 +68,17 @@ public class PromotionalCodeController {
         return new ResponseEntity<>(promotionalCode, HttpStatus.CREATED);
     }
 
-    public static class DuplicatePromoCodeException extends Exception {
+    /**
+     * Endpoint to verify that the user provided promotional code exists
+     * @param title Title of the desired code
+     * @return String - will be an error notification it the code is not valid, or "" if it is valid
+     */
+    @GetMapping(value = "/{title}")
+    public ResponseEntity<PromotionalCode> getByTitle(@PathVariable String title){
+        logger.info(String.format(LoggingConstants.GET_PROMOCODE_FORMAT, title));
+        return new ResponseEntity<>(promotionalCodeService.getPromotionalCodeByTitle(title), HttpStatus.OK);
     }
+
+//    public static class DuplicatePromoCodeException extends Exception {
+//    }
 }

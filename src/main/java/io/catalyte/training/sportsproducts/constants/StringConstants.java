@@ -47,6 +47,9 @@ public class StringConstants {
 
   //Header key for google authorization
   public static final String AUTHORIZATION_HEADER = "Authorization";
+
+  //Error Messages - PromotionalCodes
+  public static final String INVALID_CODE = "This promotional code is invalid at this time.";
   //Insufficient inventory message
   public static final String INSUFFICIENT_INVENTORY = "There is not enough inventory to cover the order(s) for: ";
 }

@@ -3,17 +3,24 @@ package io.catalyte.training.sportsproducts.data;
 import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.review.Review;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCode;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeRepository;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeType;
 import io.catalyte.training.sportsproducts.domains.purchase.BillingAddress;
 import io.catalyte.training.sportsproducts.domains.purchase.Purchase;
 import io.catalyte.training.sportsproducts.domains.purchase.PurchaseRepository;
 import io.catalyte.training.sportsproducts.domains.review.ReviewRepository;
 import io.catalyte.training.sportsproducts.domains.user.*;
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,6 +42,9 @@ public class DemoData implements CommandLineRunner {
 
   @Autowired
   private PurchaseRepository purchaseRepository;
+
+  @Autowired
+  private PromotionalCodeRepository promotionalCodeRepository;
 
   @Autowired
   private ReviewRepository reviewRepository;
@@ -76,7 +86,6 @@ public class DemoData implements CommandLineRunner {
     }
     // Generate products
     List<Product> productList = productFactory.generateRandomProducts(numberOfProducts);
-
 
     // Persist them to the database
     logger.info("Loading " + numberOfProducts + " products...");
@@ -134,6 +143,54 @@ public class DemoData implements CommandLineRunner {
     purchase4.setBillingAddress(billingAddress);
 
     purchaseRepository.save(purchase4);
+
+    Calendar cal = Calendar.getInstance();
+    Date today = new Date();
+    cal.setTime(today);
+    cal.add(Calendar.DATE, 1);
+    Date end = cal.getTime();
+
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "FlatTest",
+            "Flat rate test",
+            PromotionalCodeType.FLAT,
+            BigDecimal.valueOf(25),
+            today,
+            end));
+
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "PercentageTest",
+            "Percentage rate test",
+            PromotionalCodeType.PERCENT,
+            BigDecimal.valueOf(25),
+            today,
+            end));
+    cal.add(Calendar.DATE, -2);
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "ExpiredCode",
+            "Expired test",
+            PromotionalCodeType.FLAT,
+            BigDecimal.valueOf(10),
+            today,
+            cal.getTime()
+        )
+    );
+    cal.add(Calendar.DATE, 2);
+    Date tomorrow = cal.getTime();
+    cal.add(Calendar.DATE, 1);
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "InactiveCode",
+            "Inactive test",
+            PromotionalCodeType.PERCENT,
+            BigDecimal.valueOf(10),
+            tomorrow,
+            cal.getTime()
+        )
+    );
 
   }
 
