@@ -117,8 +117,6 @@ public class PurchaseServiceImpl implements PurchaseService {
 
       // after the purchase is persisted and has an id, we need to handle its lineitems and persist them as well
       handleLineItems(newPurchase);
-      //product validation
-      validateProducts(newPurchase);
       savedPurchase.setProducts(lineItemRepository.findByPurchase(newPurchase));
 
     return savedPurchase;
