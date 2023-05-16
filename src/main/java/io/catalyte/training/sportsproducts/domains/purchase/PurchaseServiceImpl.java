@@ -3,15 +3,23 @@ package io.catalyte.training.sportsproducts.domains.purchase;
 import io.catalyte.training.sportsproducts.constants.StringConstants;
 import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductService;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCode;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeService;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
+import io.catalyte.training.sportsproducts.exceptions.MultipleUnprocessableContent;
+import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
 import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +34,15 @@ public class PurchaseServiceImpl implements PurchaseService {
     PurchaseRepository purchaseRepository;
     ProductService productService;
     LineItemRepository lineItemRepository;
+    PromotionalCodeService promoCodeService;
 
     @Autowired
     public PurchaseServiceImpl(PurchaseRepository purchaseRepository, ProductService productService,
-                               LineItemRepository lineItemRepository) {
+                               LineItemRepository lineItemRepository, PromotionalCodeService promoCodeService) {
         this.purchaseRepository = purchaseRepository;
         this.productService = productService;
         this.lineItemRepository = lineItemRepository;
+        this.promoCodeService = promoCodeService;
     }
 
     /**
@@ -78,6 +88,20 @@ public class PurchaseServiceImpl implements PurchaseService {
       validateCreditCard(creditCard);
       //product validation
       validateProducts(newPurchase);
+      //promocode validation
+      PromotionalCode appliedCode = newPurchase.getPromoCode();
+      if (appliedCode != null) {
+        try{
+          PromotionalCode actualCode = promoCodeService.getPromotionalCodeByTitle(appliedCode.getTitle());
+          //ensure that the promoCode is valid by replacing the client supplied one with the
+          //one from the database
+          newPurchase.setPromoCode(actualCode);
+        } catch (BadRequest | ResourceNotFound e) {
+          //this means the promocode is either not active or not found
+          newPurchase.setPromoCode(null);
+        }
+
+      }
       //Handle ID received from UI and create savedPurchase
       newPurchase.setId(null);
       Purchase savedPurchase;
@@ -116,6 +140,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 if (product != null) {
                     lineItem.setProduct(product);
                 }
+                //get rid of the id
+              lineItem.setId(null);
 
                 // set the purchase on the line item
                 lineItem.setPurchase(purchase);
@@ -140,24 +166,52 @@ public class PurchaseServiceImpl implements PurchaseService {
         if (lineItemSet == null || lineItemSet.size() ==0 ) throw new BadRequest(StringConstants.PURCHASE_HAS_NO_PRODUCTS);
 
         // Set list of products that are not able to be processed
-        List<Product> unprocessable = new ArrayList<>();
+        List<Product> inactiveProducts = new ArrayList<>();
+        List<Product> insufficientStock = new ArrayList<>();
+
+        //get products with insufficient inventory
+        Map<Long, Product> lockedProducts = getProductMap(lineItemSet);
 
         // Loop through each lineItem for purchase to get product info
         lineItemSet.forEach(lineItem -> {
 
             // retrieve full product information from the database
-            Product product = productService.getProductById(lineItem.getProduct().getId());
+            Product product = lockedProducts.get(lineItem.getProduct().getId());
 
             // if product status is not active add the product to list of items unable to be processed
             if (product.getActive() == null || !product.getActive()) {
-                unprocessable.add(product);
+                inactiveProducts.add(product);
             }
+            if (lockedProducts.get(product.getId()).getQuantity() < lineItem.getQuantity()) {
+              insufficientStock.add(product);
+            }
+
         });
+        if (inactiveProducts.size() > 0 || insufficientStock.size() > 0) {
+          logger.error(StringConstants.UNPROCESSABLE_ITEMS);
+        }
+        if (inactiveProducts.size() > 0 && insufficientStock.size() > 0){
+          Map<String, List<Product>> unprocessableMap = new HashMap();
+          unprocessableMap.put(StringConstants.PRODUCT_INACTIVE, inactiveProducts);
+          unprocessableMap.put(StringConstants.INSUFFICIENT_INVENTORY, insufficientStock);
+
+          throw new MultipleUnprocessableContent(StringConstants.UNPROCESSABLE_ITEMS, unprocessableMap);
+        }
+
+        if (inactiveProducts.size() > 0) {
+          throw new UnprocessableContent(StringConstants.PRODUCT_INACTIVE, inactiveProducts);
+        }
 
         // If unprocessable list has items throw Unprocessable Content error with list of products
-        if (unprocessable.size() > 0) {
-            throw new UnprocessableContent(StringConstants.PRODUCT_INACTIVE, unprocessable);
+        if (insufficientStock.size() > 0) {
+            throw new UnprocessableContent(StringConstants.INSUFFICIENT_INVENTORY, insufficientStock);
         }
+      //if all validation passes, dock inventory qtys on the server
+      lineItemSet.forEach(lineItem -> {
+        Product product = lockedProducts.get(lineItem.getProduct().getId());
+        product.setQuantity(product.getQuantity() - lineItem.getQuantity());
+        productService.saveProduct(product);
+      });
     }
 
     /**
@@ -253,6 +307,15 @@ public class PurchaseServiceImpl implements PurchaseService {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yy");
             simpleDateFormat.setLenient(false);
             expiry = simpleDateFormat.parse(expiration);
+            int expMonth =  expiry.getMonth();
+            int expYear = expiry.getYear();
+            expMonth += 1;
+            if (expMonth == 13) {
+                expMonth = 1;
+                expYear +=1;
+            }
+            expiry.setMonth(expMonth);
+            expiry.setYear(expYear);
         } catch (ParseException e) {
             throw new BadRequest(StringConstants.CARD_EXPIRATION_INVALID_FORMAT);
         }
@@ -263,6 +326,14 @@ public class PurchaseServiceImpl implements PurchaseService {
         if (expired) {
             throw new BadRequest(StringConstants.CARD_EXPIRED);
         }
+    }
+
+    public Map<Long, Product> getProductMap(Set<LineItem> lineItems){
+      List<Long> ids = lineItems.stream()
+          .map(p -> p.getProduct().getId())
+          .collect(Collectors.toList());
+      return productService.getProductsByIds(ids).stream().collect(Collectors
+          .toMap(Product::getId, Function.identity()));
     }
 
 }

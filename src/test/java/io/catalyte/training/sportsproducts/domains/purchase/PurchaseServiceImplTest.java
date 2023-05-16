@@ -81,6 +81,8 @@ public class PurchaseServiceImplTest {
                 .thenReturn(testProducts.get(1))
                 .thenReturn(testProducts.get(2));
 
+        when(productService.getProductsByIds(any())).thenReturn(testProducts);
+
         //Set repository to return a copy of testPurchase with an id when calling save
         when(purchaseRepository.save(any(Purchase.class))).thenAnswer((p) ->{
             Purchase copyPurchase = new Purchase();
@@ -124,14 +126,17 @@ public class PurchaseServiceImplTest {
 
         // Get List of test products to add to purchase
         Set<LineItem> purchasesList = new HashSet<>();
+        Long id = 0L;
 
-        testProducts.forEach(product -> {
+        for (Product product: testProducts) {
             product.setActive(true);
+            product.setId(id);
+            ++id;
             LineItem purchaseLineItem = new LineItem();
             purchaseLineItem.setProduct(product);
             purchaseLineItem.setQuantity(1);
             purchasesList.add(purchaseLineItem);
-        });
+        }
 
         testPurchase.setProducts(purchasesList);
         testPurchase.setBillingAddress(testBillingAddress);

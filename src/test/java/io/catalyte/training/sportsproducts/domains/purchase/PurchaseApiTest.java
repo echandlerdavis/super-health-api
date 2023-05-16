@@ -98,9 +98,9 @@ public class PurchaseApiTest {
 
         testProducts.forEach(product -> {
             product.setActive(true);
-            productRepository.save(product);
+            Product savedProduct = productRepository.save(product);
             LineItem purchaseLineItem = new LineItem();
-            purchaseLineItem.setProduct(product);
+            purchaseLineItem.setProduct(savedProduct);
             purchaseLineItem.setQuantity(1);
             purchasesList.add(purchaseLineItem);
         });
@@ -524,7 +524,7 @@ public class PurchaseApiTest {
                         .contentType("application/json")
                         .content(mapper.writeValueAsString(testPurchase)))
                 .andReturn().getResponse();
-        System.out.println(response.getContentAsString());
+
         Purchase returnedPurchase = mapper.readValue(response.getContentAsString(), Purchase.class);
 
         assertTrue(twoPurchasesEqualExceptId(testPurchase, returnedPurchase));

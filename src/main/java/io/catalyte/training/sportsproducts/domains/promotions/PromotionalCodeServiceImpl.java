@@ -1,7 +1,10 @@
 package io.catalyte.training.sportsproducts.domains.promotions;
 
+import io.catalyte.training.sportsproducts.constants.StringConstants;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
+import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,14 @@ public class PromotionalCodeServiceImpl implements PromotionalCodeService {
         promotionalCode.setDescription(promotionalCodeDTO.getDescription());
         promotionalCode.setType(promotionalCodeDTO.getType());
         promotionalCode.setRate(promotionalCodeDTO.getRate());
+        promotionalCode.setStartDate(promotionalCodeDTO.getStartDate());
+        promotionalCode.setEndDate(promotionalCodeDTO.getEndDate());
+
+        //check for that title is available
+        PromotionalCode existingTitle = promotionalCodeRepository.findByTitle(promotionalCode.getTitle());
+        if (existingTitle != null) {
+            throw new IllegalArgumentException(String.format("Title %s is already in use", existingTitle.getTitle()));
+        }
 
         try {
             // validate the promotional code before saving
@@ -122,13 +133,20 @@ public class PromotionalCodeServiceImpl implements PromotionalCodeService {
      * @return The promotional code with the given Title, or null if no such promotional code exist.
      */
     @Override
-    public PromotionalCode getPromotionalCodeByTitle(String title) {
+    public PromotionalCode getPromotionalCodeByTitle(String title)  throws ResourceNotFound {
        try {
-           List<PromotionalCode> codes = (List<PromotionalCode>) promotionalCodeRepository.findByTitle(title);
-           if (codes != null && !codes.isEmpty()) {
-               return codes.get(0);
+           PromotionalCode code = promotionalCodeRepository.findByTitle(title);
+           if (code != null) {
+               //if code is not active today throw error
+               if (!activeNow(code)) {
+                   logger.error(StringConstants.INVALID_CODE);
+                   throw new BadRequest(StringConstants.INVALID_CODE);
+               }
+               return code;
            }
-           return null;
+           //if code is null throw error
+           logger.info(StringConstants.INVALID_CODE);
+           throw new ResourceNotFound(StringConstants.INVALID_CODE);
        } catch (DataAccessException e) {
            // Log the error message
            logger.error("Error getting promotional code by title: " + e.getMessage());
@@ -136,7 +154,6 @@ public class PromotionalCodeServiceImpl implements PromotionalCodeService {
            throw new ServerError(e.getMessage());
        }
     }
-
     /**
      * Applies the given promotional code to the given price and returns the discounted price.
      *
@@ -170,6 +187,53 @@ public class PromotionalCodeServiceImpl implements PromotionalCodeService {
             logger.error("An error occurred while applying promotional code: " + e.getMessage());
             throw new ServerError(e.getMessage());
         }
+    }
+
+    public void deletePromotionalCode(PromotionalCode code) {
+        try {
+            promotionalCodeRepository.delete(code);
+        } catch (DataAccessException e) {
+            // Log the error message
+            logger.error("Error deleting code: " + e.getMessage());
+            // Throw a ServerError exception with the caught exception's message
+            throw new ServerError(e.getMessage());
+        }
+    }
+
+    /**
+     * Validate that the given promotional code is valid today.
+     * @param title
+     * @return boolean
+     * @throws ResourceNotFound if the promotional code does not exist
+     * @throws ServerError if service cannot connect to the database
+     */
+    @Override
+    public boolean promotionalCodeIsActive(String title) throws ResourceNotFound, ServerError{
+        PromotionalCode code = null;
+        try {
+            code = promotionalCodeRepository.findByTitle(title);
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage());
+            throw new ServerError(e.getMessage());
+        }
+        if (code != null) {
+            return activeNow(code);
+        } else {
+            throw new ResourceNotFound(StringConstants.INVALID_CODE);
+        }
+    }
+
+    /**
+     * check that code is active now
+     * @param code PromtionalCode
+     * @return boolean
+     */
+    private boolean activeNow(PromotionalCode code) {
+        if (code.getStartDate() == null || code.getEndDate() == null) {
+            return false;
+        }
+        Date today = new Date();
+        return today.compareTo(code.getStartDate()) > 0 && today.compareTo(code.getEndDate()) < 0;
     }
 
 }

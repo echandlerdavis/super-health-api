@@ -69,6 +69,11 @@ public class ExceptionController {
         ExceptionResponse response = new ExceptionResponse(UNPROCESSABLE_ITEMS, new Date(),exception.getMessage(), exception.getUnprocessed() );
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
+    @ExceptionHandler(MultipleUnprocessableContent.class)
+    protected ResponseEntity<ExceptionResponse> multipleUnprocessableContent(MultipleUnprocessableContent exception) throws JsonProcessingException {
+        ExceptionResponse response = new ExceptionResponse(UNPROCESSABLE_ITEMS, new Date(),exception.getMessage(), exception.getUnprocessed() );
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 
     /**
      * @param ex exception response.

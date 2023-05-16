@@ -1,5 +1,9 @@
 package io.catalyte.training.sportsproducts.domains.promotions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
+import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,13 +17,16 @@ import java.math.BigDecimal;
 @Entity
 public class PromotionalCode {
 
-    private String code;
     private String title;
     private String description;
     private PromotionalCodeType type;
     private BigDecimal rate;
+
+    private Date startDate;
+    private Date endDate;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
 
     /**
@@ -38,19 +45,33 @@ public class PromotionalCode {
         this.rate = rate;
     }
 
+    public PromotionalCode(String title, String description, PromotionalCodeType type, BigDecimal rate, Date startDate, Date endDate) {
+        this(title, description, type, rate);
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
     public PromotionalCode() {
 
 
     }
-
-    public String getCode() {
-        return code;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    @Column(unique = true)
     public String getTitle() {
         return title;
     }
@@ -89,5 +110,34 @@ public class PromotionalCode {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PromotionalCode)) {
+            return false;
+        }
+        PromotionalCode that = (PromotionalCode) o;
+        return title.equals(that.title) && Objects.equals(description, that.description)
+            && type == that.type && rate.equals(that.rate) && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, description, type, rate, id);
+    }
+
+    @Override
+    public String toString() {
+        return "PromotionalCode{" +
+            "title='" + title + '\'' +
+            ", description='" + description + '\'' +
+            ", type=" + type +
+            ", rate=" + rate +
+            ", id=" + id +
+            '}';
     }
 }

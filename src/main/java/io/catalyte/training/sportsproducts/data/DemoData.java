@@ -1,17 +1,26 @@
 package io.catalyte.training.sportsproducts.data;
 
 import io.catalyte.training.sportsproducts.domains.product.Product;
+import io.catalyte.training.sportsproducts.domains.review.Review;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCode;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeRepository;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeType;
 import io.catalyte.training.sportsproducts.domains.purchase.BillingAddress;
 import io.catalyte.training.sportsproducts.domains.purchase.Purchase;
 import io.catalyte.training.sportsproducts.domains.purchase.PurchaseRepository;
+import io.catalyte.training.sportsproducts.domains.review.ReviewRepository;
 import io.catalyte.training.sportsproducts.domains.user.*;
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,6 +42,12 @@ public class DemoData implements CommandLineRunner {
 
   @Autowired
   private PurchaseRepository purchaseRepository;
+
+  @Autowired
+  private PromotionalCodeRepository promotionalCodeRepository;
+
+  @Autowired
+  private ReviewRepository reviewRepository;
 
   @Autowired
   private Environment env;
@@ -69,13 +84,19 @@ public class DemoData implements CommandLineRunner {
       // If it's not a string, set it to be a default value
       numberOfProducts = DEFAULT_NUMBER_OF_PRODUCTS;
     }
-
     // Generate products
     List<Product> productList = productFactory.generateRandomProducts(numberOfProducts);
 
     // Persist them to the database
     logger.info("Loading " + numberOfProducts + " products...");
     productRepository.saveAll(productList);
+
+    //Generate reviews for each product and persist them to the database.
+    for (Product product : productList) {
+      List<Review> reviewList = productFactory.generateRandomReviews(product);
+      product.setReviews(reviewList);
+      reviewRepository.saveAll(reviewList);
+    }
     logger.info("Data load completed. You can make requests now.");
 
     Purchase purchase1 = new Purchase();
@@ -95,12 +116,81 @@ public class DemoData implements CommandLineRunner {
     Purchase purchase4 = new Purchase();
     billingAddress.setEmail("blah");
 
-    User user = new User("amir@amir.com", "Customer", "Amir", "Sharapov");
+    User user = new User("amir@amir.com", "Customer", "Amir", "Sharapov",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA",98101));
     userRepository.save(user);
+
+    User user1 = new User("cgandy@catalyte.io", "Casey", "Gandy",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user1);
+
+    User user2 = new User("cdavis@catalyte.io","Chandler", "Davis",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user2);
+
+    User user3 = new User("dduval@catalyte.io","Devin", "Duval",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user3);
+
+    User user4 = new User("bmiller@catalyte.io","Blake", "Miller",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user4);
+
+    User user5 = new User("kfreeman@catalyte.io", "Kaschae", "Freeman",
+            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
+    userRepository.save(user5);
 
     purchase4.setBillingAddress(billingAddress);
 
     purchaseRepository.save(purchase4);
+
+    Calendar cal = Calendar.getInstance();
+    Date today = new Date();
+    cal.setTime(today);
+    cal.add(Calendar.DATE, 1);
+    Date end = cal.getTime();
+
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "FlatTest",
+            "Flat rate test",
+            PromotionalCodeType.FLAT,
+            BigDecimal.valueOf(25),
+            today,
+            end));
+
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "PercentageTest",
+            "Percentage rate test",
+            PromotionalCodeType.PERCENT,
+            BigDecimal.valueOf(25),
+            today,
+            end));
+    cal.add(Calendar.DATE, -2);
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "ExpiredCode",
+            "Expired test",
+            PromotionalCodeType.FLAT,
+            BigDecimal.valueOf(10),
+            today,
+            cal.getTime()
+        )
+    );
+    cal.add(Calendar.DATE, 2);
+    Date tomorrow = cal.getTime();
+    cal.add(Calendar.DATE, 1);
+    promotionalCodeRepository.save(
+        new PromotionalCode(
+            "InactiveCode",
+            "Inactive test",
+            PromotionalCodeType.PERCENT,
+            BigDecimal.valueOf(10),
+            tomorrow,
+            cal.getTime()
+        )
+    );
 
   }
 

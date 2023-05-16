@@ -16,7 +16,20 @@ public interface ProductService {
 
   List<String> getDistinctCategories();
 
+  List<String> getDistinctBrands();
+
+  List<String> getDistinctMaterials();
+
+  List<String> getDistinctDemographics();
+
+  List<String> getDistinctPrimaryColors();
+
+  List<String> getDistinctSecondaryColors();
+
   List<Product> addProducts(List<Product> products);
 
+  Product saveProduct(Product product);
+
   List<Product> getProductsByFilters(HashMap<String, String> filters);
+  List<Product> getProductsByIds(List<Long> ids);
 }
