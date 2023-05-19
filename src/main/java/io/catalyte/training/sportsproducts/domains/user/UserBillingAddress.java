@@ -8,7 +8,7 @@ import javax.persistence.Embeddable;
  * Describes the object for the billing address of the purchase
  */
 @Embeddable
-public class BillingAddress {
+public class UserBillingAddress {
 
     @Nullable
     @Column(nullable = true)
@@ -29,10 +29,10 @@ public class BillingAddress {
     @Column(nullable = true)
     private String phone;
 
-    public BillingAddress() {
+    public UserBillingAddress() {
     }
 
-    public BillingAddress(String billingStreet, String billingStreet2, String billingCity, String billingState, int billingZip, String phone) {
+    public UserBillingAddress(String billingStreet, String billingStreet2, String billingCity, String billingState, int billingZip, String phone) {
         this.billingStreet = billingStreet;
         this.billingStreet2 = billingStreet2;
         this.billingCity = billingCity;
@@ -41,7 +41,7 @@ public class BillingAddress {
         this.phone = phone;
     }
 
-    public BillingAddress(String billingStreet, String billingStreet2, String billingCity, String billingState, int billingZip) {
+    public UserBillingAddress(String billingStreet, String billingStreet2, String billingCity, String billingState, int billingZip) {
         this.billingStreet = billingStreet;
         this.billingStreet2 = billingStreet2;
         this.billingCity = billingCity;
@@ -106,7 +106,7 @@ public class BillingAddress {
             return false;
         }
 
-        io.catalyte.training.sportsproducts.domains.user.BillingAddress that = (io.catalyte.training.sportsproducts.domains.user.BillingAddress) o;
+        UserBillingAddress that = (UserBillingAddress) o;
 
         if (getBillingZip() != that.getBillingZip()) {
             return false;
@@ -144,7 +144,7 @@ public class BillingAddress {
 
     @Override
     public String toString() {
-        return "BillingAddress{" +
+        return "UserBillingAddress{" +
                 "billingStreet='" + billingStreet + '\'' +
                 ", billingStreet2='" + billingStreet2 + '\'' +
                 ", billingCity='" + billingCity + '\'' +
