@@ -1,5 +1,7 @@
 package io.catalyte.training.sportsproducts.domains.purchase;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -347,6 +349,52 @@ public class PurchaseServiceImplTest {
         doThrow(new DataAccessException("Test exception"){}).when(purchaseRepository).save(testPurchase);
         Purchase copy = purchaseServiceImpl.savePurchase(testPurchase);
         fail(); //this should never run
+    }
+    @Test
+    public void purchaseCalcLineItemTotalSingleItemTest(){
+        final double PRICE = 1.00;
+        final int QUANTITY = 49;
+        Set<LineItem> lineItems = new HashSet<>();
+        Product product1 = new Product();
+        product1.setPrice(PRICE);
+        LineItem line1 = new LineItem();
+        line1.setProduct(product1);
+        line1.setQuantity(QUANTITY);
+        lineItems.add(line1);
+        Purchase purchase = new Purchase();
+        purchase.setProducts(lineItems);
+
+        assertEquals(PRICE * QUANTITY, purchase.calcLineItemTotal(), .001);
+        assertFalse(purchase.applyShippingCharge());
+
+    }
+    @Test
+    public void purchaseCalcLineItemTotalMultipleItemTest(){
+        final double PRICE = 1.00;
+        final int QUANTITY = 25;
+        Set<LineItem> lineItems = new HashSet<>();
+        Product product1 = new Product();
+        Product product2 = new Product();
+        product1.setPrice(PRICE);
+        product2.setPrice(PRICE);
+        product1.setBrand("brand1");
+        product2.setBrand("different brand");
+        LineItem line1 = new LineItem();
+        LineItem line2 = new LineItem();
+
+        line1.setProduct(product1);
+        line1.setQuantity(QUANTITY);
+        line2.setProduct(product2);
+        line2.setQuantity(QUANTITY);
+
+        lineItems.add(line1);
+        lineItems.add(line2);
+        Purchase purchase = new Purchase();
+        purchase.setProducts(lineItems);
+
+        assertEquals(PRICE * QUANTITY * lineItems.size(), purchase.calcLineItemTotal(), .001);
+        assertEquals(true, purchase.applyShippingCharge());
+
     }
 
 }

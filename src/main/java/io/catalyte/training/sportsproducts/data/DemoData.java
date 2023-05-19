@@ -1,12 +1,13 @@
 package io.catalyte.training.sportsproducts.data;
 
 import io.catalyte.training.sportsproducts.domains.product.Product;
+import io.catalyte.training.sportsproducts.domains.purchase.LineItem;
+import io.catalyte.training.sportsproducts.domains.purchase.LineItemRepository;
 import io.catalyte.training.sportsproducts.domains.review.Review;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
 import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCode;
 import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeRepository;
 import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeType;
-import io.catalyte.training.sportsproducts.domains.purchase.BillingAddress;
 import io.catalyte.training.sportsproducts.domains.purchase.Purchase;
 import io.catalyte.training.sportsproducts.domains.purchase.PurchaseRepository;
 import io.catalyte.training.sportsproducts.domains.review.ReviewRepository;
@@ -15,12 +16,12 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,6 +40,8 @@ public class DemoData implements CommandLineRunner {
 
   @Autowired
   private ProductRepository productRepository;
+  @Autowired
+  private LineItemRepository lineItemRepository;
 
   @Autowired
   private PurchaseRepository purchaseRepository;
@@ -52,9 +55,13 @@ public class DemoData implements CommandLineRunner {
   @Autowired
   private Environment env;
 
-  ProductFactory productFactory = new ProductFactory();
+  private final ProductFactory productFactory = new ProductFactory();
+  private final PurchaseFactory purchaseFactory = new PurchaseFactory();
+  private final UserFactory userFactory = new UserFactory();
 
   public static final int DEFAULT_NUMBER_OF_PRODUCTS = 500;
+  public static final int MAX_PURCHASES_PER_USER = 20;
+  public static final int MIN_PURCHASES_PER_USER = 5;
 
   @Override
   public void run(String... strings) {
@@ -87,9 +94,12 @@ public class DemoData implements CommandLineRunner {
     // Generate products
     List<Product> productList = productFactory.generateRandomProducts(numberOfProducts);
 
-    // Persist them to the database
+    // Persist them to the database and save list to purchaseFactory
     logger.info("Loading " + numberOfProducts + " products...");
-    productRepository.saveAll(productList);
+    purchaseFactory.setAvailableProducts(productRepository.saveAll(productList));
+    //save actual users if that hasn't happened
+    userFactory.persistActualUsers(userRepository);
+
 
     //Generate reviews for each product and persist them to the database.
     for (Product product : productList) {
@@ -97,52 +107,6 @@ public class DemoData implements CommandLineRunner {
       product.setReviews(reviewList);
       reviewRepository.saveAll(reviewList);
     }
-    logger.info("Data load completed. You can make requests now.");
-
-    Purchase purchase1 = new Purchase();
-    BillingAddress billingAddress = new BillingAddress();
-    billingAddress.setEmail("bob@ross.com");
-    purchase1.setBillingAddress(billingAddress);
-    purchaseRepository.save(purchase1);
-
-    Purchase purchase2 = new Purchase();
-    purchase2.setBillingAddress(billingAddress);
-    purchaseRepository.save(purchase2);
-
-    Purchase purchase3 = new Purchase();
-    purchase3.setBillingAddress(billingAddress);
-    purchaseRepository.save(purchase3);
-
-    Purchase purchase4 = new Purchase();
-    billingAddress.setEmail("blah");
-
-    User user = new User("amir@amir.com", "Customer", "Amir", "Sharapov",
-            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA",98101));
-    userRepository.save(user);
-
-    User user1 = new User("cgandy@catalyte.io", "Casey", "Gandy",
-            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
-    userRepository.save(user1);
-
-    User user2 = new User("cdavis@catalyte.io","Chandler", "Davis",
-            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
-    userRepository.save(user2);
-
-    User user3 = new User("dduval@catalyte.io","Devin", "Duval",
-            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
-    userRepository.save(user3);
-
-    User user4 = new User("bmiller@catalyte.io","Blake", "Miller",
-            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
-    userRepository.save(user4);
-
-    User user5 = new User("kfreeman@catalyte.io", "Kaschae", "Freeman",
-            new io.catalyte.training.sportsproducts.domains.user.BillingAddress("123 Main St", "", "Seattle", "WA", 98101));
-    userRepository.save(user5);
-
-    purchase4.setBillingAddress(billingAddress);
-
-    purchaseRepository.save(purchase4);
 
     Calendar cal = Calendar.getInstance();
     Date today = new Date();
@@ -191,6 +155,37 @@ public class DemoData implements CommandLineRunner {
             cal.getTime()
         )
     );
+
+    //set promotional code list in purchaseFactory
+    purchaseFactory.setAvailablePromoCodes(promotionalCodeRepository.findAll());
+    //anonymous user
+    User amir = new User("amir@amir.com", "Customer", "Amir", "Sharapov",
+        new UserBillingAddress("123 Main St", "", "Seattle", "Washington",98101));
+
+    //generate purchases for actual users
+    for(User u: userFactory.ACTUAL_USERS){
+      int numberPurchases = new Random().nextInt(MAX_PURCHASES_PER_USER);
+      numberPurchases = numberPurchases > MIN_PURCHASES_PER_USER ? numberPurchases: MIN_PURCHASES_PER_USER;
+      int count = 0;
+      while(count++ < numberPurchases){
+        Purchase newPurchase = purchaseFactory.generateRandomPurchase(u);
+        Purchase savedPurchase = purchaseRepository.save(newPurchase);
+        for(LineItem line: savedPurchase.getProducts()){
+          line.setPurchase(savedPurchase);
+        }
+        lineItemRepository.saveAll(savedPurchase.getProducts());
+      }
+      Purchase anonymousPurchase = null;
+      if (new Random().nextBoolean()){
+        anonymousPurchase = purchaseFactory.generateRandomPurchase(amir);
+      } else {
+        anonymousPurchase = purchaseFactory.generateRandomPurchase();
+      }
+      purchaseRepository.save(anonymousPurchase);
+    }
+    logger.info("Data load completed. You can make requests now.");
+
+
 
   }
 
