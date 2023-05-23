@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import io.catalyte.training.sportsproducts.data.ProductFactory;
 import io.catalyte.training.sportsproducts.domains.product.Product;
-import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,37 +27,32 @@ import org.springframework.dao.DataAccessException;
 @WebMvcTest(ReviewServiceImpl.class)
 public class ReviewServiceImplTest {
 
-  @InjectMocks
-  private ReviewServiceImpl reviewServiceImpl;
-
   @Rule
   public ExpectedException thrown = ExpectedException.none();
-
-  @Mock
-  private ReviewRepository reviewRepository;
-
   Review testReview1;
   Review testReview2;
   Review testReview3;
   Product testProduct1;
   Product testProduct2;
   ProductFactory productFactory;
-
   List<Review> testReviewsForProduct1List = new ArrayList<>();
   List<Review> testReviewsForProduct2List = new ArrayList<>();
+  @InjectMocks
+  private ReviewServiceImpl reviewServiceImpl;
+  @Mock
+  private ReviewRepository reviewRepository;
 
   @Before
-  public void setUp(){
+  public void setUp() {
     MockitoAnnotations.initMocks(this);
 
     setTestReviews();
-
 
     when(reviewRepository.findByProductId(anyLong())).thenReturn(testReviewsForProduct1List);
 
   }
 
-  private void setTestReviews(){
+  private void setTestReviews() {
     //Create three random reviews set to two null products.
     productFactory = new ProductFactory();
     testProduct1 = new Product();
@@ -94,18 +88,18 @@ public class ReviewServiceImplTest {
     testProduct1.setReviews(testReviewsForProduct1List);
     testProduct2.setReviews(testReviewsForProduct2List);
 
-
   }
 
   @Test
-  public void getAllReviewByProductIdReturnsReviews(){
+  public void getAllReviewByProductIdReturnsReviews() {
     List<Review> actual = reviewServiceImpl.getAllReviewsByProductId(123L);
     assertEquals(testReviewsForProduct1List, actual);
   }
 
   @Test
-  public void getAllReviewsByProductIdThrowsError(){
-    doThrow(new DataAccessException("TEST EXCEPTION") {}).when(reviewRepository).findByProductId(anyLong());
+  public void getAllReviewsByProductIdThrowsError() {
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(reviewRepository).findByProductId(anyLong());
     assertThrows(ServerError.class, () -> reviewServiceImpl.getAllReviewsByProductId(123L));
   }
 

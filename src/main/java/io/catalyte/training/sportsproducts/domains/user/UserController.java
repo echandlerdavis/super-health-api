@@ -5,11 +5,19 @@ import static io.catalyte.training.sportsproducts.constants.LoggingConstants.UPD
 import static io.catalyte.training.sportsproducts.constants.Paths.USERS_PATH;
 import static io.catalyte.training.sportsproducts.constants.StringConstants.AUTHORIZATION_HEADER;
 
-import org.apache.logging.log4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Rest controller for the user entity
@@ -18,10 +26,9 @@ import java.util.List;
 @RequestMapping(value = USERS_PATH)
 public class UserController {
 
-  Logger logger = LogManager.getLogger(UserController.class);
-
   @Autowired
   private final UserServiceImpl userService;
+  Logger logger = LogManager.getLogger(UserController.class);
 
   public UserController(UserServiceImpl userService) {
     this.userService = userService;
@@ -63,6 +70,7 @@ public class UserController {
     logger.info(UPDATE_USER_REQUEST);
     return new ResponseEntity<>(userService.updateUser(bearerToken, id, user), HttpStatus.OK);
   }
+
   @PutMapping(path = "/{id}/updateLastActive")
   public ResponseEntity<Boolean> updateLastActive(
       @PathVariable Long id,
@@ -72,7 +80,7 @@ public class UserController {
     logger.info(UPDATE_LAST_ACTIVE);
     User savedUser = userService.updateLastActive(bearerToken, id, user);
     if (savedUser != null) {
-      return new ResponseEntity<>(Boolean.TRUE ,HttpStatus.OK);
+      return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 
     return new ResponseEntity<>(Boolean.FALSE, HttpStatus.OK);

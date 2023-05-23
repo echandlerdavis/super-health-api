@@ -1,29 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <groupId>io.catalyte.training.sportsproducts</groupId>
   <artifactId>sports-apparel-api</artifactId>
-  <modelVersion>4.0.0</modelVersion>
-  <version>1.1-SNAPSHOT</version>
-
-  <parent>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <groupId>org.springframework.boot</groupId>
-    <relativePath/>
-    <version>2.2.4.RELEASE</version> <!-- lookup parent from repository -->
-  </parent>
-
   <build>
     <plugins>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.springframework.boot</groupId>
       </plugin>
     </plugins>
   </build>
-
   <dependencies>
     <dependency>
       <artifactId>spring-boot-starter</artifactId>
@@ -38,19 +26,19 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
+      <groupId>org.springframework.boot</groupId>
     </dependency>
 
     <dependency>
-      <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client</artifactId>
+      <groupId>com.google.api-client</groupId>
       <version>1.32.1</version>
     </dependency>
 
     <dependency>
-      <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
+      <groupId>io.jsonwebtoken</groupId>
       <version>0.9.1</version>
     </dependency>
 
@@ -149,5 +137,17 @@
     </dependency>
 
   </dependencies>
+  <groupId>io.catalyte.training.sportsproducts</groupId>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <relativePath/>
+    <version>2.2.4.RELEASE</version> <!-- lookup parent from repository -->
+  </parent>
+
+  <version>1.1-SNAPSHOT</version>
 
 </project>

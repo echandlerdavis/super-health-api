@@ -4,6 +4,7 @@ package io.catalyte.training.sportsproducts.constants;
  * Class for logging statements
  */
 public class LoggingConstants {
+
   //User domain logging statements
   //Google authentication failure
   public static final String GOOGLE_AUTHENTICATION_FAILURE =
@@ -18,6 +19,5 @@ public class LoggingConstants {
   public static final String UPDATE_USER_REQUEST = "Request received for updateUser";
   public static final String UPDATE_LAST_ACTIVE = "Request received to update last active time";
   public static final String GET_PROMOCODE_FORMAT = "Get request for promocode %s";
-
 
 }
