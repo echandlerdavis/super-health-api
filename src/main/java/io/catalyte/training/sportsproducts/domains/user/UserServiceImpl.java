@@ -10,9 +10,9 @@ import static io.catalyte.training.sportsproducts.constants.LoggingConstants.UPD
 import static io.catalyte.training.sportsproducts.constants.Roles.CUSTOMER;
 
 import io.catalyte.training.sportsproducts.auth.GoogleAuthService;
+import io.catalyte.training.sportsproducts.constants.LoggingConstants;
 import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
-import io.catalyte.training.sportsproducts.constants.LoggingConstants;
 import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -94,10 +94,10 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User updateLastActive(String bearerToken, Long id, User user){
+  public User updateLastActive(String bearerToken, Long id, User user) {
     logger.info(String.format(UPDATED_LAST_ACTIVE_FORMAT, id));
     user.setLastActive(new Date());
-    return updateUser(bearerToken, id, user );
+    return updateUser(bearerToken, id, user);
   }
 
   /**
@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
     // }
 
     // Set lastActive
-    if (user.getLastActive() == null){
+    if (user.getLastActive() == null) {
       user.setLastActive(new Date());
     }
 

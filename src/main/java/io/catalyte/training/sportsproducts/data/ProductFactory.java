@@ -14,6 +14,7 @@ import org.apache.commons.lang3.RandomStringUtils;
  * This class provides tools for random generation of products.
  */
 public class ProductFactory {
+
   private static final String[] brands = {
       "Nike",
       "Brooks",
@@ -136,12 +137,13 @@ public class ProductFactory {
   };
 
   private static final Random randomGenerator = new Random();
+
   /**
    * Returns a random brand from the list of brands.
    *
    * @return - a brand string
    */
-  public static String getBrand(){
+  public static String getBrand() {
     return brands[randomGenerator.nextInt(brands.length)];
   }
 
@@ -150,19 +152,20 @@ public class ProductFactory {
    *
    * @return - a material string
    */
-  public static String getMaterial(){
+  public static String getMaterial() {
     return materials[randomGenerator.nextInt(materials.length)];
   }
 
   /**
    * Returns a random double between minimum and maximum parameters to two decimal places.
+   *
    * @param min - a double minimum value
    * @param max - a double maximum value
    * @return - a double between minimum and maximum values as the price to two decimal places.
    */
-  public static Double getPrice(double min, double max){
+  public static Double getPrice(double min, double max) {
     DecimalFormat df = new DecimalFormat("0.00");
-    return Double.valueOf(df.format((randomGenerator.nextDouble() * (max-min)) + min));
+    return Double.valueOf(df.format((randomGenerator.nextDouble() * (max - min)) + min));
   }
 
   /**
@@ -171,9 +174,10 @@ public class ProductFactory {
    * @param max - a maximum value integer
    * @return - an integer representing quantity
    */
-  public static Integer getQuantity(int max){
+  public static Integer getQuantity(int max) {
     return randomGenerator.nextInt(max);
   }
+
   /**
    * Returns a random demographic from the list of demographics.
    *
@@ -188,7 +192,7 @@ public class ProductFactory {
    *
    * @return - a category string
    */
-  public static String getCategory(){
+  public static String getCategory() {
     return categories[randomGenerator.nextInt(categories.length)];
   }
 
@@ -197,7 +201,7 @@ public class ProductFactory {
    *
    * @return - a type string
    */
-  public static String getType(){
+  public static String getType() {
     return types[randomGenerator.nextInt(types.length)];
   }
 
@@ -206,7 +210,7 @@ public class ProductFactory {
    *
    * @return - an adjective string
    */
-  public static String getAdjective(){
+  public static String getAdjective() {
     return adjectives[randomGenerator.nextInt(adjectives.length)];
   }
 
@@ -215,7 +219,7 @@ public class ProductFactory {
    *
    * @return - a color code string
    */
-  public static String getColorCode(){
+  public static String getColorCode() {
     return colors[randomGenerator.nextInt(colors.length)];
   }
 
@@ -259,7 +263,7 @@ public class ProductFactory {
    *
    * @return - a boolean
    */
-  private static boolean isActive(){
+  private static boolean isActive() {
     return randomGenerator.nextBoolean();
   }
 
@@ -268,7 +272,7 @@ public class ProductFactory {
    *
    * @return - a string of review content.
    */
-  public static String getReviewContent(){
+  public static String getReviewContent() {
     return reviews[randomGenerator.nextInt(reviews.length)];
   }
 
@@ -277,7 +281,7 @@ public class ProductFactory {
    *
    * @return - a string user name
    */
-  public static String getReviewUserName(){
+  public static String getReviewUserName() {
     return reviewUserNames[randomGenerator.nextInt(reviewUserNames.length)];
   }
 
@@ -286,34 +290,18 @@ public class ProductFactory {
    *
    * @return - an integer between 1 and 5.
    */
-  public static int getReviewRating(){
+  public static int getReviewRating() {
     return randomGenerator.nextInt(4) + 1;
   }
 
   /**
-   * Generates a list of random review objects, length of list between 0 and 10.
-   * @param product - the product the list of reviews will belong to.
-   * @return an array list of review objects.
-   */
-  public List<Review> generateRandomReviews(Product product){
-
-    List<Review> reviewList = new ArrayList<>();
-    int numberOfReviews = randomGenerator.nextInt(10);
-
-    for(int i = 0; i < numberOfReviews; i++){
-      reviewList.add(createRandomReview(product, (i + 1)));
-    }
-
-    return reviewList;
-  }
-
-  /**
    * Generates a single Review object.
+   *
    * @param product - the product the review belongs to
-   * @param number - a number to add to the title.
+   * @param number  - a number to add to the title.
    * @return a single Review object.
    */
-  public static Review createRandomReview(Product product, int number){
+  public static Review createRandomReview(Product product, int number) {
     Review review = new Review();
     review.setTitle("Review #" + number);
     review.setReview(getReviewContent());
@@ -324,6 +312,24 @@ public class ProductFactory {
     review.setProduct(product);
 
     return review;
+  }
+
+  /**
+   * Generates a list of random review objects, length of list between 0 and 10.
+   *
+   * @param product - the product the list of reviews will belong to.
+   * @return an array list of review objects.
+   */
+  public List<Review> generateRandomReviews(Product product) {
+
+    List<Review> reviewList = new ArrayList<>();
+    int numberOfReviews = randomGenerator.nextInt(10);
+
+    for (int i = 0; i < numberOfReviews; i++) {
+      reviewList.add(createRandomReview(product, (i + 1)));
+    }
+
+    return reviewList;
   }
 
   /**

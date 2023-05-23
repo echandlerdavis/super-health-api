@@ -16,9 +16,11 @@ public class BillingAddress {
   private String email;
   private String phone;
 
-  public BillingAddress() {}
+  public BillingAddress() {
+  }
 
-  public BillingAddress(String billingStreet, String billingStreet2, String billingCity, String billingState, int billingZip, String email, String phone) {
+  public BillingAddress(String billingStreet, String billingStreet2, String billingCity,
+      String billingState, int billingZip, String email, String phone) {
     this.billingStreet = billingStreet;
     this.billingStreet2 = billingStreet2;
     this.billingCity = billingCity;

@@ -5,14 +5,12 @@ package io.catalyte.training.sportsproducts.domains.product;
  */
 public enum ProductFilterTypes {
 
-    brand,
-    category,
-    demographic,
-    material,
-    priceMax,
-    priceMin,
-    primaryColor
-    ;
-
+  brand,
+  category,
+  demographic,
+  material,
+  priceMax,
+  priceMin,
+  primaryColor
 
 }

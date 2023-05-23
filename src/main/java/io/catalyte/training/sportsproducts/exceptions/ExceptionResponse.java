@@ -24,21 +24,23 @@ public class ExceptionResponse {
     this.timestamp = timestamp;
     this.errorMessage = errorMessage;
   }
-  public ExceptionResponse(String error, Date timestamp, String errorMessage,List payload) {
+
+  public ExceptionResponse(String error, Date timestamp, String errorMessage, List payload) {
     this.error = error;
     this.timestamp = timestamp;
     this.errorMessage = errorMessage;
     this.payload = payload;
   }
 
-  public ExceptionResponse(String error, Date timestamp, String errorMessage, Map<String, List<Product>> payload){
+  public ExceptionResponse(String error, Date timestamp, String errorMessage,
+      Map<String, List<Product>> payload) {
     this(error, timestamp, error);
     List<String> consolidatedMap = new ArrayList<>();
     //consolidate map to list
-    for (String errorType: payload.keySet()){
+    for (String errorType : payload.keySet()) {
       consolidatedMap.add(errorType);
       List<Product> associatedProducts = payload.get(errorType);
-      for (Product p: associatedProducts){
+      for (Product p : associatedProducts) {
         consolidatedMap.add(p.toString());
       }
     }

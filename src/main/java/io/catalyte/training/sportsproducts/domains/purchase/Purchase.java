@@ -93,26 +93,29 @@ public class Purchase {
       PromotionalCode promoCode) {
     this.promoCode = promoCode;
   }
+
   public Date getDate() {
     return date;
   }
 
-  public void setDate(Date date){
+  public void setDate(Date date) {
     this.date = date;
   }
 
   public double getShippingCharge() {
     return shippingCharge;
   }
+
   public void setShippingCharge(double shippingCharge) {
     this.shippingCharge = shippingCharge;
   }
 
   /**
    * Get the total cost of all the line items
+   *
    * @return double
    */
-  public double calcLineItemTotal(){
+  public double calcLineItemTotal() {
     return products.stream()
         .map(line -> line.getProduct().getPrice() * line.getQuantity())
         .reduce(0.0, (runningTotal, lineTotal) -> runningTotal + lineTotal);
@@ -120,9 +123,10 @@ public class Purchase {
 
   /**
    * Return if shipping charges should apply to this purchase
+   *
    * @return boolean
    */
-  public boolean applyShippingCharge(){
+  public boolean applyShippingCharge() {
     return calcLineItemTotal() >= 50.00;
 
   }

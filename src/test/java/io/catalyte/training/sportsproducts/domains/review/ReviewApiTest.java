@@ -1,5 +1,9 @@
 package io.catalyte.training.sportsproducts.domains.review;
 
+import static io.catalyte.training.sportsproducts.constants.Paths.PRODUCTS_PATH;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import io.catalyte.training.sportsproducts.data.ProductFactory;
 import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
@@ -14,38 +18,29 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static io.catalyte.training.sportsproducts.constants.Paths.PRODUCTS_PATH;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ReviewApiTest {
-  @Autowired
-  private WebApplicationContext wac;
-
-  private MockMvc mockMvc;
 
   @Autowired
   ReviewRepository reviewRepository;
-
   @Autowired
   ProductRepository productRepository;
-
   ProductFactory productFactory = new ProductFactory();
   Product testProduct = productFactory.createRandomProduct();
-
   Review testReview1 = productFactory.createRandomReview(testProduct, 1);
   Review testReview2 = productFactory.createRandomReview(testProduct, 2);
+  @Autowired
+  private WebApplicationContext wac;
+  private MockMvc mockMvc;
 
   @Before
-  public void setUp(){
+  public void setUp() {
     setTestReviews();
     mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
   }
 
-  private void setTestReviews(){
+  private void setTestReviews() {
     productRepository.save(testProduct);
     testProduct.setReviews(Arrays.asList(testReview1, testReview2));
     reviewRepository.saveAll(Arrays.asList(testReview1, testReview2));

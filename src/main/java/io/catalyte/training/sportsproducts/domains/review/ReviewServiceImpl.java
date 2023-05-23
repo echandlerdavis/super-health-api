@@ -25,6 +25,7 @@ public class ReviewServiceImpl implements ReviewService {
 
   /**
    * Retrieves all reviews from the database attributed to a specific product id.
+   *
    * @param productId - the id of the product the review belongs to
    * @return - a list of reviews belonging to a product with the given product id.
    */

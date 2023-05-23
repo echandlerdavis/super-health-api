@@ -15,13 +15,13 @@ import org.springframework.dao.DataAccessException;
 
 public class UserFactory {
 
-  private static final Random random = new Random();
-  private static final int MAX_NAME_LENGTH = 10;
-  private static final int MAX_STREET_DIGITS = 4;
   /**
    * List of actual users
    */
   public static final List<User> ACTUAL_USERS = new ArrayList();
+  private static final Random random = new Random();
+  private static final int MAX_NAME_LENGTH = 10;
+  private static final int MAX_STREET_DIGITS = 4;
   private static boolean USERS_PERSISTED = false;
 
   /**
@@ -39,7 +39,6 @@ public class UserFactory {
   public static StateEnum getRandomState() {
     int size = StateEnum.values().length;
     StateEnum state = StateEnum.values()[random.nextInt(size)];
-    ;
     return state;
   }
 
@@ -56,7 +55,6 @@ public class UserFactory {
         .limit(length > 0 ? length : 1)
         .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
         .toString();
-    ;
     return randomString;
   }
 
@@ -68,7 +66,6 @@ public class UserFactory {
    */
   public static String generateRandomName(int length) {
     String randomString = generateRandomString(length);
-    ;
     return randomString.substring(0, 1).toUpperCase() + randomString.substring(1);
   }
 
@@ -82,9 +79,8 @@ public class UserFactory {
     String numberString = "";
     int digitCount = 0;
     while (digitCount++ < maxDigits) {
-      numberString = numberString + Integer.toString(random.nextInt(9));
+      numberString = numberString + random.nextInt(9);
     }
-    ;
     return Integer.parseInt(numberString);
   }
 
@@ -109,7 +105,6 @@ public class UserFactory {
     while (lineNumber.length() < 4) {
       lineNumber += "0";
     }
-    ;
     return areaCode + "-" + prefix + "-" + lineNumber;
   }
 
@@ -121,7 +116,6 @@ public class UserFactory {
   public static String generateRandomEmailAddress() {
     String userName = generateRandomString(random.nextInt(12));
     String domain = generateRandomString(random.nextInt(12));
-    ;
     return userName + "@" + domain + ".com";
   }
 
@@ -139,10 +133,9 @@ public class UserFactory {
     while (zip.length() < 5) {
       zip += "0";
     }
-    ;
     address.setBillingStreet(street1);
     if (random.nextBoolean()) {
-      address.setBillingStreet2("#" + Integer.toString(getRandomInt(3)));
+      address.setBillingStreet2("#" + getRandomInt(3));
     }
     address.setBillingCity(city);
     address.setBillingState(state.fullName);
@@ -184,9 +177,9 @@ public class UserFactory {
    */
   public static CreditCard generateRandomCreditCard(String owner) {
     String creditCardNumber = Integer.toString(getRandomInt(5))
-        + Integer.toString(getRandomInt(5))
-        + Integer.toString(getRandomInt(5))
-        + Integer.toString(getRandomInt(1));
+        + getRandomInt(5)
+        + getRandomInt(5)
+        + getRandomInt(1);
     while (creditCardNumber.length() < 16) {
       creditCardNumber += "0";
     }
@@ -240,11 +233,11 @@ public class UserFactory {
               lastNames[i],
               generateRandomUserBillingAddress()));
     }
-    ;
   }
 
   /**
    * Generate a user with all random information
+   *
    * @return User
    */
   public static User generateRandomUser() {
@@ -259,6 +252,7 @@ public class UserFactory {
 
   /**
    * Save a given User to the given UserRepository
+   *
    * @param user User to save
    * @param repo UserRepository to save User in
    * @return User

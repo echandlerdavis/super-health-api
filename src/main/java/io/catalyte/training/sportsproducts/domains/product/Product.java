@@ -1,8 +1,8 @@
 package io.catalyte.training.sportsproducts.domains.product;
 
 import io.catalyte.training.sportsproducts.domains.review.Review;
-import io.micrometer.core.lang.Nullable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -63,9 +63,10 @@ public class Product {
   public Product(String name, String description,
       String demographic, String category,
       String type, String releaseDate,
-      String brand,String imageSrc, String material,
+      String brand, String imageSrc, String material,
       Integer quantity, Double price, Boolean active, String globalProductCode,
-      String styleNumber, String secondaryColorCode, String primaryColorCode, List<Review> reviews) {
+      String styleNumber, String secondaryColorCode, String primaryColorCode,
+      List<Review> reviews) {
     this.name = name;
     this.description = description;
     this.demographic = demographic;
@@ -182,38 +183,42 @@ public class Product {
   }
 
   public String getBrand() {
-    return brand; 
+    return brand;
   }
 
   public void setBrand(String brand) {
-    this.brand = brand; 
+    this.brand = brand;
   }
 
   public String getImageSrc() {
     return imageSrc;
   }
-  public void setImageSrc(String imageSrc){ 
-    this.imageSrc = imageSrc; 
+
+  public void setImageSrc(String imageSrc) {
+    this.imageSrc = imageSrc;
   }
 
   public Integer getQuantity() {
-    return quantity; 
-  }
-  public void setQuantity(Integer quantity){ 
-    this.quantity = quantity; 
+    return quantity;
   }
 
-  public String getMaterial() { 
-    return  material; 
+  public void setQuantity(Integer quantity) {
+    this.quantity = quantity;
   }
-  public void setMaterial(String material) { 
-    this.material = material; 
+
+  public String getMaterial() {
+    return material;
+  }
+
+  public void setMaterial(String material) {
+    this.material = material;
   }
 
   public Double getPrice() {
-    return price; 
+    return price;
   }
-  public void setPrice(Double price) { 
+
+  public void setPrice(Double price) {
     this.price = price;
   }
 
@@ -236,70 +241,56 @@ public class Product {
 
     Product product = (Product) o;
 
-    if (id != null ? !id.equals(product.id)
-            : product.id != null) {
+    if (!Objects.equals(id, product.id)) {
       return false;
     }
-    if (brand != null ? !brand.equals(product.brand)
-            : product.brand != null) {
+    if (!Objects.equals(brand, product.brand)) {
       return false;
     }
-    if (imageSrc != null ? !imageSrc.equals(product.imageSrc)
-            : product.imageSrc != null) {
+    if (!Objects.equals(imageSrc, product.imageSrc)) {
       return false;
     }
-    if (material != null ? !material.equals(product.material)
-            : product.material != null) {
+    if (!Objects.equals(material, product.material)) {
       return false;
     }
-    if (price != null ? !price.equals(product.price)
-            : product.price != null) {
+    if (!Objects.equals(price, product.price)) {
       return false;
     }
-    if (quantity != null ? !quantity.equals(product.quantity)
-            : product.quantity != null) {
+    if (!Objects.equals(quantity, product.quantity)) {
       return false;
     }
-    if (name != null ? !name.equals(product.name) : product.name != null) {
+    if (!Objects.equals(name, product.name)) {
       return false;
     }
-    if (description != null ? !description.equals(product.description)
-        : product.description != null) {
+    if (!Objects.equals(description, product.description)) {
       return false;
     }
-    if (demographic != null ? !demographic.equals(product.demographic)
-        : product.demographic != null) {
+    if (!Objects.equals(demographic, product.demographic)) {
       return false;
     }
-    if (category != null ? !category.equals(product.category) : product.category != null) {
+    if (!Objects.equals(category, product.category)) {
       return false;
     }
-    if (type != null ? !type.equals(product.type) : product.type != null) {
+    if (!Objects.equals(type, product.type)) {
       return false;
     }
-    if (releaseDate != null ? !releaseDate.equals(product.releaseDate)
-        : product.releaseDate != null) {
+    if (!Objects.equals(releaseDate, product.releaseDate)) {
       return false;
     }
-    if (primaryColorCode != null ? !primaryColorCode.equals(product.primaryColorCode)
-        : product.primaryColorCode != null) {
+    if (!Objects.equals(primaryColorCode, product.primaryColorCode)) {
       return false;
     }
-    if (secondaryColorCode != null ? !secondaryColorCode.equals(product.secondaryColorCode)
-        : product.secondaryColorCode != null) {
+    if (!Objects.equals(secondaryColorCode, product.secondaryColorCode)) {
       return false;
     }
-    if (styleNumber != null ? !styleNumber.equals(product.styleNumber)
-        : product.styleNumber != null) {
+    if (!Objects.equals(styleNumber, product.styleNumber)) {
       return false;
     }
-    if (globalProductCode != null ? !globalProductCode.equals(product.globalProductCode)
-        : product.globalProductCode != null) {
+    if (!Objects.equals(globalProductCode, product.globalProductCode)) {
       return false;
     }
-    return active != null ? active.equals(product.active) : product.active == null;
+    return Objects.equals(active, product.active);
   }
-
 
   @Override
   public int hashCode() {
@@ -317,9 +308,9 @@ public class Product {
     result = 31 * result + (active != null ? active.hashCode() : 0);
     result = 31 * result + (brand != null ? brand.hashCode() : 0);
     result = 31 * result + (imageSrc != null ? imageSrc.hashCode() : 0);
-    result = 31 * result + (material  != null ? material.hashCode() : 0);
-    result = 31 * result + (price  != null ? price.hashCode() : 0);
-    result = 31 * result + (quantity  != null ? quantity.hashCode() : 0);
+    result = 31 * result + (material != null ? material.hashCode() : 0);
+    result = 31 * result + (price != null ? price.hashCode() : 0);
+    result = 31 * result + (quantity != null ? quantity.hashCode() : 0);
     return result;
   }
 
@@ -327,24 +318,24 @@ public class Product {
   public String toString() {
     return
         "Product{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", description='" + description + '\'' +
-        ", demographic='" + demographic + '\'' +
-        ", category='" + category + '\'' +
-        ", type='" + type + '\'' +
-        ", releaseDate='" + releaseDate + '\'' +
-        ", primaryColorCode='" + primaryColorCode + '\'' +
-        ", secondaryColorCode='" + secondaryColorCode + '\'' +
-        ", styleNumber='" + styleNumber + '\'' +
-        ", globalProductCode='" + globalProductCode + '\'' +
-        ", active='" + active + '\'' +
-        ", brand='" + brand + '\'' +
-        ", imageSrc='" + imageSrc + '\'' +
-        ", material'" + material + '\'' +
-        ", price'" + price + '\'' +
-      ", quantity'" + quantity + '\'' +
-            ", reviews'" + reviews + '\''+
-        '}';
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", demographic='" + demographic + '\'' +
+            ", category='" + category + '\'' +
+            ", type='" + type + '\'' +
+            ", releaseDate='" + releaseDate + '\'' +
+            ", primaryColorCode='" + primaryColorCode + '\'' +
+            ", secondaryColorCode='" + secondaryColorCode + '\'' +
+            ", styleNumber='" + styleNumber + '\'' +
+            ", globalProductCode='" + globalProductCode + '\'' +
+            ", active='" + active + '\'' +
+            ", brand='" + brand + '\'' +
+            ", imageSrc='" + imageSrc + '\'' +
+            ", material'" + material + '\'' +
+            ", price'" + price + '\'' +
+            ", quantity'" + quantity + '\'' +
+            ", reviews'" + reviews + '\'' +
+            '}';
   }
 }

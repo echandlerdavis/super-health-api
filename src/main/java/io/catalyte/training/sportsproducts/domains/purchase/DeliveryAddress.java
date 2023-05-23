@@ -17,9 +17,11 @@ public class DeliveryAddress {
   private String deliveryState;
   private int deliveryZip;
 
-  public DeliveryAddress() {}
+  public DeliveryAddress() {
+  }
 
-  public DeliveryAddress(String firstName, String lastName, String deliveryStreet, String deliveryStreet2, String deliveryCity, String deliveryState, int deliveryZip) {
+  public DeliveryAddress(String firstName, String lastName, String deliveryStreet,
+      String deliveryStreet2, String deliveryCity, String deliveryState, int deliveryZip) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.deliveryStreet = deliveryStreet;
