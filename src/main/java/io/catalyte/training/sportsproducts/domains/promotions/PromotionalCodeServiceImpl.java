@@ -81,6 +81,7 @@ public class PromotionalCodeServiceImpl implements PromotionalCodeService {
     }
 
     try {
+      logger.info("Promocode saved!");
       return promotionalCodeRepository.save(promotionalCode);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
