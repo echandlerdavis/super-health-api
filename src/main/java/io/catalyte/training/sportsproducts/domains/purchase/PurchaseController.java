@@ -1,5 +1,9 @@
 package io.catalyte.training.sportsproducts.domains.purchase;
 
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.GET_STATES;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.GET_USER_PURCHASES_FORMAT;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.POST_PURCHASE;
+import static io.catalyte.training.sportsproducts.constants.LoggingConstants.REJECTED_GET_ALL_PURCHASES;
 import static io.catalyte.training.sportsproducts.constants.Paths.PURCHASES_PATH;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +43,7 @@ public class PurchaseController {
    */
   @PostMapping
   public ResponseEntity savePurchase(@RequestBody Purchase purchase) {
+    logger.info(POST_PURCHASE);
     Purchase newPurchase = purchaseService.savePurchase(purchase);
     return new ResponseEntity<>(newPurchase, HttpStatus.CREATED);
   }
@@ -50,8 +55,14 @@ public class PurchaseController {
    */
   @GetMapping
   public ResponseEntity findAllPurchases() {
+    logger.error(REJECTED_GET_ALL_PURCHASES);
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
 
+  @GetMapping(value = "/StateOptions")
+  public ResponseEntity getStateOptions() {
+    logger.info(GET_STATES);
+    return new ResponseEntity(purchaseService.getStateOptions(), HttpStatus.OK);
   }
 
   /**
@@ -63,6 +74,7 @@ public class PurchaseController {
    */
   @RequestMapping(value = "/{email}", method = RequestMethod.GET)
   public ResponseEntity findAllPurchasesByEmail(@PathVariable String email) {
+    logger.info(String.format(GET_USER_PURCHASES_FORMAT, email));
     return new ResponseEntity(purchaseService.findByBillingAddressEmail(email), HttpStatus.OK);
   }
 }

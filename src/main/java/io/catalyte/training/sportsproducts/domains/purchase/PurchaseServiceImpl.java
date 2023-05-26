@@ -76,6 +76,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
   }
 
+  @Override
+  public List<StateEnumDTO> getStateOptions() {
+    return StateEnum.getStatesJsonList();
+  }
+
   /**
    * Persists a purchase to the database
    *
@@ -88,6 +93,16 @@ public class PurchaseServiceImpl implements PurchaseService {
     validateCreditCard(creditCard);
     //product validation
     validateProducts(newPurchase);
+    //products in newPurchase should now be products pulled from database
+    //calculate the shipping charge and apply if appropriate
+    if (newPurchase.applyShippingCharge()) {
+      newPurchase.setShippingCharge(
+          StateEnum.getShippingByName(newPurchase.getDeliveryAddress().getDeliveryState())
+      );
+    } else {
+      //else set shipping charge to 0
+      newPurchase.setShippingCharge(0.00);
+    }
     //promocode validation
     PromotionalCode appliedCode = newPurchase.getPromoCode();
     if (appliedCode != null) {
@@ -101,8 +116,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         //this means the promocode is either not active or not found
         newPurchase.setPromoCode(null);
       }
-
     }
+    //add date of today
+    newPurchase.setDate(new Date());
+
     //Handle ID received from UI and create savedPurchase
     newPurchase.setId(null);
     Purchase savedPurchase;
@@ -118,17 +135,25 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     // after the purchase is persisted and has an id, we need to handle its lineitems and persist them as well
     handleLineItems(newPurchase);
+    //update inventory quantities
+    updateInventory(newPurchase);
     savedPurchase.setProducts(lineItemRepository.findByPurchase(newPurchase));
+    //don't need purchase attached to line items
+    for (LineItem line : savedPurchase.getProducts()) {
+      line.setPurchase(null);
+    }
 
     return savedPurchase;
   }
 
   /**
-   * This helper method retrieves produ  ct information for each line item and persists it
+   * This helper method retrieves product information for each line item and persists it
    *
    * @param purchase - the purchase obj  ect to handle lineitems for
    */
   private void handleLineItems(Purchase purchase) {
+    //all LineItems should have already had their product set to
+    //the product retrieved from the database
     Set<LineItem> itemsList = purchase.getProducts();
 
     if (itemsList != null) {
@@ -181,12 +206,16 @@ public class PurchaseServiceImpl implements PurchaseService {
       Product product = lockedProducts.get(lineItem.getProduct().getId());
 
       // if product status is not active add the product to list of items unable to be processed
-      if (product.getActive() == null || !product.getActive()) {
+      if (product.getActive() == null || !product.getActive() || product == null) {
         inactiveProducts.add(product);
       }
-      if (lockedProducts.get(product.getId()).getQuantity() < lineItem.getQuantity()) {
+      if (product != null
+          && lockedProducts.get(product.getId()).getQuantity() < lineItem.getQuantity()) {
         insufficientStock.add(product);
       }
+
+      //set lineItem product to product instance from database
+      lineItem.setProduct(product);
 
     });
     if (inactiveProducts.size() > 0 || insufficientStock.size() > 0) {
@@ -208,12 +237,6 @@ public class PurchaseServiceImpl implements PurchaseService {
     if (insufficientStock.size() > 0) {
       throw new UnprocessableContent(StringConstants.INSUFFICIENT_INVENTORY, insufficientStock);
     }
-    //if all validation passes, dock inventory qtys on the server
-    lineItemSet.forEach(lineItem -> {
-      Product product = lockedProducts.get(lineItem.getProduct().getId());
-      product.setQuantity(product.getQuantity() - lineItem.getQuantity());
-      productService.saveProduct(product);
-    });
   }
 
   /**
@@ -337,6 +360,28 @@ public class PurchaseServiceImpl implements PurchaseService {
         .collect(Collectors.toList());
     return productService.getProductsByIds(ids).stream().collect(Collectors
         .toMap(Product::getId, Function.identity()));
+  }
+
+  /**
+   * Updates product inventory in the database based on a purchase
+   *
+   * @param purchase Purchase whose LineItem list will be used to reduce inventory quantities in the
+   *                 database
+   */
+  private void updateInventory(Purchase purchase) {
+    //purchase products at this point should be products from database, not ones passed
+    //from client
+    purchase.getProducts().forEach(lineItem -> {
+      Product product = lineItem.getProduct();
+      product.setQuantity(product.getQuantity() - lineItem.getQuantity());
+      try {
+        productService.saveProduct(product);
+      } catch (DataAccessException dae) {
+        logger.error("Failed to update inventory for product " + product.getId());
+        throw new ServerError(dae.getMessage());
+      }
+    });
+
   }
 
 }

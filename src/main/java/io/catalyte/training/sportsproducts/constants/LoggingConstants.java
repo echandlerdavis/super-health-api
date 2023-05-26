@@ -19,5 +19,9 @@ public class LoggingConstants {
   public static final String UPDATE_USER_REQUEST = "Request received for updateUser";
   public static final String UPDATE_LAST_ACTIVE = "Request received to update last active time";
   public static final String GET_PROMOCODE_FORMAT = "Get request for promocode %s";
+  public static final String POST_PURCHASE = "Received request to post purchase";
+  public static final String GET_STATES = "Received request for State options";
+  public static final String REJECTED_GET_ALL_PURCHASES = "Rejected request to get all purchases";
+  public static final String GET_USER_PURCHASES_FORMAT = "Received request to get all purchases with email %s";
 
 }

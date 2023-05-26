@@ -2,7 +2,9 @@ package io.catalyte.training.sportsproducts.domains.purchase;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum StateEnum {
   AL("Alabama", shippingCosts.DEFAULT.cost),
@@ -120,6 +122,16 @@ public enum StateEnum {
   }
 
   /**
+   * Get the StateEnum based on the given state name
+   *
+   * @param stateName String
+   * @return StateEnum
+   */
+  public static StateEnum getStateByName(String stateName) {
+    return BY_FULLNAME.get(formatStateName(stateName));
+  }
+
+  /**
    * Formats the given string to match the StateEnum.fullName values
    *
    * @param string String
@@ -136,6 +148,29 @@ public enum StateEnum {
     return cleanedString.trim();
   }
 
+  /**
+   * Get list of state DTO to send to front ent
+   *
+   * @return List of StateEnumDTO
+   */
+  public static List<StateEnumDTO> getStatesJsonList() {
+    return Arrays.stream(values())
+        .map(state -> new StateEnumDTO(state))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Check if given state is Alaska or Hawaii
+   *
+   * @param stateName String
+   * @return boolean
+   */
+  public static boolean isAlaskaOrHawaii(String stateName) {
+    String name = formatStateName(stateName);
+    StateEnum state = getStateByName(name);
+    return state.equals(AK) || state.equals(HI);
+  }
+
   private enum shippingCosts {
 
     DEFAULT(5),
@@ -146,5 +181,4 @@ public enum StateEnum {
       this.cost = value;
     }
   }
-
 }

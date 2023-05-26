@@ -1,13 +1,21 @@
 package io.catalyte.training.sportsproducts.domains.promotions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
 import io.catalyte.training.sportsproducts.exceptions.ResourceNotFound;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -134,8 +142,9 @@ public class PromotionalCodeServiceImplTest {
     testCode.setEndDate(endDate);
 
     when(promotionalCodeRepository.findByTitle(anyString())).thenReturn(testCode);
+
     PromotionalCode expected = testCode;
-    PromotionalCode actual = promotionalCodeServiceImpl.getPromotionalCodeByTitle("valid title");
+    PromotionalCode actual = promotionalCodeServiceImpl.getPromotionalCodeByTitle("title");
 
     assertEquals(expected, actual);
   }
@@ -146,7 +155,7 @@ public class PromotionalCodeServiceImplTest {
 
     PromotionalCode actual = promotionalCodeServiceImpl.getPromotionalCodeByTitle("invalid title");
 
-    assertTrue(false); //should not run
+    fail(); //should not run
   }
 }
 
