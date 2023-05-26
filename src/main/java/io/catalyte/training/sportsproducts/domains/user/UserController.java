@@ -54,9 +54,9 @@ public class UserController {
   }
 
   /**
-   * Controller method for updating the user
+   * Controller method for updating the user by id
    *
-   * @param id          Id of the user to update
+   * @param id          id of the user to update
    * @param user        User to update
    * @param bearerToken String value in the Authorization property of the header
    * @return User - Updated user
@@ -98,5 +98,44 @@ public class UserController {
   ) {
     logger.info("Request received for getUserByEmail");
     return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
+  }
+
+  /**
+   * Controller method for updating the user by email
+   *
+   * @param email       email of the user to update
+   * @param updatedUser User to update
+   * @param bearerToken String value in the Authorization property of the header
+   * @return User - Updated user
+   */
+  @PutMapping("/email/{email}")
+  public ResponseEntity<User> updateUser(
+      @PathVariable String email,
+      @RequestBody User updatedUser,
+      @RequestHeader(AUTHORIZATION_HEADER) String bearerToken
+  ) {
+    logger.info("Received request to update user " + email);
+    try {
+      User existingUser = userService.getUserByEmail(email);
+      if (existingUser == null) {
+        // User not found, return appropriate response
+        return ResponseEntity.notFound().build();
+      }
+
+      // Update the fields of the existing user with the new values
+      existingUser.setFirstName(updatedUser.getFirstName());
+      existingUser.setLastName(updatedUser.getLastName());
+      existingUser.setEmail(updatedUser.getEmail());
+      existingUser.setBillingAddress(updatedUser.getBillingAddress());
+
+      // Save the updated user back to the database
+      User savedUser = userService.updateUser(existingUser);
+
+      // Return the updated user in the response
+      return ResponseEntity.ok(savedUser);
+    } catch (Exception e) {
+      // Handle any errors that occur during the update process
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
   }
 }

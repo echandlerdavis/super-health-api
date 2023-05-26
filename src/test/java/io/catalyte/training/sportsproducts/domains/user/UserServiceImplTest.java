@@ -71,6 +71,8 @@ public class UserServiceImplTest {
 
     //userRepo.getById mock
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+    //userRepo.findByEmail
+    when(userRepository.findByEmail(anyString())).thenReturn(testUser);
   }
 
   public void setUserData(User emptyUser, Long id, String firstName, String lastName, String email,
