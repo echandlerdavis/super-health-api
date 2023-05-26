@@ -33,6 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ProductApiTest {
@@ -127,6 +128,7 @@ public class ProductApiTest {
     mockMvc.perform(get(PRODUCTS_PATH + "/primarycolors"))
         .andExpect(status().isOk());
   }
+
 
   @Test
   public void getDistinctSecondaryColorsReturnsWith200() throws Exception {
@@ -457,6 +459,7 @@ public class ProductApiTest {
 
   @Test
   public void saveProductReturns201WithProductObject() throws Exception {
+    //This test fails when run with coverage
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(PRODUCTS_PATH)
             .contentType("application/json")
@@ -472,6 +475,7 @@ public class ProductApiTest {
 
   @Test
   public void SaveProductReturns400IfPriceIsNegativeNumber() throws Exception {
+    //This test fails when run with coverage
     Product newProduct = productFactory.createRandomProduct();
     newProduct.setPrice(-1.00);
     ObjectMapper mapper = new ObjectMapper();
@@ -486,6 +490,7 @@ public class ProductApiTest {
 
   @Test
   public void SaveProductReturns400IQuantityIsNegativeNumber() throws Exception {
+    //This test fails when run with coverage
     Product newProduct = productFactory.createRandomProduct();
     newProduct.setQuantity(-1);
     ObjectMapper mapper = new ObjectMapper();
@@ -500,6 +505,7 @@ public class ProductApiTest {
 
   @Test
   public void SaveProductReturns400IfFieldsAreNull() throws Exception {
+    //This test fails when run with coverage
     Product newProduct = productFactory.createRandomProduct();
     newProduct.setActive(null);
     newProduct.setBrand(null);
@@ -516,6 +522,7 @@ public class ProductApiTest {
 
   @Test
   public void SaveProductReturns400IfFieldsAreEmpty() throws Exception {
+    //This test fails when run with coverage
     Product newProduct = productFactory.createRandomProduct();
     newProduct.setCategory("");
     newProduct.setBrand("");
@@ -532,6 +539,7 @@ public class ProductApiTest {
 
   @Test
   public void SaveProductReturns400WithListOfAllErrors() throws Exception {
+    //This test fails when run with coverage
     Product newProduct = productFactory.createRandomProduct();
     newProduct.setActive(null);
     newProduct.setBrand("");
@@ -544,7 +552,6 @@ public class ProductApiTest {
                 .content(mapper.writeValueAsString(newProduct)))
         .andExpect(status().isBadRequest())
         .andReturn().getResponse();
-    System.out.println("response = " + response);
     HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
     String[] responseErrors = responseMap.get("errorMessage").toString().split("\n");
     List<String> errorsList = Arrays.asList(responseErrors);

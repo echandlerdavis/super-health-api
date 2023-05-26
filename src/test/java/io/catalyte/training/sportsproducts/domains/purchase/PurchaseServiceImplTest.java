@@ -1,6 +1,8 @@
 package io.catalyte.training.sportsproducts.domains.purchase;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,15 +15,23 @@ import io.catalyte.training.sportsproducts.data.ProductFactory;
 import io.catalyte.training.sportsproducts.domains.product.Product;
 import io.catalyte.training.sportsproducts.domains.product.ProductRepository;
 import io.catalyte.training.sportsproducts.domains.product.ProductService;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCode;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeService;
+import io.catalyte.training.sportsproducts.domains.promotions.PromotionalCodeType;
 import io.catalyte.training.sportsproducts.exceptions.BadRequest;
+import io.catalyte.training.sportsproducts.exceptions.MultipleUnprocessableContent;
 import io.catalyte.training.sportsproducts.exceptions.ServerError;
 import io.catalyte.training.sportsproducts.exceptions.UnprocessableContent;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,9 +44,13 @@ import org.springframework.dao.DataAccessException;
 @WebMvcTest(PurchaseServiceImpl.class)
 public class PurchaseServiceImplTest {
 
+  private final int INVENTORY_QUANTITY = 100;
+  private final int PURCHASE_QUANTITY = 1;
+  private final long TEST_CODE_RATE = 25;
   CreditCard testCreditCard = new CreditCard("1234567890123456", "111", "04/30", "Visa");
   Purchase testPurchase = new Purchase();
   String testEmail = "test@validEmail.com";
+  PromotionalCode promoCode;
   ArrayList<Purchase> testPurchases = new ArrayList<>();
   @InjectMocks
   private PurchaseServiceImpl purchaseServiceImpl;
@@ -48,6 +62,8 @@ public class PurchaseServiceImplTest {
   private LineItemRepository lineItemRepository;
   @Mock
   private ProductRepository productRepository;
+  @Mock
+  private PromotionalCodeService promotionalCodeService;
   private ProductFactory productFactory = new ProductFactory();
   private List<Product> testProducts;
 
@@ -60,10 +76,17 @@ public class PurchaseServiceImplTest {
     // Generate list of test products to add to a purchase
     productFactory = new ProductFactory();
     testProducts = productFactory.generateRandomProducts(3);
-    for (Product p : testProducts) {
-      p.setQuantity(100);
-      productService.saveProduct(p);
-    }
+
+    //set the valid promocode
+    Long dateMilliseconds = new Date().getTime();
+    promoCode = new PromotionalCode(
+        "Test",
+        "description",
+        PromotionalCodeType.FLAT,
+        BigDecimal.valueOf(TEST_CODE_RATE),
+        new Date(dateMilliseconds),
+        new Date(dateMilliseconds * 1000 * 60 * 60 * 24)
+    );
 
     // Initialize a test purchase instance and list of purchases
     setTestPurchase();
@@ -73,10 +96,9 @@ public class PurchaseServiceImplTest {
     when(purchaseRepository.findByBillingAddressEmail(anyString())).thenReturn(testPurchases);
 
     // Set consecutive mock calls for product service since Purchase service consecutively calls this for each item in a purchase
-    when(productService.getProductById(any()))
-        .thenReturn(testProducts.get(0))
-        .thenReturn(testProducts.get(1))
-        .thenReturn(testProducts.get(2));
+    //set mock for productService.getProductsByIds
+    when(productService.getProductsByIds(any()))
+        .thenReturn(testProducts);
 
     when(productService.getProductsByIds(any())).thenReturn(testProducts);
 
@@ -88,9 +110,15 @@ public class PurchaseServiceImplTest {
       copyPurchase.setCreditCard(passedPurchase.getCreditCard());
       copyPurchase.setBillingAddress(passedPurchase.getBillingAddress());
       copyPurchase.setDeliveryAddress(passedPurchase.getDeliveryAddress());
+      copyPurchase.setDate(passedPurchase.getDate());
+      copyPurchase.setPromoCode(passedPurchase.getPromoCode());
+      copyPurchase.setShippingCharge(passedPurchase.getShippingCharge());
 
       return copyPurchase;
     });
+
+    //Set promotional code repo to return a valid promocode by default
+    when(promotionalCodeService.getPromotionalCodeByTitle(anyString())).thenReturn(promoCode);
 
     //Set lineItemRepository.save to add product to testPurchased
     when(lineItemRepository.findByPurchase(any(Purchase.class))).thenAnswer((l) -> {
@@ -129,10 +157,11 @@ public class PurchaseServiceImplTest {
     for (Product product : testProducts) {
       product.setActive(true);
       product.setId(id);
+      product.setQuantity(INVENTORY_QUANTITY);
       ++id;
       LineItem purchaseLineItem = new LineItem();
       purchaseLineItem.setProduct(product);
-      purchaseLineItem.setQuantity(1);
+      purchaseLineItem.setQuantity(PURCHASE_QUANTITY);
       purchasesList.add(purchaseLineItem);
     }
 
@@ -140,6 +169,7 @@ public class PurchaseServiceImplTest {
     testPurchase.setBillingAddress(testBillingAddress);
     testPurchase.setDeliveryAddress(testDeliveryAddress);
     testPurchase.setCreditCard(testCreditCard);
+    testPurchase.setPromoCode(promoCode);
   }
 
   @Test
@@ -149,6 +179,29 @@ public class PurchaseServiceImplTest {
 
     Purchase actual = purchaseServiceImpl.savePurchase(testPurchase);
     assertEquals(expected, actual);
+  }
+
+  @Test
+  public void savePurchaseIgnoresInvalidPromoCodeAndSaves() {
+    //simulate promocode attached to purchase is not a valid title
+    when(promotionalCodeService.getPromotionalCodeByTitle(anyString())).thenReturn(null);
+    assertNotNull(testPurchase.getPromoCode());
+    purchaseServiceImpl.savePurchase(testPurchase);
+    assertNull(testPurchase.getPromoCode());
+  }
+
+  @Test
+  public void savePurchaseSavesValidPromoCodeFromDataBase() {
+    PromotionalCode fakePromo = new PromotionalCode();
+    fakePromo.setTitle(promoCode.getTitle());
+    fakePromo.setRate(BigDecimal.valueOf(30));
+    fakePromo.setStartDate(promoCode.getStartDate());
+    fakePromo.setEndDate(promoCode.getEndDate());
+    fakePromo.setType(promoCode.getType());
+    testPurchase.setPromoCode(fakePromo);
+    Purchase actualPurchase = purchaseServiceImpl.savePurchase(testPurchase);
+
+    assertEquals(BigDecimal.valueOf(TEST_CODE_RATE), actualPurchase.getPromoCode().getRate());
   }
 
   @Test
@@ -353,6 +406,8 @@ public class PurchaseServiceImplTest {
   public void purchaseCalcLineItemTotalSingleItemTest() {
     final double PRICE = 1.00;
     final int QUANTITY = 49;
+    DeliveryAddress delivery = new DeliveryAddress();
+    delivery.setDeliveryState(StateEnum.WA.fullName);
     Set<LineItem> lineItems = new HashSet<>();
     Product product1 = new Product();
     product1.setPrice(PRICE);
@@ -362,15 +417,16 @@ public class PurchaseServiceImplTest {
     lineItems.add(line1);
     Purchase purchase = new Purchase();
     purchase.setProducts(lineItems);
+    purchase.setDeliveryAddress(delivery);
 
     assertEquals(PRICE * QUANTITY, purchase.calcLineItemTotal(), .001);
-    assertFalse(purchase.applyShippingCharge());
+    assertTrue(purchase.applyShippingCharge());
 
   }
 
   @Test
   public void purchaseCalcLineItemTotalMultipleItemTest() {
-    final double PRICE = 1.00;
+    final double PRICE = 1.01;
     final int QUANTITY = 25;
     Set<LineItem> lineItems = new HashSet<>();
     Product product1 = new Product();
@@ -387,13 +443,82 @@ public class PurchaseServiceImplTest {
     line2.setProduct(product2);
     line2.setQuantity(QUANTITY);
 
+    DeliveryAddress delivery = new DeliveryAddress();
+    delivery.setDeliveryState(StateEnum.RI.fullName);
+
     lineItems.add(line1);
     lineItems.add(line2);
     Purchase purchase = new Purchase();
     purchase.setProducts(lineItems);
+    purchase.setDeliveryAddress(delivery);
 
     assertEquals(PRICE * QUANTITY * lineItems.size(), purchase.calcLineItemTotal(), .001);
-    assertEquals(true, purchase.applyShippingCharge());
+    Assertions.assertFalse(purchase.applyShippingCharge());
+
+  }
+
+  @Test(expected = UnprocessableContent.class)
+  public void savePurchaseThrowsUnprocessableContentForNotEnoughInventory() {
+    int purchaseQuantity = INVENTORY_QUANTITY + PURCHASE_QUANTITY;
+    testPurchase.getProducts().iterator().next().setQuantity(purchaseQuantity);
+    purchaseServiceImpl.savePurchase(testPurchase);
+    fail();//shouldn't run
+  }
+
+  @Test(expected = MultipleUnprocessableContent.class)
+  public void savePurchaseThrowsMultipleUnprocessableContentForNotEnoughInventoryAndInactiveProduct() {
+    int purchaseQuantity = INVENTORY_QUANTITY + PURCHASE_QUANTITY;
+    testProducts.get(1).setActive(false);
+    Iterator<LineItem> lines = testPurchase.getProducts().iterator();
+    for (int count = 0; count < testPurchase.getProducts().size(); count++) {
+      LineItem line = lines.next();
+      if (count++ == 0) {
+        line.setQuantity(purchaseQuantity);
+      }
+    }
+    purchaseServiceImpl.savePurchase(testPurchase);
+    fail();//shouldn't run
+  }
+
+  @Test
+  public void purchaseApplyShippingChargeAlwaysTrueForAlaska() {
+    final double PRICE = 1.00;
+    final int QUANTITY = 100;
+    DeliveryAddress deliveryAddress = new DeliveryAddress();
+    deliveryAddress.setDeliveryState(StateEnum.AK.fullName);
+    Set<LineItem> lineItems = new HashSet<>();
+    Product product1 = new Product();
+    product1.setPrice(PRICE);
+    LineItem line1 = new LineItem();
+    line1.setProduct(product1);
+    line1.setQuantity(QUANTITY);
+    lineItems.add(line1);
+    Purchase purchase = new Purchase();
+    purchase.setProducts(lineItems);
+    purchase.setDeliveryAddress(deliveryAddress);
+
+    assertTrue(purchase.applyShippingCharge());
+
+  }
+
+  @Test
+  public void purchaseApplyShippingChargeAlwaysTrueForHawaii() {
+    final double PRICE = 1.00;
+    final int QUANTITY = 100;
+    DeliveryAddress deliveryAddress = new DeliveryAddress();
+    deliveryAddress.setDeliveryState(StateEnum.HI.fullName);
+    Set<LineItem> lineItems = new HashSet<>();
+    Product product1 = new Product();
+    product1.setPrice(PRICE);
+    LineItem line1 = new LineItem();
+    line1.setProduct(product1);
+    line1.setQuantity(QUANTITY);
+    lineItems.add(line1);
+    Purchase purchase = new Purchase();
+    purchase.setProducts(lineItems);
+    purchase.setDeliveryAddress(deliveryAddress);
+
+    assertTrue(purchase.applyShippingCharge());
 
   }
 

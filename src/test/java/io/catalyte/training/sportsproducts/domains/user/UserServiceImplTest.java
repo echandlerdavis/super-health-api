@@ -1,6 +1,7 @@
 package io.catalyte.training.sportsproducts.domains.user;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,7 +47,7 @@ public class UserServiceImplTest {
     lastName = "Belcher";
     email = "Bob@BobsBurgers.com";
     role = "BurgerMeister";
-    id = 1l;
+    id = 1L;
     lastActive = new Date();
     //set testUser
     testUser = new User();
@@ -95,7 +96,7 @@ public class UserServiceImplTest {
   public void updateLastActiveAuthenticationFailureThrowsResponseStatusExceptionTest() {
     when(googleAuthService.authenticateUser(anyString(), any(User.class))).thenReturn(false);
     User updated = userService.updateLastActive(testUser.getEmail(), id, testUser);
-    assertTrue(false); //this shouldn't run
+    fail(); //this shouldn't run
   }
 
   @Test(expected = ServerError.class)
@@ -103,7 +104,7 @@ public class UserServiceImplTest {
     when(userRepository.save(any(User.class))).thenThrow(
         new DataAccessResourceFailureException("Server down"));
     User updated = userService.updateLastActive(testUser.getEmail(), id, testUser);
-    assertTrue(false); //this shouldn't run
+    fail(); //this shouldn't run
   }
 
 }

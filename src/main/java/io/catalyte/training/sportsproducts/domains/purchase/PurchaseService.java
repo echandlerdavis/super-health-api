@@ -10,4 +10,6 @@ public interface PurchaseService {
 
   List<Purchase> findByBillingAddressEmail(String email);
 
+  List<StateEnumDTO> getStateOptions();
+
 }

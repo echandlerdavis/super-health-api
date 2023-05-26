@@ -30,7 +30,7 @@ public class Purchase {
 
   private DeliveryAddress deliveryAddress;
 
-  private double shippingCharge;
+  private Double shippingCharge;
 
   private BillingAddress billingAddress;
 
@@ -102,32 +102,36 @@ public class Purchase {
     this.date = date;
   }
 
-  public double getShippingCharge() {
+  public Double getShippingCharge() {
     return shippingCharge;
   }
 
-  public void setShippingCharge(double shippingCharge) {
+  public void setShippingCharge(Double shippingCharge) {
     this.shippingCharge = shippingCharge;
   }
 
   /**
    * Get the total cost of all the line items
    *
-   * @return double
+   * @return Double
    */
-  public double calcLineItemTotal() {
+  public Double calcLineItemTotal() {
     return products.stream()
         .map(line -> line.getProduct().getPrice() * line.getQuantity())
         .reduce(0.0, (runningTotal, lineTotal) -> runningTotal + lineTotal);
   }
 
   /**
-   * Return if shipping charges should apply to this purchase
+   * Return if shipping charges should apply to this purchase. Shipping charges apply if: LineItem
+   * total value is < $50 or the items are being shipped to Alaska or Hawaii
    *
-   * @return boolean
+   * @return Boolean
    */
-  public boolean applyShippingCharge() {
-    return calcLineItemTotal() >= 50.00;
+  public Boolean applyShippingCharge() {
+    if (StateEnum.isAlaskaOrHawaii(deliveryAddress.getDeliveryState())) {
+      return true;
+    }
+    return calcLineItemTotal() <= 50.00;
 
   }
 

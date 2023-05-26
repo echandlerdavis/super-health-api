@@ -2,6 +2,7 @@ package io.catalyte.training.sportsproducts.domains.purchase;
 
 import static io.catalyte.training.sportsproducts.constants.Paths.PURCHASES_PATH;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,20 +37,24 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest
 public class PurchaseApiTest {
 
+  private final int INVENTORY_QUANTITY = 100;
+  private final int PURCHASE_QUANTITY = 1;
+  private final Purchase testPurchase = new Purchase();
+  private final CreditCard testCreditCard = new CreditCard("1234567890123456", "111", "04/30",
+      "Visa");
+  private final String[] emails = {"email@address.com", "email@address.net", "email@address.edu"};
+  private final ProductFactory productFactory = new ProductFactory();
   @Autowired
   public PurchaseRepository purchaseRepository;
+
   @Autowired
   public ProductRepository productRepository;
+  //TODO: test for getting state shipping cost info
   @Autowired
   private WebApplicationContext wac;
   private MockMvc mockMvc;
-  private Purchase testPurchase = new Purchase();
-  private CreditCard testCreditCard = new CreditCard("1234567890123456", "111", "04/30", "Visa");
   private List<BillingAddress> testAddresses;
-  private String[] emails = {"email@address.com", "email@address.net", "email@address.edu"};
   private Map<String, Integer> purchaseCounts;
-  private ProductFactory productFactory = new ProductFactory();
-
   private List<Product> testProducts;
 
   @Before
@@ -91,10 +96,11 @@ public class PurchaseApiTest {
 
     testProducts.forEach(product -> {
       product.setActive(true);
+      product.setQuantity(INVENTORY_QUANTITY);
       Product savedProduct = productRepository.save(product);
       LineItem purchaseLineItem = new LineItem();
       purchaseLineItem.setProduct(savedProduct);
-      purchaseLineItem.setQuantity(1);
+      purchaseLineItem.setQuantity(PURCHASE_QUANTITY);
       purchasesList.add(purchaseLineItem);
     });
 
@@ -102,6 +108,7 @@ public class PurchaseApiTest {
     testPurchase.setBillingAddress(testBillingAddress);
     testPurchase.setDeliveryAddress(testDeliveryAddress);
     testPurchase.setCreditCard(testCreditCard);
+    testPurchase.setPromoCode(null);
 
     testAddresses = new ArrayList<>();
     purchaseCounts = new HashMap<>();
@@ -120,17 +127,23 @@ public class PurchaseApiTest {
 
   }
 
+
   /**
    * Remove purchases that were added in setup.
    */
   @After
   public void tearDown() {
-
+    //delete purchases
     for (String email : emails) {
       List<Purchase> purchases = purchaseRepository.findByBillingAddressEmail(email);
       for (Purchase p : purchases) {
         purchaseRepository.delete(p);
       }
+    }
+    //reset inventory quantities
+    for (Product p : testProducts) {
+      p.setQuantity(INVENTORY_QUANTITY);
+      productRepository.save(p);
     }
 
   }
@@ -279,6 +292,7 @@ public class PurchaseApiTest {
         .andExpect(status().isBadRequest());
   }
 
+
   @Test
   public void savePurchaseWithCVVLessThan3Digits() throws Exception {
     // object mapper for creating a json string
@@ -365,7 +379,6 @@ public class PurchaseApiTest {
   @Test
   public void findPurchasesByEmailReturnsEmailList() throws Exception {
 
-    System.out.println("purchaseRepository.findAll() = " + purchaseRepository.findAll());
     ObjectMapper mapper = new ObjectMapper();
 
     for (String email : emails) {
@@ -374,7 +387,7 @@ public class PurchaseApiTest {
       List<Purchase> purchases = mapper.readValue(response.getContentAsString(),
           new TypeReference<List<Purchase>>() {
           });
-      assertEquals(Integer.valueOf(purchaseCounts.get(email)), Integer.valueOf(purchases.size()));
+      assertEquals(purchaseCounts.get(email), Integer.valueOf(purchases.size()));
     }
 
     String purchasesJson =
@@ -504,6 +517,7 @@ public class PurchaseApiTest {
 
   @Test
   public void postPurchasesReturnsPurchaseObject() throws Exception {
+    //This test fails when run with coverage
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response =
         mockMvc.perform(
@@ -532,5 +546,146 @@ public class PurchaseApiTest {
       return false;
     }
     return p1.getCreditCard().equals(p2.getCreditCard());
+  }
+
+  @Test
+  public void updateInventoryTest() throws Exception {
+    //This test fails when run with coverage
+    int expectedEndingInventory = INVENTORY_QUANTITY - PURCHASE_QUANTITY;
+    ObjectMapper mapper = new ObjectMapper();
+    mockMvc.perform(
+            post(PURCHASES_PATH)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testPurchase)))
+        .andReturn().getResponse();
+
+    for (Product p : testProducts) {
+      Product updatedProduct = productRepository.findById(p.getId()).get();
+      assertEquals(Long.valueOf(expectedEndingInventory),
+          Long.valueOf(updatedProduct.getQuantity()));
+    }
+  }
+
+  @Test
+  public void shippingChargeIs0WhenPurchaseAbove50() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    //Update the prices on the purchase items
+    double price = 16.67;
+    int purchaseQty = 1;
+    for (Product p : testProducts) {
+      p.setPrice(price);
+      productRepository.save(p);
+    }
+    //update the purchase quantities
+    for (LineItem l : testPurchase.getProducts()) {
+      l.setQuantity(purchaseQty);
+    }
+    //set state
+    testPurchase.getDeliveryAddress().setDeliveryState(StateEnum.ID.fullName);
+    //save purchase
+    MockHttpServletResponse result = mockMvc.perform(
+            post(PURCHASES_PATH)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testPurchase)))
+        .andReturn().getResponse();
+    String json = result.getContentAsString();
+    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
+    //assertions
+    assertFalse(returnedPurchase.applyShippingCharge());
+    assertEquals(0.00, returnedPurchase.getShippingCharge(), .001);
+
+  }
+
+  @Test
+  public void shippingChargeIs5WhenPurchaseBelow50AndDeliverToLower48() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    StateEnum state = StateEnum.AL;
+    //Update the prices on the purchase items
+    double price = 16.66;
+    int purchaseQty = 1;
+    for (Product p : testProducts) {
+      p.setPrice(price);
+      productRepository.save(p);
+    }
+    //update the purchase quantities
+    for (LineItem l : testPurchase.getProducts()) {
+      l.setQuantity(purchaseQty);
+    }
+    //set state
+    testPurchase.getDeliveryAddress().setDeliveryState(state.fullName);
+    //save purchase
+    MockHttpServletResponse result = mockMvc.perform(
+            post(PURCHASES_PATH)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testPurchase)))
+        .andReturn().getResponse();
+    String json = result.getContentAsString();
+    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
+    //assertions
+    assertTrue(returnedPurchase.applyShippingCharge());
+    assertEquals(state.shippingCost, returnedPurchase.getShippingCharge(), .001);
+
+  }
+
+  @Test
+  public void shippingChargeIs10WhenShippingToAlaska() throws Exception {
+    StateEnum state = StateEnum.AK;
+    ObjectMapper mapper = new ObjectMapper();
+    //Update the prices on the purchase items
+    double price = 100.00;
+    int purchaseQty = 1;
+    for (Product p : testProducts) {
+      p.setPrice(price);
+      productRepository.save(p);
+    }
+    //update the purchase quantities
+    for (LineItem l : testPurchase.getProducts()) {
+      l.setQuantity(purchaseQty);
+    }
+    //set state
+    testPurchase.getDeliveryAddress().setDeliveryState(state.fullName);
+    //save purchase
+    MockHttpServletResponse result = mockMvc.perform(
+            post(PURCHASES_PATH)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testPurchase)))
+        .andReturn().getResponse();
+    String json = result.getContentAsString();
+    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
+    //assertions
+    assertTrue(returnedPurchase.applyShippingCharge());
+    assertEquals(state.shippingCost, returnedPurchase.getShippingCharge(), .001);
+
+  }
+
+  @Test
+  public void shippingChargeIs10WhenShippingToHawaii() throws Exception {
+    StateEnum state = StateEnum.HI;
+    ObjectMapper mapper = new ObjectMapper();
+    //Update the prices on the purchase items
+    double price = 100.00;
+    int purchaseQty = 1;
+    for (Product p : testProducts) {
+      p.setPrice(price);
+      productRepository.save(p);
+    }
+    //update the purchase quantities
+    for (LineItem l : testPurchase.getProducts()) {
+      l.setQuantity(purchaseQty);
+    }
+    //set state
+    testPurchase.getDeliveryAddress().setDeliveryState(state.fullName);
+    //save purchase
+    MockHttpServletResponse result = mockMvc.perform(
+            post(PURCHASES_PATH)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testPurchase)))
+        .andReturn().getResponse();
+    String json = result.getContentAsString();
+    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
+    //assertions
+    assertTrue(returnedPurchase.applyShippingCharge());
+    assertEquals(state.shippingCost, returnedPurchase.getShippingCharge(), .001);
+
   }
 }
