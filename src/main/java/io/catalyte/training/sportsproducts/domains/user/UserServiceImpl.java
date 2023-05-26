@@ -20,12 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Implements user service interface
  */
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
   private final Logger logger = LogManager.getLogger(UserServiceImpl.class);
@@ -41,10 +43,20 @@ public class UserServiceImpl implements UserService {
   // METHODS
 
   /**
+   * Updates user using Profile Page updates
+   */
+  @Override
+  public User updateUser(User user) {
+    // Save the updated user to the database
+    logger.info(String.format("Updated user %d", user.getId()));
+    return userRepository.save(user);
+  }
+
+  /**
    * Updates user given valid credentials
    *
    * @param bearerToken String value in the Authorization property of the header
-   * @param id          Id of the user to update
+   * @param id          id of the user to update
    * @param updatedUser User to update
    * @return User - Updated user
    */
@@ -61,8 +73,12 @@ public class UserServiceImpl implements UserService {
     }
 
     // UPDATES USER
-    User existingUser;
+    User existingUser = userRepository.findByEmail(updatedUser.getEmail());
 
+    if (existingUser == null) {
+      logger.error(String.format(NO_USER_WITH_EMAIL_FORMAT, updatedUser.getEmail()));
+      throw new ResourceNotFound(String.format(NO_USER_WITH_EMAIL_FORMAT, updatedUser.getEmail()));
+    }
     try {
       existingUser = userRepository.findById(id).orElse(null);
     } catch (DataAccessException dae) {

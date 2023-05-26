@@ -5,6 +5,8 @@ package io.catalyte.training.sportsproducts.domains.user;
  */
 public interface UserService {
 
+  User updateUser(User user);
+
   User updateUser(String credentials, Long id, User user);
 
   User createUser(User user);
