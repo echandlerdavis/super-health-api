@@ -17,19 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping
 public class ReviewController {
+
   Logger logger = LogManager.getLogger(ReviewController.class);
   @Autowired
   private ReviewService reviewService;
 
   /**
-   * Handles a GET request to /products/{productId}/reviews -
-   * returns all reviews attributed to a given product.
+   * Handles a GET request to /products/{productId}/reviews - returns all reviews attributed to a
+   * given product.
    *
    * @param productId - the id of the product the reviews belong to
    * @return all reviews in the database attributed to a given product.
    */
   @GetMapping(value = "products/{productId}/reviews")
-  public ResponseEntity<List<Review>> getAllReviewsByProductId(@PathVariable(value = "productId") Long productId){
+  public ResponseEntity<List<Review>> getAllReviewsByProductId(
+      @PathVariable(value = "productId") Long productId) {
     logger.info("Request received for getAllReviews");
     return new ResponseEntity<>(reviewService.getAllReviewsByProductId(productId), HttpStatus.OK);
   }

@@ -1,9 +1,12 @@
 package io.catalyte.training.sportsproducts.domains.user;
 
 import java.util.Date;
-import javax.persistence.*;
-import java.util.Arrays;
-import java.util.List;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * User entity in database
@@ -20,7 +23,7 @@ public class User {
   private String firstName;
   private String lastName;
   @Embedded
-  private BillingAddress billingAddress;
+  private UserBillingAddress billingAddress;
 
   private Date lastActive;
 
@@ -28,14 +31,15 @@ public class User {
     // Empty Constructor
   }
 
-  public User(String email, String firstName, String lastName, BillingAddress billingAddress) {
+  public User(String email, String firstName, String lastName, UserBillingAddress billingAddress) {
     this.email = email;
     this.firstName = firstName;
     this.lastName = lastName;
     this.billingAddress = billingAddress;
   }
 
-  public User(Long id, String email, String role, String firstName, String lastName, BillingAddress billingAddress) {
+  public User(Long id, String email, String role, String firstName, String lastName,
+      UserBillingAddress billingAddress) {
     this.id = id;
     this.email = email;
     this.role = role;
@@ -44,7 +48,8 @@ public class User {
     this.billingAddress = billingAddress;
   }
 
-  public User(String email, String role, String firstName, String lastName, BillingAddress billingAddress) {
+  public User(String email, String role, String firstName, String lastName,
+      UserBillingAddress billingAddress) {
     this.email = email;
     this.role = role;
     this.firstName = firstName;
@@ -91,6 +96,7 @@ public class User {
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
+
   public Date getLastActive() {
     return lastActive;
   }
@@ -100,11 +106,11 @@ public class User {
   }
 
 
-  public BillingAddress getBillingAddress() {
+  public UserBillingAddress getBillingAddress() {
     return billingAddress;
   }
 
-  public void setBillingAddress(BillingAddress billingAddress) {
+  public void setBillingAddress(UserBillingAddress billingAddress) {
     this.billingAddress = billingAddress;
   }
 

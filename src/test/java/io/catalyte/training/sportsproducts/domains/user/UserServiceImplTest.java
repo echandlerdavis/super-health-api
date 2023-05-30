@@ -1,9 +1,10 @@
 package io.catalyte.training.sportsproducts.domains.user;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.sportsproducts.auth.GoogleAuthService;
@@ -46,7 +47,7 @@ public class UserServiceImplTest {
     lastName = "Belcher";
     email = "Bob@BobsBurgers.com";
     role = "BurgerMeister";
-    id = 1l;
+    id = 1L;
     lastActive = new Date();
     //set testUser
     testUser = new User();
@@ -55,24 +56,28 @@ public class UserServiceImplTest {
     //google mock
     when(googleAuthService.authenticateUser(anyString(), any(User.class))).thenReturn(true);
     //userRepo.save mock
-    when(userRepository.save(any(User.class))).thenAnswer((u) ->{
+    when(userRepository.save(any(User.class))).thenAnswer((u) -> {
       User copyUser = new User();
       User passedUser = u.getArgument(0);
       setUserData(copyUser,
-                  passedUser.getId(),
-                  passedUser.getFirstName(),
-                  passedUser.getLastName(),
-                  passedUser.getRole(),
-                  passedUser.getEmail(),
-                  passedUser.getLastActive());
+          passedUser.getId(),
+          passedUser.getFirstName(),
+          passedUser.getLastName(),
+          passedUser.getRole(),
+          passedUser.getEmail(),
+          passedUser.getLastActive());
 
       return copyUser;
     });
 
     //userRepo.getById mock
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+    //userRepo.findByEmail
+    when(userRepository.findByEmail(anyString())).thenReturn(testUser);
   }
-  public void setUserData(User emptyUser, Long id, String firstName, String lastName, String email, String role, Date lastActive){
+
+  public void setUserData(User emptyUser, Long id, String firstName, String lastName, String email,
+      String role, Date lastActive) {
     emptyUser.setId(id);
     emptyUser.setFirstName(firstName);
     emptyUser.setLastName(lastName);
@@ -86,17 +91,20 @@ public class UserServiceImplTest {
     User updated = userService.updateLastActive(testUser.getEmail(), id, testUser);
     assertTrue(updated.getLastActive().after(lastActive));
   }
+
   @Test(expected = ResponseStatusException.class)
   public void updateLastActiveAuthenticationFailureThrowsResponseStatusExceptionTest() {
     when(googleAuthService.authenticateUser(anyString(), any(User.class))).thenReturn(false);
     User updated = userService.updateLastActive(testUser.getEmail(), id, testUser);
-    assertTrue(false); //this shouldn't run
+    fail(); //this shouldn't run
   }
+
   @Test(expected = ServerError.class)
   public void updateLastActiveAuthenticationFailureThrowsServerErrorTest() {
-    when(userRepository.save(any(User.class))).thenThrow(new DataAccessResourceFailureException("Server down"));
-    User updated = userService.updateLastActive(testUser.getEmail(), id,  testUser);
-    assertTrue(false); //this shouldn't run
+    when(userRepository.save(any(User.class))).thenThrow(
+        new DataAccessResourceFailureException("Server down"));
+    User updated = userService.updateLastActive(testUser.getEmail(), id, testUser);
+    fail(); //this shouldn't run
   }
 
 }

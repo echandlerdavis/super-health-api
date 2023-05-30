@@ -5,13 +5,14 @@ import io.catalyte.training.sportsproducts.domains.product.Product;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Id;
 
 @Entity
 @Table(name = "reviews")
 public class Review {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -23,8 +24,12 @@ public class Review {
   @ManyToOne
   @JsonIgnore
   private Product product;
-  public Review(){}
-  public Review(String title, int rating, String review, String createdAt, String userName, Product product) {
+
+  public Review() {
+  }
+
+  public Review(String title, int rating, String review, String createdAt, String userName,
+      Product product) {
     this.title = title;
     this.rating = rating;
     this.review = review;

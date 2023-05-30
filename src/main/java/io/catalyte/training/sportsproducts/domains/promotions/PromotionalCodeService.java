@@ -7,25 +7,28 @@ import java.util.List;
  */
 public interface PromotionalCodeService {
 
-    /**
-     * Creates a new promotional code using the information in the given PromotionalCodeDTO.
-     *
-     * @param promotionalCodeDTO The PromotionalCodeDTO containing the information for the new promotional code.
-     * @return The created PromotionalCode.
-     * @throws IllegalArgumentException
-     */
-    PromotionalCode createPromotionalCode(PromotionalCodeDTO promotionalCodeDTO) throws IllegalArgumentException;
+  /**
+   * Creates a new promotional code using the information in the given PromotionalCodeDTO.
+   *
+   * @param promotionalCodeDTO The PromotionalCodeDTO containing the information for the new
+   *                           promotional code.
+   * @return The created PromotionalCode.
+   * @throws IllegalArgumentException
+   */
+  PromotionalCode createPromotionalCode(PromotionalCodeDTO promotionalCodeDTO)
+      throws IllegalArgumentException;
 
-    /**
-     * Returns a list of all promotional codes
-     *
-     * @return A list of all promotional codes
-     */
+  /**
+   * Returns a list of all promotional codes
+   *
+   * @return A list of all promotional codes
+   */
 
-    List<PromotionalCode> getAllPromotionalCodes();
+  List<PromotionalCode> getAllPromotionalCodes();
 
-    PromotionalCode getPromotionalCodeByTitle(String title);
-    void deletePromotionalCode(PromotionalCode code);
+  PromotionalCode getPromotionalCodeByTitle(String title);
 
-    boolean promotionalCodeIsActive(String title);
+  void deletePromotionalCode(PromotionalCode code);
+
+  boolean promotionalCodeIsActive(String title);
 }
