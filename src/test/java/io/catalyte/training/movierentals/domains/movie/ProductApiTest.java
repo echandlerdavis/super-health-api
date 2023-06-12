@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.product;
+package io.catalyte.training.movierentals.domains.movie;
 
 import static io.catalyte.training.movierentals.constants.Paths.PRODUCTS_PATH;
 import static org.hamcrest.Matchers.anyOf;
@@ -39,7 +39,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class ProductApiTest {
 
   @Autowired
-  ProductRepository productRepository;
+  MovieRepository movieRepository;
   ProductFactory productFactory = new ProductFactory();
   Product testProduct1 = productFactory.createRandomProduct();
   Product testProduct2 = productFactory.createRandomProduct();
@@ -62,7 +62,7 @@ public class ProductApiTest {
   }
 
   private void setTestProducts() {
-    productRepository.saveAll(Arrays.asList(testProduct1, testProduct2));
+    movieRepository.saveAll(Arrays.asList(testProduct1, testProduct2));
     getMinMaxPrice();
   }
 
@@ -77,8 +77,8 @@ public class ProductApiTest {
 
   @After
   public void removeTestData() {
-    productRepository.delete(testProduct1);
-    productRepository.delete(testProduct2);
+    movieRepository.delete(testProduct1);
+    movieRepository.delete(testProduct2);
   }
 
   @Test

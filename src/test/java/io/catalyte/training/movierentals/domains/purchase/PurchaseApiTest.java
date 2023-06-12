@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.movierentals.data.ProductFactory;
-import io.catalyte.training.movierentals.domains.product.Product;
-import io.catalyte.training.movierentals.domains.product.ProductRepository;
+import io.catalyte.training.movierentals.domains.movie.Product;
+import io.catalyte.training.movierentals.domains.movie.MovieRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +48,7 @@ public class PurchaseApiTest {
   public PurchaseRepository purchaseRepository;
 
   @Autowired
-  public ProductRepository productRepository;
+  public MovieRepository movieRepository;
   //TODO: test for getting state shipping cost info
   @Autowired
   private WebApplicationContext wac;
@@ -97,7 +97,7 @@ public class PurchaseApiTest {
     testProducts.forEach(product -> {
       product.setActive(true);
       product.setQuantity(INVENTORY_QUANTITY);
-      Product savedProduct = productRepository.save(product);
+      Product savedProduct = movieRepository.save(product);
       LineItem purchaseLineItem = new LineItem();
       purchaseLineItem.setProduct(savedProduct);
       purchaseLineItem.setQuantity(PURCHASE_QUANTITY);
@@ -143,7 +143,7 @@ public class PurchaseApiTest {
     //reset inventory quantities
     for (Product p : testProducts) {
       p.setQuantity(INVENTORY_QUANTITY);
-      productRepository.save(p);
+      movieRepository.save(p);
     }
 
   }
@@ -428,7 +428,7 @@ public class PurchaseApiTest {
 
     // Set all test products to inactive
     testProducts.forEach(product -> product.setActive(false));
-    productRepository.saveAll(testProducts);
+    movieRepository.saveAll(testProducts);
 
     // Convert purchase to json string
     String JsonString = mapper.writeValueAsString(testPurchase);
@@ -447,7 +447,7 @@ public class PurchaseApiTest {
 
     // Set one test product to be inactive
     testProducts.get(2).setActive(false);
-    productRepository.save(testProducts.get(2));
+    movieRepository.save(testProducts.get(2));
 
     // Convert purchase to json string
     String JsonString = mapper.writeValueAsString(testPurchase);
@@ -484,7 +484,7 @@ public class PurchaseApiTest {
 
     // Set all test products active status to be null
     testProducts.forEach(product -> product.setActive(null));
-    productRepository.saveAll(testProducts);
+    movieRepository.saveAll(testProducts);
 
     // Convert purchase to json string
     String JsonString = mapper.writeValueAsString(testPurchase);
@@ -503,7 +503,7 @@ public class PurchaseApiTest {
 
     // Set one product to null active status
     testProducts.get(0).setActive(null);
-    productRepository.save(testProducts.get(0));
+    movieRepository.save(testProducts.get(0));
 
     // Convert purchase to json string
     String JsonString = mapper.writeValueAsString(testPurchase);
@@ -560,7 +560,7 @@ public class PurchaseApiTest {
         .andReturn().getResponse();
 
     for (Product p : testProducts) {
-      Product updatedProduct = productRepository.findById(p.getId()).get();
+      Product updatedProduct = movieRepository.findById(p.getId()).get();
       assertEquals(Long.valueOf(expectedEndingInventory),
           Long.valueOf(updatedProduct.getQuantity()));
     }
@@ -574,7 +574,7 @@ public class PurchaseApiTest {
     int purchaseQty = 1;
     for (Product p : testProducts) {
       p.setPrice(price);
-      productRepository.save(p);
+      movieRepository.save(p);
     }
     //update the purchase quantities
     for (LineItem l : testPurchase.getProducts()) {
@@ -605,7 +605,7 @@ public class PurchaseApiTest {
     int purchaseQty = 1;
     for (Product p : testProducts) {
       p.setPrice(price);
-      productRepository.save(p);
+      movieRepository.save(p);
     }
     //update the purchase quantities
     for (LineItem l : testPurchase.getProducts()) {
@@ -636,7 +636,7 @@ public class PurchaseApiTest {
     int purchaseQty = 1;
     for (Product p : testProducts) {
       p.setPrice(price);
-      productRepository.save(p);
+      movieRepository.save(p);
     }
     //update the purchase quantities
     for (LineItem l : testPurchase.getProducts()) {
@@ -667,7 +667,7 @@ public class PurchaseApiTest {
     int purchaseQty = 1;
     for (Product p : testProducts) {
       p.setPrice(price);
-      productRepository.save(p);
+      movieRepository.save(p);
     }
     //update the purchase quantities
     for (LineItem l : testPurchase.getProducts()) {

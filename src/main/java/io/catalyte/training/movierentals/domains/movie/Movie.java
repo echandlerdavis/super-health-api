@@ -1,7 +1,5 @@
-package io.catalyte.training.movierentals.domains.product;
+package io.catalyte.training.movierentals.domains.movie;
 
-import io.catalyte.training.movierentals.domains.review.Review;
-import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

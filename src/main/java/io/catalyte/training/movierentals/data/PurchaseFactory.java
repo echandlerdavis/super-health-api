@@ -1,6 +1,6 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.product.Product;
+import io.catalyte.training.movierentals.domains.movie.Product;
 import io.catalyte.training.movierentals.domains.promotions.PromotionalCode;
 import io.catalyte.training.movierentals.domains.purchase.BillingAddress;
 import io.catalyte.training.movierentals.domains.purchase.DeliveryAddress;

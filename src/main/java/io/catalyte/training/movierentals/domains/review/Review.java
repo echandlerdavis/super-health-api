@@ -1,7 +1,7 @@
 package io.catalyte.training.movierentals.domains.review;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.catalyte.training.movierentals.domains.product.Product;
+import io.catalyte.training.movierentals.domains.movie.Product;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

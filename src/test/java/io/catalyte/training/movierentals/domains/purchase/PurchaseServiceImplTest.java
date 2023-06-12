@@ -12,9 +12,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.movierentals.data.ProductFactory;
-import io.catalyte.training.movierentals.domains.product.Product;
-import io.catalyte.training.movierentals.domains.product.ProductRepository;
-import io.catalyte.training.movierentals.domains.product.ProductService;
+import io.catalyte.training.movierentals.domains.movie.Product;
+import io.catalyte.training.movierentals.domains.movie.MovieRepository;
+import io.catalyte.training.movierentals.domains.movie.MovieService;
 import io.catalyte.training.movierentals.domains.promotions.PromotionalCode;
 import io.catalyte.training.movierentals.domains.promotions.PromotionalCodeService;
 import io.catalyte.training.movierentals.domains.promotions.PromotionalCodeType;
@@ -57,11 +57,11 @@ public class PurchaseServiceImplTest {
   @Mock
   private PurchaseRepository purchaseRepository;
   @Mock
-  private ProductService productService;
+  private MovieService movieService;
   @Mock
   private LineItemRepository lineItemRepository;
   @Mock
-  private ProductRepository productRepository;
+  private MovieRepository movieRepository;
   @Mock
   private PromotionalCodeService promotionalCodeService;
   private ProductFactory productFactory = new ProductFactory();
@@ -97,10 +97,10 @@ public class PurchaseServiceImplTest {
 
     // Set consecutive mock calls for product service since Purchase service consecutively calls this for each item in a purchase
     //set mock for productService.getProductsByIds
-    when(productService.getProductsByIds(any()))
+    when(movieService.getProductsByIds(any()))
         .thenReturn(testProducts);
 
-    when(productService.getProductsByIds(any())).thenReturn(testProducts);
+    when(movieService.getProductsByIds(any())).thenReturn(testProducts);
 
     //Set repository to return a copy of testPurchase with an id when calling save
     when(purchaseRepository.save(any(Purchase.class))).thenAnswer((p) -> {

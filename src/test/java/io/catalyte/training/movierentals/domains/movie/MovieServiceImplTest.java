@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.product;
+package io.catalyte.training.movierentals.domains.movie;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,8 +33,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataAccessException;
 
 @RunWith(MockitoJUnitRunner.class)
-@WebMvcTest(ProductServiceImpl.class)
-public class ProductServiceImplTest {
+@WebMvcTest(MovieServiceImpl.class)
+public class MovieServiceImplTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -55,9 +55,9 @@ public class ProductServiceImplTest {
   String priceMin;
   String priceMax;
   @InjectMocks
-  private ProductServiceImpl productServiceImpl;
+  private MovieServiceImpl productServiceImpl;
   @Mock
-  private ProductRepository productRepository;
+  private MovieRepository movieRepository;
 
   @Before
   public void setUp() {
@@ -66,23 +66,23 @@ public class ProductServiceImplTest {
     setTestProducts();
     getMinMaxPrice();
 
-    when(productRepository.findById(anyLong())).thenReturn(Optional.of(testProduct1));
-    when(productRepository.findAll()).thenReturn(testProductsList);
-    when(productRepository.findDistinctBrands()).thenReturn(
+    when(movieRepository.findById(anyLong())).thenReturn(Optional.of(testProduct1));
+    when(movieRepository.findAll()).thenReturn(testProductsList);
+    when(movieRepository.findDistinctBrands()).thenReturn(
         Arrays.asList(testProduct1.getBrand(), testProduct2.getBrand()));
-    when(productRepository.findDistinctCategories()).thenReturn(
+    when(movieRepository.findDistinctCategories()).thenReturn(
         Arrays.asList(testProduct1.getCategory(), testProduct2.getCategory()));
-    when(productRepository.findDistinctDemographics()).thenReturn(
+    when(movieRepository.findDistinctDemographics()).thenReturn(
         Arrays.asList(testProduct1.getDemographic(), testProduct2.getDemographic()));
-    when(productRepository.findDistinctPrimaryColors()).thenReturn(
+    when(movieRepository.findDistinctPrimaryColors()).thenReturn(
         Arrays.asList(testProduct1.getPrimaryColorCode(), testProduct2.getPrimaryColorCode()));
-    when(productRepository.findDistinctSecondaryColors()).thenReturn(
+    when(movieRepository.findDistinctSecondaryColors()).thenReturn(
         Arrays.asList(testProduct1.getSecondaryColorCode(), testProduct2.getSecondaryColorCode()));
-    when(productRepository.findDistinctTypes()).thenReturn(
+    when(movieRepository.findDistinctTypes()).thenReturn(
         Arrays.asList(testProduct1.getType(), testProduct2.getType()));
-    when(productRepository.findDistinctMaterials()).thenReturn(
+    when(movieRepository.findDistinctMaterials()).thenReturn(
         Arrays.asList(testProduct1.getMaterial(), testProduct2.getMaterial()));
-    when(productRepository.save(any())).thenReturn(testProduct1);
+    when(movieRepository.save(any())).thenReturn(testProduct1);
 
   }
 
@@ -179,13 +179,13 @@ public class ProductServiceImplTest {
 
   @Test
   public void getProductByIdThrowsErrorWhenNotFound() {
-    when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+    when(movieRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThrows(ResourceNotFound.class, () -> productServiceImpl.getProductById(123L));
   }
 
   @Test
   public void getProductByOneBrandReturnsListOfProducts() {
-    List<Product> actual = productServiceImpl.getProductsByBrands(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByBrands(movieRepository.findAll(),
         testProduct2.getBrand());
     assertEquals(Collections.singletonList(testProduct2), actual);
   }
@@ -195,7 +195,7 @@ public class ProductServiceImplTest {
     brands.add(testProduct1.getBrand());
     brands.add(testProduct2.getBrand());
     String brandsString = String.join("|", brands);
-    List<Product> actual = productServiceImpl.getProductsByBrands(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByBrands(movieRepository.findAll(),
         brandsString);
     assertEquals(testProductsList, actual);
   }
@@ -203,7 +203,7 @@ public class ProductServiceImplTest {
   @Test
   public void getProductByOneCategoryReturnsListOfProducts() {
     categories.add(testProduct2.getCategory());
-    List<Product> actual = productServiceImpl.getProductsByCategories(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByCategories(movieRepository.findAll(),
         testProduct2.getCategory());
     assertEquals(Collections.singletonList(testProduct2), actual);
   }
@@ -213,7 +213,7 @@ public class ProductServiceImplTest {
     categories.add(testProduct1.getCategory());
     categories.add(testProduct2.getCategory());
     String categoryString = String.join("|", categories);
-    List<Product> actual = productServiceImpl.getProductsByCategories(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByCategories(movieRepository.findAll(),
         categoryString);
     assertEquals(testProductsList, actual);
   }
@@ -221,7 +221,7 @@ public class ProductServiceImplTest {
   @Test
   public void getProductByOneDemographicReturnsListOfProducts() {
 
-    List<Product> actual = productServiceImpl.getProductsByDemographics(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByDemographics(movieRepository.findAll(),
         testProduct2.getDemographic());
     assertEquals(Collections.singletonList(testProduct2), actual);
   }
@@ -231,7 +231,7 @@ public class ProductServiceImplTest {
     demographics.add(testProduct1.getDemographic());
     demographics.add(testProduct2.getDemographic());
     String demographicsString = String.join("|", demographics);
-    List<Product> actual = productServiceImpl.getProductsByDemographics(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByDemographics(movieRepository.findAll(),
         demographicsString);
     assertEquals(testProductsList, actual);
   }
@@ -239,7 +239,7 @@ public class ProductServiceImplTest {
   @Test
   public void getProductByTwoPricesReturnsListOfProducts() {
 
-    List<Product> actual = productServiceImpl.getProductsByPrice(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByPrice(movieRepository.findAll(),
         priceMin, priceMax);
     assertEquals(testProductsList, actual);
   }
@@ -248,7 +248,7 @@ public class ProductServiceImplTest {
   public void getProductByTwoPricesThrowsErrorIfOnePriceIsNotANumber() {
     priceMin = "abc";
     assertThrows(BadRequest.class,
-        () -> productServiceImpl.getProductsByPrice(productRepository.findAll(), priceMin,
+        () -> productServiceImpl.getProductsByPrice(movieRepository.findAll(), priceMin,
             priceMax));
   }
 
@@ -256,7 +256,7 @@ public class ProductServiceImplTest {
   public void getProductByOnePrimaryColorReturnsListOfProducts() {
 
     List<Product> actual = productServiceImpl.getProductsByPrimaryColors(
-        productRepository.findAll(), testProduct2.getPrimaryColorCode());
+        movieRepository.findAll(), testProduct2.getPrimaryColorCode());
     assertEquals(Collections.singletonList(testProduct2), actual);
   }
 
@@ -266,13 +266,13 @@ public class ProductServiceImplTest {
     primaryColors.add(testProduct2.getPrimaryColorCode());
     String primaryColorsString = String.join("|", primaryColors);
     List<Product> actual = productServiceImpl.getProductsByPrimaryColors(
-        productRepository.findAll(), primaryColorsString);
+        movieRepository.findAll(), primaryColorsString);
     assertEquals(testProductsList, actual);
   }
 
   @Test
   public void getProductByOneMaterialReturnsListOfProducts() {
-    List<Product> actual = productServiceImpl.getProductsByMaterials(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByMaterials(movieRepository.findAll(),
         testProduct2.getMaterial());
     assertEquals(Collections.singletonList(testProduct2), actual);
   }
@@ -282,7 +282,7 @@ public class ProductServiceImplTest {
     materials.add(testProduct1.getMaterial());
     materials.add(testProduct2.getMaterial());
     String materialsString = String.join("|", materials);
-    List<Product> actual = productServiceImpl.getProductsByMaterials(productRepository.findAll(),
+    List<Product> actual = productServiceImpl.getProductsByMaterials(movieRepository.findAll(),
         materialsString);
     assertEquals(testProductsList, actual);
   }
@@ -380,56 +380,56 @@ public class ProductServiceImplTest {
   public void saveProductThrowsServerError() {
     //This test fails when run with coverage
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).save(any());
+    }).when(movieRepository).save(any());
     assertThrows(ServerError.class, () -> productServiceImpl.saveProduct(testProduct2));
   }
 
   @Test
   public void GetDistinctBrandsThrowsServerError() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).findDistinctBrands();
+    }).when(movieRepository).findDistinctBrands();
     assertThrows(ServerError.class, () -> productServiceImpl.getDistinctBrands());
   }
 
   @Test
   public void GetDistinctCategoriesThrowsServerError() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).findDistinctCategories();
+    }).when(movieRepository).findDistinctCategories();
     assertThrows(ServerError.class, () -> productServiceImpl.getDistinctCategories());
   }
 
   @Test
   public void GetDistinctTypesThrowsServerError() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).findDistinctTypes();
+    }).when(movieRepository).findDistinctTypes();
     assertThrows(ServerError.class, () -> productServiceImpl.getDistinctTypes());
   }
 
   @Test
   public void GetDistinctMaterialsThrowsServerError() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).findDistinctMaterials();
+    }).when(movieRepository).findDistinctMaterials();
     assertThrows(ServerError.class, () -> productServiceImpl.getDistinctMaterials());
   }
 
   @Test
   public void GetDistinctDemographicsThrowsServerError() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).findDistinctDemographics();
+    }).when(movieRepository).findDistinctDemographics();
     assertThrows(ServerError.class, () -> productServiceImpl.getDistinctDemographics());
   }
 
   @Test
   public void GetDistinctPrimaryColorsThrowsServerError() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).findDistinctPrimaryColors();
+    }).when(movieRepository).findDistinctPrimaryColors();
     assertThrows(ServerError.class, () -> productServiceImpl.getDistinctPrimaryColors());
   }
 
   @Test
   public void GetDistinctSecondaryColorsThrowsServerError() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(productRepository).findDistinctSecondaryColors();
+    }).when(movieRepository).findDistinctSecondaryColors();
     assertThrows(ServerError.class, () -> productServiceImpl.getDistinctSecondaryColors());
   }
 

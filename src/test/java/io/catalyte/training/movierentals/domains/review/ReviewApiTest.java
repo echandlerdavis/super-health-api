@@ -5,8 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.catalyte.training.movierentals.data.ProductFactory;
-import io.catalyte.training.movierentals.domains.product.Product;
-import io.catalyte.training.movierentals.domains.product.ProductRepository;
+import io.catalyte.training.movierentals.domains.movie.Product;
+import io.catalyte.training.movierentals.domains.movie.MovieRepository;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class ReviewApiTest {
   @Autowired
   ReviewRepository reviewRepository;
   @Autowired
-  ProductRepository productRepository;
+  MovieRepository movieRepository;
   ProductFactory productFactory = new ProductFactory();
   Product testProduct = productFactory.createRandomProduct();
   Review testReview1 = productFactory.createRandomReview(testProduct, 1);
@@ -41,7 +41,7 @@ public class ReviewApiTest {
   }
 
   private void setTestReviews() {
-    productRepository.save(testProduct);
+    movieRepository.save(testProduct);
     testProduct.setReviews(Arrays.asList(testReview1, testReview2));
     reviewRepository.saveAll(Arrays.asList(testReview1, testReview2));
   }

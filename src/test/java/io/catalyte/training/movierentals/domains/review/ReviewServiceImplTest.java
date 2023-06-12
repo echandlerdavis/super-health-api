@@ -7,7 +7,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.movierentals.data.ProductFactory;
-import io.catalyte.training.movierentals.domains.product.Product;
+import io.catalyte.training.movierentals.domains.movie.Product;
 import io.catalyte.training.movierentals.exceptions.ServerError;
 import java.util.ArrayList;
 import java.util.List;

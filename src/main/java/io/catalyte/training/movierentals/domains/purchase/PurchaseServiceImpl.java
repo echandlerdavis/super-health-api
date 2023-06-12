@@ -1,8 +1,8 @@
 package io.catalyte.training.movierentals.domains.purchase;
 
 import io.catalyte.training.movierentals.constants.StringConstants;
-import io.catalyte.training.movierentals.domains.product.Product;
-import io.catalyte.training.movierentals.domains.product.ProductService;
+import io.catalyte.training.movierentals.domains.movie.Product;
+import io.catalyte.training.movierentals.domains.movie.MovieService;
 import io.catalyte.training.movierentals.domains.promotions.PromotionalCode;
 import io.catalyte.training.movierentals.domains.promotions.PromotionalCodeService;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
@@ -32,15 +32,15 @@ public class PurchaseServiceImpl implements PurchaseService {
   private final Logger logger = LogManager.getLogger(PurchaseServiceImpl.class);
 
   PurchaseRepository purchaseRepository;
-  ProductService productService;
+  MovieService movieService;
   LineItemRepository lineItemRepository;
   PromotionalCodeService promoCodeService;
 
   @Autowired
-  public PurchaseServiceImpl(PurchaseRepository purchaseRepository, ProductService productService,
+  public PurchaseServiceImpl(PurchaseRepository purchaseRepository, MovieService movieService,
       LineItemRepository lineItemRepository, PromotionalCodeService promoCodeService) {
     this.purchaseRepository = purchaseRepository;
-    this.productService = productService;
+    this.movieService = movieService;
     this.lineItemRepository = lineItemRepository;
     this.promoCodeService = promoCodeService;
   }
@@ -160,7 +160,7 @@ public class PurchaseServiceImpl implements PurchaseService {
       itemsList.forEach(lineItem -> {
 
         // retrieve full product information from the database
-        Product product = productService.getProductById(lineItem.getProduct().getId());
+        Product product = movieService.getProductById(lineItem.getProduct().getId());
 
         // set the product info into the lineitem
         if (product != null) {
@@ -358,7 +358,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     List<Long> ids = lineItems.stream()
         .map(p -> p.getProduct().getId())
         .collect(Collectors.toList());
-    return productService.getProductsByIds(ids).stream().collect(Collectors
+    return movieService.getProductsByIds(ids).stream().collect(Collectors
         .toMap(Product::getId, Function.identity()));
   }
 
@@ -375,7 +375,7 @@ public class PurchaseServiceImpl implements PurchaseService {
       Product product = lineItem.getProduct();
       product.setQuantity(product.getQuantity() - lineItem.getQuantity());
       try {
-        productService.saveProduct(product);
+        movieService.saveProduct(product);
       } catch (DataAccessException dae) {
         logger.error("Failed to update inventory for product " + product.getId());
         throw new ServerError(dae.getMessage());
