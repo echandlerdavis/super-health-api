@@ -1,11 +1,12 @@
 package io.catalyte.training.movierentals.exceptions;
 
-import io.catalyte.training.movierentals.domains.movie.Product;
+import io.catalyte.training.movierentals.domains.movie.Movie;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+//TODO: Update language in this file
 /**
  * Describes an object to hold error information that the server will return to clients.
  */
@@ -33,14 +34,14 @@ public class ExceptionResponse {
   }
 
   public ExceptionResponse(String error, Date timestamp, String errorMessage,
-      Map<String, List<Product>> payload) {
+      Map<String, List<Movie>> payload) {
     this(error, timestamp, error);
     List<String> consolidatedMap = new ArrayList<>();
     //consolidate map to list
     for (String errorType : payload.keySet()) {
       consolidatedMap.add(errorType);
-      List<Product> associatedProducts = payload.get(errorType);
-      for (Product p : associatedProducts) {
+      List<Movie> associatedProducts = payload.get(errorType);
+      for (Movie p : associatedProducts) {
         consolidatedMap.add(p.toString());
       }
     }

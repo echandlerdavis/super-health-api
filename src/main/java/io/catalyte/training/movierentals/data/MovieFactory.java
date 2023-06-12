@@ -55,7 +55,7 @@ public class MovieFactory {
    * @return - a title string
    */
   public static String getTitle() {
-    return title[randomGenerator.nextInt(titles.length)];
+    return titles[randomGenerator.nextInt(titles.length)];
   }
 
   /**
