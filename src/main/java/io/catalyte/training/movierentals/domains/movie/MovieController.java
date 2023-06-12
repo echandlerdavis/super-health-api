@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,7 +52,7 @@ public class MovieController {
   @GetMapping(value = "/{id}")
   @ResponseStatus(value = HttpStatus.OK)
   public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
-    logger.info("Request received for getProductsById: " + id);
+    logger.info("Request received for getMovieById: " + id);
 
     return new ResponseEntity<>(movieService.getMovieById(id), HttpStatus.OK);
   }
@@ -67,9 +68,15 @@ public class MovieController {
   @PostMapping
   @ResponseStatus(value = HttpStatus.OK)
   public ResponseEntity<Movie> postMovie(@RequestBody Movie movie) {
-    logger.info("Request received for postProduct");
+    logger.info("Request received for postMovie");
     return new ResponseEntity<>(movieService.saveMovie(movie), HttpStatus.CREATED);
   }
 
+  @PutMapping(value = "/{id}")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie){
+    logger.info("Request received to updateMovie: " + id);
+    return new ResponseEntity<>(movieService.updateMovie(id, movie), HttpStatus.OK);
+  }
 
 }

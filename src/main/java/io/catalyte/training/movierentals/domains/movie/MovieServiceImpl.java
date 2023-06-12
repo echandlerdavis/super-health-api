@@ -87,7 +87,23 @@ public class MovieServiceImpl implements MovieService {
   }
 
   public Movie updateMovie(Long id, Movie movie){
-    return movie;
+    Movie findMovie = movieRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFound("Cannot update a movie that does not exist."));
+
+    //TODO: Validation for each item.
+    try{
+      findMovie.setSku(movie.getSku());
+      findMovie.setGenre(movie.getGenre());
+      findMovie.setDirector(movie.getDirector());
+      findMovie.setTitle(movie.getTitle());
+      findMovie.setDailyRentalCost(movie.getDailyRentalCost());
+      findMovie.setId(id);
+      return movieRepository.save(findMovie);
+    }catch (DataAccessException e){
+      logger.error(e.getMessage());
+
+      throw new ServerError(e.getMessage());
+    }
   }
 
   public void deleteMovie(Long id){
