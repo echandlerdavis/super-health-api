@@ -107,6 +107,16 @@ public class MovieServiceImpl implements MovieService {
   }
 
   public void deleteMovie(Long id){
+    if(movieRepository.findById(id) == null){
+      throw new ResourceNotFound("You cannot delete a movie that doesn't exist.");
+    }
+
+    try {
+      movieRepository.deleteById(id);
+    } catch (DataAccessException e){
+      logger.error(e.getMessage());
+      throw new ServerError(e.getMessage());
+    }
 
   }
 
