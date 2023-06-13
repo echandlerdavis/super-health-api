@@ -2,28 +2,18 @@ package io.catalyte.training.movierentals.data;
 
 import io.catalyte.training.movierentals.domains.movie.Movie;
 import io.catalyte.training.movierentals.domains.movie.MovieRepository;
-//import io.catalyte.training.movierentals.domains.promotions.PromotionalCode;
-//import io.catalyte.training.movierentals.domains.promotions.PromotionalCodeRepository;
-//import io.catalyte.training.movierentals.domains.promotions.PromotionalCodeType;
-//import io.catalyte.training.movierentals.domains.purchase.LineItem;
-//import io.catalyte.training.movierentals.domains.purchase.LineItemRepository;
-//import io.catalyte.training.movierentals.domains.purchase.Purchase;
-//import io.catalyte.training.movierentals.domains.purchase.PurchaseRepository;
-//import io.catalyte.training.movierentals.domains.review.Review;
-//import io.catalyte.training.movierentals.domains.review.ReviewRepository;
-//import io.catalyte.training.movierentals.domains.user.User;
-//import io.catalyte.training.movierentals.domains.user.UserBillingAddress;
-//import io.catalyte.training.movierentals.domains.user.UserRepository;
-//import java.math.BigDecimal;
-//import java.util.Calendar;
-//import java.util.Date;
+import io.catalyte.training.movierentals.domains.rental.Rental;
+import io.catalyte.training.movierentals.domains.rental.RentalRepository;
+import io.catalyte.training.movierentals.domains.rental.RentedMovie;
+import io.catalyte.training.movierentals.domains.rental.RentedMovieRepository;
 import java.util.List;
-import java.util.Random;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,8 +28,14 @@ public class DemoData implements CommandLineRunner {
   public static final int DEFAULT_NUMBER_OF_PRODUCTS = 500;
   private final Logger logger = LogManager.getLogger(DemoData.class);
   private final MovieFactory movieFactory = new MovieFactory();
+  private final RentalFactory rentalFactory = new RentalFactory();
+  private final RentedMovieFactory rentedMovieFactory = new RentedMovieFactory();
   @Autowired
   private MovieRepository movieRepository;
+  @Autowired
+  private RentalRepository rentalRepository;
+  @Autowired
+  private RentedMovieRepository rentedMovieRepository;
   @Autowired
   private Environment env;
 
@@ -62,15 +58,24 @@ public class DemoData implements CommandLineRunner {
 
   private void seedDatabase() {
     int numberOfMovies = 20;
-
+    int numberOfRentals = 10;
     // Generate products
-    List<Movie> movieList = movieFactory.generateRandomMovie(numberOfMovies);
+    List<Movie> movieList = movieFactory.generateRandomMovieList(numberOfMovies);
+    List<Rental> rentalList = rentalFactory.generateRandomRentalList(numberOfRentals);
 
     // Persist them to the database and save list to purchaseFactory
     logger.info("Loading " + numberOfMovies + " movies...");
     movieRepository.saveAll(movieList);
-    logger.info("Data load completed. You can make requests now.");
+    logger.info("Loading " + numberOfRentals + " rentals...");
+    rentalRepository.saveAll(rentalList);
 
+    for (Rental rental : rentalList){
+      Set<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
+      rental.setRentedMovies(rentedMovieSet);
+      rentedMovieRepository.saveAll(rentedMovieSet);
+    }
+
+    logger.info("Data load completed. You can make requests now.");
 
   }
 

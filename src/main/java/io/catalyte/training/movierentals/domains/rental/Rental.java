@@ -6,6 +6,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Describes a purchase object that holds the information for a transaction
@@ -18,7 +22,9 @@ public class Rental {
   private Long id;
   private String rentalDate;
 
-  private Set<RentedMovie> rentedMovies;
+  @OneToMany(mappedBy = "rental")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  public Set<RentedMovie> rentedMovies;
 
   private Double rentalTotalCost;
 

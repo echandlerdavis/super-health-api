@@ -84,6 +84,7 @@ public class RentalServiceImpl implements RentalService {
    */
   public Rental saveRental(Rental newRental) {
    //TODO: Validation to save.
+//    TODO: fix it so the rentedMovie ids are not null. (Look at Purchase/Line Item relationship)
     try {
       return rentalRepository.save(newRental);
     } catch (DataAccessException e){
@@ -97,9 +98,9 @@ public class RentalServiceImpl implements RentalService {
         .orElseThrow(() -> new ResourceNotFound("Cannot update a movie that does not exist."));
 
     //TODO: Validation for each.
-    //TODO: Handle Rented Movies List?
+    //TODO: Handle Rented Movies List - I think they need to be persisted individually/saved to their own repository
     try {
-      findRental.setId(updatedRental.getId());
+      findRental.setId(id);
       findRental.setRentalDate(updatedRental.getRentalDate());
       findRental.setRentedMovies(updatedRental.getRentedMovies());
       findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());

@@ -1,10 +1,13 @@
 package io.catalyte.training.movierentals.domains.rental;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  * Describes one line item of a purchase transaction
@@ -16,6 +19,10 @@ public class RentedMovie {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @ManyToOne
+  @JsonIgnore
+  private Rental rental;
+
   private Long movieId;
 
   private int daysRented;
@@ -23,10 +30,11 @@ public class RentedMovie {
   public RentedMovie() {
   }
 
-  public RentedMovie(Long id, Long movieId, int daysRented) {
+  public RentedMovie(Long id, Long movieId, int daysRented, Rental rental) {
     this.id = id;
     this.movieId = movieId;
     this.daysRented = daysRented;
+    this.rental = rental;
   }
 
   public Long getId() {
@@ -51,6 +59,14 @@ public class RentedMovie {
 
   public void setDaysRented(int daysRented) {
     this.daysRented = daysRented;
+  }
+
+  public Rental getRental() {
+    return rental;
+  }
+
+  public void setRental(Rental rental) {
+    this.rental = rental;
   }
 
   @Override

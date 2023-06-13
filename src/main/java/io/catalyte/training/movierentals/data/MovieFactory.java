@@ -103,7 +103,7 @@ public class MovieFactory {
    * @param numberOfMovies - the number of random products to generate
    * @return - a list of random products
    */
-  public List<Movie> generateRandomMovie(Integer numberOfMovies) {
+  public List<Movie> generateRandomMovieList(Integer numberOfMovies) {
 
     List<Movie> movieList = new ArrayList<>();
 
