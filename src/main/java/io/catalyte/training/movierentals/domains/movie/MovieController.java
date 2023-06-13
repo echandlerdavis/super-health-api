@@ -38,7 +38,7 @@ public class MovieController {
    */
   @GetMapping
   public ResponseEntity<List<Movie>> getMovies(Movie movie) {
-    logger.info("Request received for getMovie");
+    logger.info("Request received for getMovies");
 
     return new ResponseEntity<>(movieService.getMovies(movie), HttpStatus.OK);
   }
@@ -63,8 +63,8 @@ public class MovieController {
    * Handles a POST request to /movies. This creates a new product object that gets saved to the
    * database.
    *
-   * @param movie - product object
-   * @return product(s) added to database
+   * @param movie - movie object
+   * @return movie(s) added to database
    */
   @PostMapping
   @ResponseStatus(value = HttpStatus.OK)

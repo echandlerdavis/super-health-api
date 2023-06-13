@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.purchase;
+package io.catalyte.training.movierentals.domains.rental;
 
 import static org.junit.Assert.assertEquals;
 

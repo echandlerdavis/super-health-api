@@ -4,6 +4,6 @@ public class Paths {
 
   // Local
   public static final String MOVIES_PATH = "/movies";
-  public static final String PURCHASES_PATH = "/purchases";
-  public static final String USERS_PATH = "/users";
+  public static final String RENTALS_PATH = "/rentals";
+
 }
