@@ -5,6 +5,8 @@ import io.catalyte.training.movierentals.domains.movie.MovieService;
 import io.catalyte.training.movierentals.domains.rental.Rental;
 import io.catalyte.training.movierentals.domains.rental.RentalRepository;
 import io.catalyte.training.movierentals.domains.rental.RentalService;
+import io.catalyte.training.movierentals.domains.rental.RentedMovie;
+import io.catalyte.training.movierentals.domains.rental.RentedMovieRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.MultipleUnprocessableContent;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
@@ -32,10 +34,13 @@ public class RentalServiceImpl implements RentalService {
   private final Logger logger = LogManager.getLogger(RentalServiceImpl.class);
 
   RentalRepository rentalRepository;
+  RentedMovieRepository rentedMovieRepository;
 
   @Autowired
-  public RentalServiceImpl(RentalRepository rentalRepository) {
+  public RentalServiceImpl(RentalRepository rentalRepository,
+      RentedMovieRepository rentedMovieRepository) {
     this.rentalRepository = rentalRepository;
+    this.rentedMovieRepository = rentedMovieRepository;
   }
 
   /**
@@ -84,31 +89,69 @@ public class RentalServiceImpl implements RentalService {
    */
   public Rental saveRental(Rental newRental) {
    //TODO: Validation to save.
-//    TODO: fix it so the rentedMovie ids are not null. (Look at Purchase/Line Item relationship)
+    Rental savedRental;
+
     try {
-      return rentalRepository.save(newRental);
+      savedRental = rentalRepository.save(newRental);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServerError(e.getMessage());
     }
+
+    newRental.setId(savedRental.getId());
+    handleRentedMovies(newRental);
+    savedRental.setRentedMovies(rentedMovieRepository.findByRental(newRental));
+
+    return savedRental;
   }
+
+  private void handleRentedMovies(Rental rental){
+    Set<RentedMovie> rentedMovieSet = rental.getRentedMovies();
+
+    if(rentedMovieSet != null){
+      rentedMovieSet.forEach(rentedMovie -> {
+
+        rentedMovie.setRental(rental);
+        rentedMovie.setId(null);
+
+        try {
+          rentedMovieRepository.save(rentedMovie);
+        } catch (DataAccessException e) {
+          logger.error(e.getMessage());
+          throw new ServerError(e.getMessage());
+        }
+      });
+    }
+
+
+  }
+
 
   public Rental updateRental(Long id, Rental updatedRental){
     Rental findRental = rentalRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound("Cannot update a movie that does not exist."));
-
+        .orElseThrow(() -> new ResourceNotFound("Cannot update a rental that does not exist."));
+//  Set<>
+    Rental savedRental;
     //TODO: Validation for each.
-    //TODO: Handle Rented Movies List - I think they need to be persisted individually/saved to their own repository
+    //TODO: Handle Rented Movies List - if you're updating the rental list, remove the previous from the repository
+
+    findRental.setId(id);
+    findRental.setRentalDate(updatedRental.getRentalDate());
+    findRental.setRentedMovies(null);
+    findRental.setRentedMovies(updatedRental.getRentedMovies());
+    //Consider writing a different handleUpdateRentedMovie() method
+    handleRentedMovies(findRental);
+    findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
     try {
-      findRental.setId(id);
-      findRental.setRentalDate(updatedRental.getRentalDate());
-      findRental.setRentedMovies(updatedRental.getRentedMovies());
-      findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
-      return rentalRepository.save(findRental);
+      savedRental = rentalRepository.save(findRental);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServerError(e.getMessage());
     }
+
+    //TODO: Check if I need this.
+    savedRental.setRentedMovies(rentedMovieRepository.findByRental(findRental));
+    return savedRental;
   }
 
   public void deleteRentalById(Long id){

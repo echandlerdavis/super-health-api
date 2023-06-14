@@ -87,7 +87,15 @@ public class RentedMovie {
       return false;
     }
     RentedMovie that = (RentedMovie) o;
-    return daysRented == that.daysRented && id.equals(that.id) && movieId.equals(that.movieId);
+
+    if(movieId != that.movieId){
+      return false;
+    }
+    if(daysRented != that.daysRented){
+      return false;
+    }
+    return Objects.equals(rental, that.rental);
+
   }
 
   @Override
