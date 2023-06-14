@@ -1,6 +1,8 @@
 package io.catalyte.training.movierentals.constants;
 
 import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringConstants {
 
@@ -17,27 +19,29 @@ public class StringConstants {
   public static final String MOVIE_SKU_INVALID = "Movie SKU must match the format XXXXXX-DDDD where 'X' is a capital letter and 'D' is a single digit";
 
   public static final String MOVIE_SKU_ALREADY_EXISTS = "Movie SKU already exists";
-  // Error Messages - Purchase Products Validation
-  public static final String PRODUCT_INACTIVE = "Product(s) must be active in order to be purchased";
-  public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Purchase must have products";
-  // Error Messages - Filters
-  public static final String UNIMPLEMENTED_FILTERS = "Filters not implemented: ";
-  // Google Client ID
-  public static final String GOOGLE_CLIENT_ID = "912899852587-7996nh9mlpvpa2446q0il4f9hj5o492h.apps.googleusercontent.com";
-  //Header key for google authorization
-  public static final String AUTHORIZATION_HEADER = "Authorization";
-  //Error Messages - PromotionalCodes
-  public static final String INVALID_CODE = "This promotional code is invalid at this time.";
-  //Insufficient inventory message
-  public static final String INSUFFICIENT_INVENTORY = "There is not enough inventory to cover the order(s) for: ";
+  // Error Messages - Rented Movies Validation
+  public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Rental must have at least one rentedMovie";
+  public static final String RENTED_MOVIE_DAYS_RENTED_INVALID = "The number of days rented must be greater than 0";
+  public static final String RENTED_MOVIEID_INVALID(List<Long> invalidMovieIds){
+    String fieldsToString = StringUtils.join(invalidMovieIds, ", ");
+    return "The following movie ids do not exist: " + fieldsToString;
+  }
+  public static final String RENTED_MOVIE_FIELDS_EMPTY(Set<String> emptyFields) {
+    String fieldsToString = String.join(", ", emptyFields);
+    return "The following rented movie fields cannot be empty: " + fieldsToString;
+  }
+  public static final String RENTED_MOVIE_FIELDS_NULL(Set<String> nullFields){
+    String fieldsToString = String.join(", ", nullFields);
+    return "The following rented movie fields cannot be null: " + fieldsToString;
+  }
 
   public static final String MOVIE_FIELDS_EMPTY(List<String> emptyFields) {
     String fieldsToString = String.join(", ", emptyFields);
-    return "The following fields can not be empty: " + fieldsToString;
+    return "The following fields cannot be empty: " + fieldsToString;
   }
 
   public static final String MOVIE_FIELDS_NULL(List<String> nullFields) {
     String fieldsToString = String.join(", ", nullFields);
-    return "The following fields can not be null: " + fieldsToString;
+    return "The following fields cannot be null: " + fieldsToString;
   }
 }
