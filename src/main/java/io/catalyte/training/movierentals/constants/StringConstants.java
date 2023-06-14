@@ -20,6 +20,7 @@ public class StringConstants {
 
   public static final String MOVIE_SKU_ALREADY_EXISTS = "Movie SKU already exists";
   // Error Messages - Rented Movies Validation
+  public static final String RENTAL_DATE_STRING_INVALID = "Rental Date must match format 'YYYY-MM-DD'";
   public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Rental must have at least one rentedMovie";
   public static final String RENTED_MOVIE_DAYS_RENTED_INVALID = "The number of days rented must be greater than 0";
   public static final String RENTED_MOVIEID_INVALID(List<Long> invalidMovieIds){
@@ -34,7 +35,6 @@ public class StringConstants {
     String fieldsToString = String.join(", ", nullFields);
     return "The following rented movie fields cannot be null: " + fieldsToString;
   }
-
   public static final String MOVIE_FIELDS_EMPTY(List<String> emptyFields) {
     String fieldsToString = String.join(", ", emptyFields);
     return "The following fields cannot be empty: " + fieldsToString;

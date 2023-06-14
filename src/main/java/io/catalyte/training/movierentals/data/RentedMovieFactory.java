@@ -2,17 +2,9 @@ package io.catalyte.training.movierentals.data;
 
 import io.catalyte.training.movierentals.domains.rental.Rental;
 import io.catalyte.training.movierentals.domains.rental.RentedMovie;
-import io.catalyte.training.movierentals.domains.user.User;
-import io.catalyte.training.movierentals.domains.user.UserBillingAddress;
-import io.catalyte.training.movierentals.domains.user.UserRepository;
-import io.catalyte.training.movierentals.exceptions.ServerError;
-import java.time.Year;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import org.springframework.dao.DataAccessException;
 
 public class RentedMovieFactory {
 

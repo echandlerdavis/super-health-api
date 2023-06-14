@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -182,7 +184,6 @@ public class RentalServiceImpl implements RentalService {
    */
   public List<String> getRentalErrors(Rental rental) {
     List<String> errors = new ArrayList<>();
-    Boolean dailyRentalCostIsNotValid = validateTotalRentalCost(rental);
     List<String> emptyFields = getRentalFieldsEmptyOrNull(rental).get("emptyFields");
     List<String> nullFields = getRentalFieldsEmptyOrNull(rental).get("nullFields");
     Set<String> rentedMovieErrors = getRentedMovieErrors(rental);
@@ -195,8 +196,12 @@ public class RentalServiceImpl implements RentalService {
       errors.add(StringConstants.MOVIE_FIELDS_EMPTY(emptyFields));
     }
 
-    if (dailyRentalCostIsNotValid) {
+    if (validateTotalRentalCost(rental)) {
       errors.add(StringConstants.MOVIE_RENTAL_COST_INVALID);
+    }
+
+    if(!validateDateStringFormat(rental)){
+      errors.add(StringConstants.RENTAL_DATE_STRING_INVALID);
     }
 
     if(!rentedMovieErrors.isEmpty()){
@@ -223,6 +228,16 @@ public class RentalServiceImpl implements RentalService {
       Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
       Boolean priceLessThanZero = rental.getRentalTotalCost() < 0;
       return priceLessThanZero || priceMoreThan2Decimals;
+    }
+    return false;
+  }
+
+  public Boolean validateDateStringFormat(Rental rental) {
+    String regex = "^\\d{4}-\\d{2}-\\d{2}$";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(rental.getRentalDate());
+    if (rental.getRentalDate() != null) {
+      return matcher.matches();
     }
     return false;
   }
