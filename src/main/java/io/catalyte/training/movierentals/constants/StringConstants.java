@@ -12,20 +12,12 @@ public class StringConstants {
   public static final String SERVICE_UNAVAILABLE = "503 Service Unavailable";
   public static final String UNPROCESSABLE_ITEMS = "Unable to process the following Items";
 
-  // Error Messages - Credit Card Validation
-  public static final String CARD_NOT_PROVIDED = "creditCard cannot be null";
-  public static final String CARD_NUMBER_INVALID = "Credit card number can not be null and must be 16 digits in length";
-  public static final String CARD_CVV_INVALID = "Credit card cvv can not be null and must be 3 digits in length";
-  public static final String CARD_HOLDER_INVALID = "Credit card holder can not be null and Can not contain numbers";
-  public static final String CARD_EXPIRATION_INVALID_FORMAT = "Credit card expiration date must be in format MM/YY";
-  public static final String CARD_EXPIRED = "Credit card is expired";
-
-  // Error Messages - Product Validation
-  public static final String PRODUCT_PRICE_INVALID = "Price must be a number greater than 0 with 2 digits after the decimal place";
-  public static final String PRODUCT_QUANTITY_INVALID = "Product quantity can not be less than 0";
+  // Error Messages - Movie Validation
+  public static final String MOVIE_RENTAL_COST_INVALID = "Daily rental cost must be a number greater than 0 with 2 digits after the decimal place";
+  public static final String MOVIE_SKU_INVALID = "Movie SKU must match the format XXXXXX-DDDD where 'X' is a capital letter and 'D' is a single digit";
   // Error Messages - Purchase Products Validation
   public static final String PRODUCT_INACTIVE = "Product(s) must be active in order to be purchased";
-  public static final String PURCHASE_HAS_NO_PRODUCTS = "Purchase must have products";
+  public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Purchase must have products";
   // Error Messages - Filters
   public static final String UNIMPLEMENTED_FILTERS = "Filters not implemented: ";
   // Google Client ID
@@ -37,12 +29,12 @@ public class StringConstants {
   //Insufficient inventory message
   public static final String INSUFFICIENT_INVENTORY = "There is not enough inventory to cover the order(s) for: ";
 
-  public static final String PRODUCT_FIELDS_EMPTY(List<String> emptyFields) {
+  public static final String MOVIE_FIELDS_EMPTY(List<String> emptyFields) {
     String fieldsToString = String.join(", ", emptyFields);
     return "The following fields can not be empty: " + fieldsToString;
   }
 
-  public static final String PRODUCT_FIELDS_NULL(List<String> nullFields) {
+  public static final String MOVIE_FIELDS_NULL(List<String> nullFields) {
     String fieldsToString = String.join(", ", nullFields);
     return "The following fields can not be null: " + fieldsToString;
   }

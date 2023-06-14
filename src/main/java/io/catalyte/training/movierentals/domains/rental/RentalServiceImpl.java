@@ -138,8 +138,6 @@ public class RentalServiceImpl implements RentalService {
 //  Set<>
     Rental savedRental;
     //TODO: Validation for each.
-    //TODO: Handle Rented Movies List - if you're updating the rental list, remove the previous from the repository
-
     findRental.setId(id);
     findRental.setRentalDate(updatedRental.getRentalDate());
     findRental.setRentedMovies(null);
@@ -153,9 +151,6 @@ public class RentalServiceImpl implements RentalService {
       logger.error(e.getMessage());
       throw new ServerError(e.getMessage());
     }
-
-    //TODO: Check if I need this.
-    savedRental.setRentedMovies(rentedMovieRepository.findByRental(findRental));
     return savedRental;
   }
 

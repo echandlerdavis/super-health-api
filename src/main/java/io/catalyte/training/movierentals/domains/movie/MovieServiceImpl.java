@@ -1,8 +1,18 @@
 package io.catalyte.training.movierentals.domains.movie;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.movierentals.constants.StringConstants;
+import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServerError;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,11 +82,11 @@ public class MovieServiceImpl implements MovieService {
    * @return list of movie objects that are added to database
    */
   public Movie saveMovie(Movie movie) {
-//    List<String> productErrors = getProductErrors(movie);
+    List<String> movieErrors = getMovieErrors(movie);
 
-//    if (!productErrors.isEmpty()) {
-//      throw new BadRequest(String.join("\n", productErrors));
-//    }
+    if (!movieErrors.isEmpty()) {
+      throw new BadRequest(String.join("\n", movieErrors));
+    }
 
     try {
       return movieRepository.save(movie);
@@ -90,7 +100,12 @@ public class MovieServiceImpl implements MovieService {
     Movie findMovie = movieRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFound("Cannot update a movie that does not exist."));
 
-    //TODO: Validation for each item.
+    List<String> movieErrors = getMovieErrors(movie);
+
+    if (!movieErrors.isEmpty()) {
+      throw new BadRequest(String.join("\n", movieErrors));
+    }
+
     try{
       findMovie.setSku(movie.getSku());
       findMovie.setGenre(movie.getGenre());
@@ -124,104 +139,115 @@ public class MovieServiceImpl implements MovieService {
 
   //TODO: Use these helper methods as basis for validation of save/update product
   /**
-   * Helper method that reads a product and validateds it's properties
+   * Helper method that reads a movie and validates it's properties
    *
-   * @param product product to be validated
-   * @return a list of errrors
+   * @param movie movie to be validated
+   * @return a list of errors
    */
-//  public List<String> getProductErrors(Product product) {
-//    List<String> errors = new ArrayList<>();
-//    Boolean priceIsValid = validateProductPrice(product);
-//    List<String> emptyFields = getFieldsEmptyOrNull(product).get("emptyFields");
-//    List<String> nullFields = getFieldsEmptyOrNull(product).get("nullFields");
-//    Boolean quantityIsValid = validateProductQuantity(product);
-//
-//    if (!nullFields.isEmpty()) {
-//      errors.add(StringConstants.PRODUCT_FIELDS_NULL(nullFields));
-//    }
-//
-//    if (!emptyFields.isEmpty()) {
-//      errors.add(StringConstants.PRODUCT_FIELDS_EMPTY(emptyFields));
-//    }
-//
-//    if (!priceIsValid) {
-//      errors.add(StringConstants.PRODUCT_PRICE_INVALID);
-//    }
-//
-//    if (!quantityIsValid) {
-//      errors.add(StringConstants.PRODUCT_QUANTITY_INVALID);
-//    }
-//
-//    return errors;
-//  }
+  public List<String> getMovieErrors(Movie movie) {
+    List<String> errors = new ArrayList<>();
+    Boolean dailyRentalCostIsNotValid = validateDailyRentalCost(movie);
+    List<String> emptyFields = getFieldsEmptyOrNull(movie).get("emptyFields");
+    List<String> nullFields = getFieldsEmptyOrNull(movie).get("nullFields");
+    Boolean skuFormatIsValid= validateMovieSkuFormat(movie);
+
+    if (!nullFields.isEmpty()) {
+      errors.add(StringConstants.MOVIE_FIELDS_NULL(nullFields));
+    }
+
+    if (!emptyFields.isEmpty()) {
+      errors.add(StringConstants.MOVIE_FIELDS_EMPTY(emptyFields));
+    }
+
+    if (dailyRentalCostIsNotValid) {
+      errors.add(StringConstants.MOVIE_RENTAL_COST_INVALID);
+    }
+
+    if (!skuFormatIsValid) {
+      errors.add(StringConstants.MOVIE_SKU_INVALID);
+    }
+
+    return errors;
+  }
 
   /**
-   * Checks price is a double value greater than zero and does not have more than 2 digits after the
+   * Checks that daily rental cost is a double value greater than zero and does not have more than 2 digits after the
    * decimal
    * <p>
    * Because price is stored as a double, regardless of input the product will always have 1 digit
    * after the decimal even if input as an integer, or with 2 zeros after decimal
    *
-   * @param movie product to be validated
-   * @return boolean if product price is valid
+   * @param movie movie to be validated
+   * @return boolean if dailyRentalCost is valid
    */
-//  public Boolean validateProductPrice(Movie movie) {
-//    if (movie.getDailyRentalCost() != null) {
-//      //Split price by the decimal
-//      String[] priceString = String.valueOf(movie.getDailyRentalCost()).split("\\.");
-//      Boolean priceMoreThan2Decimals = priceString[1].length() > 2;
-//      Boolean priceLessThanZero = movie.getDailyRentalCost() > 0;
-//      return priceLessThanZero || priceMoreThan2Decimals;
-//    }
-//    return false;
-//  }
-//
-//  /**
-//   * Validates a products quantity is not a negative number
-//   *
-//   * @param product product to be validated
-//   * @return boolean if product has valid quantity
-//   */
-//  public Boolean validateProductQuantity(Product product) {
-//    if (product.getQuantity() != null) {
-//      return product.getQuantity() >= 0;
-//    }
-//    return false;
-//  }
+  public Boolean validateDailyRentalCost(Movie movie) {
+    if (movie.getDailyRentalCost() != null) {
+      //Split price by the decimal
+      String[] rentalCostString = String.valueOf(movie.getDailyRentalCost()).split("\\.");
+      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
+      Boolean priceLessThanZero = movie.getDailyRentalCost() < 0;
+      return priceLessThanZero || priceMoreThan2Decimals;
+    }
+    return false;
+  }
 
-//  /**
-//   * Reads a products fields and checks for fields that are empty or null
-//   *
-//   * @param product product to be validated
-//   * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
-//   */
-//  public HashMap<String, List<String>> getFieldsEmptyOrNull(Product product) {
-//    List<Field> productFields = Arrays.asList(Product.class.getDeclaredFields());
-//    List<String> productFieldNames = new ArrayList<>();
-//    List<String> emptyFields = new ArrayList<>();
-//    List<String> nullFields = new ArrayList<>();
-//    HashMap<String, List<String>> results = new HashMap<>();
-//    //Get product field names
-//    productFields.forEach((field -> productFieldNames.add(field.getName())));
-//    //Remove id as product will not have an id before it is saved
-//    productFieldNames.remove("id");
-//    //Convert product to a HashMap
-//    ObjectMapper mapper = new ObjectMapper();
-//    Map productMap = mapper.convertValue(product, HashMap.class);
-//    //Loop through each fieldName to retrieve each product mapping value of the field
-//    productFieldNames.forEach((field) -> {
-//      //Check if the value for the product's field is null or empty and place in the corresponding list
-//      if (productMap.get(field) == null && field != "reviews") {
-//        nullFields.add(field);
-//      } else if (field != "reviews" && productMap.get(field).toString().trim() == "") {
-//        emptyFields.add(field);
-//      }
-//    });
-//    //place each list in the results
-//    results.put("emptyFields", emptyFields);
-//    results.put("nullFields", nullFields);
-//    return results;
-//  }
+  /**
+   * Validates the format of a movie SKU to match "
+   *
+   * @param movie product to be validated
+   * @return boolean if product has valid quantity
+   */
+  public Boolean validateMovieSkuFormat(Movie movie) {
+    String regex = "^[A-Z]{6}-\\d{4}$";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(movie.getSku());
+    if (movie.getSku() != null) {
+      return matcher.matches();
+    }
+    return false;
+  }
+
+  public Boolean validateMovieSkuDoesNotExist(Movie movie){
+
+    if(movie.getSku() != null){
+
+    }
+    return false;
+  }
+
+  /**
+   * Reads a movie fields and checks for fields that are empty or null
+   *
+   * @param movie movie to be validated
+   * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
+   */
+  public HashMap<String, List<String>> getFieldsEmptyOrNull(Movie movie) {
+    List<Field> movieFields = Arrays.asList(Movie.class.getDeclaredFields());
+    List<String> movieFieldNames = new ArrayList<>();
+    List<String> emptyFields = new ArrayList<>();
+    List<String> nullFields = new ArrayList<>();
+    HashMap<String, List<String>> results = new HashMap<>();
+    //Get product field names
+    movieFields.forEach((field -> movieFieldNames.add(field.getName())));
+    //Remove id as product will not have an id before it is saved
+    movieFieldNames.remove("id");
+    //Convert product to a HashMap
+    ObjectMapper mapper = new ObjectMapper();
+    Map movieMap = mapper.convertValue(movie, HashMap.class);
+    //Loop through each fieldName to retrieve each product mapping value of the field
+    movieFieldNames.forEach((field) -> {
+      //Check if the value for the product's field is null or empty and place in the corresponding list
+      if (movieMap.get(field) == null) {
+        nullFields.add(field);
+      } else if (movieMap.get(field).toString().trim() == "") {
+        emptyFields.add(field);
+      }
+    });
+    //place each list in the results
+    results.put("emptyFields", emptyFields);
+    results.put("nullFields", nullFields);
+    return results;
+  }
 
 
 }
