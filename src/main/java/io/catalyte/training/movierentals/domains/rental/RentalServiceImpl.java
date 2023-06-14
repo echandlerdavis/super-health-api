@@ -107,6 +107,11 @@ public class RentalServiceImpl implements RentalService {
 
   private void handleRentedMovies(Rental rental){
     Set<RentedMovie> rentedMovieSet = rental.getRentedMovies();
+    Set<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
+
+    if(findRentedMovies != null){
+      rentedMovieRepository.deleteAll(findRentedMovies);
+    }
 
     if(rentedMovieSet != null){
       rentedMovieSet.forEach(rentedMovie -> {
