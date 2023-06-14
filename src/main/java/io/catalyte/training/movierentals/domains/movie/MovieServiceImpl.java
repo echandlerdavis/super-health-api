@@ -3,6 +3,7 @@ package io.catalyte.training.movierentals.domains.movie;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
+import io.catalyte.training.movierentals.exceptions.RequestConflict;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServerError;
 import java.lang.reflect.Field;
@@ -74,7 +75,6 @@ public class MovieServiceImpl implements MovieService {
     }
   }
 
-
   /**
    * Adds a movie to the database
    *
@@ -83,11 +83,13 @@ public class MovieServiceImpl implements MovieService {
    */
   public Movie saveMovie(Movie movie) {
     List<String> movieErrors = getMovieErrors(movie);
-
+    Boolean skuExists = movieSkuExists(movie);
     if (!movieErrors.isEmpty()) {
       throw new BadRequest(String.join("\n", movieErrors));
     }
-
+    if(skuExists){
+      throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
+    }
     try {
       return movieRepository.save(movie);
     } catch (DataAccessException e) {
@@ -101,9 +103,14 @@ public class MovieServiceImpl implements MovieService {
         .orElseThrow(() -> new ResourceNotFound("Cannot update a movie that does not exist."));
 
     List<String> movieErrors = getMovieErrors(movie);
+    Boolean skuExists = movieSkuExists(findMovie);
 
     if (!movieErrors.isEmpty()) {
       throw new BadRequest(String.join("\n", movieErrors));
+    }
+
+    if(skuExists){
+      throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
     }
 
     try{
@@ -136,8 +143,6 @@ public class MovieServiceImpl implements MovieService {
   }
 
 
-
-  //TODO: Use these helper methods as basis for validation of save/update product
   /**
    * Helper method that reads a movie and validates it's properties
    *
@@ -207,10 +212,14 @@ public class MovieServiceImpl implements MovieService {
     return false;
   }
 
-  public Boolean validateMovieSkuDoesNotExist(Movie movie){
-
-    if(movie.getSku() != null){
-
+  public Boolean movieSkuExists(Movie newMovie){
+    List<Movie> allMovies = movieRepository.findAll();
+    if(newMovie.getSku() != null){
+      for(Movie movie : allMovies){
+          if (movie.getSku().equals(newMovie.getSku()) && movie.getId() != newMovie.getId()) {
+            return true;
+          }
+      }
     }
     return false;
   }

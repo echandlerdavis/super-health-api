@@ -1,6 +1,7 @@
 package io.catalyte.training.movierentals.exceptions;
 
 import static io.catalyte.training.movierentals.constants.StringConstants.BAD_REQUEST;
+import static io.catalyte.training.movierentals.constants.StringConstants.CONFLICT;
 import static io.catalyte.training.movierentals.constants.StringConstants.NOT_FOUND;
 import static io.catalyte.training.movierentals.constants.StringConstants.SERVER_ERROR;
 import static io.catalyte.training.movierentals.constants.StringConstants.UNPROCESSABLE_ITEMS;
@@ -66,6 +67,13 @@ public class ExceptionController {
     ExceptionResponse response = new ExceptionResponse(BAD_REQUEST, new Date(),
         exception.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(RequestConflict.class)
+  protected  ResponseEntity<ExceptionResponse> requestConflict(RequestConflict exception){
+    ExceptionResponse response = new ExceptionResponse(CONFLICT, new Date(),
+        exception.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(UnprocessableContent.class)

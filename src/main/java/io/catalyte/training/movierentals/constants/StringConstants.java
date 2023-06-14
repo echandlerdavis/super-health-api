@@ -15,6 +15,8 @@ public class StringConstants {
   // Error Messages - Movie Validation
   public static final String MOVIE_RENTAL_COST_INVALID = "Daily rental cost must be a number greater than 0 with 2 digits after the decimal place";
   public static final String MOVIE_SKU_INVALID = "Movie SKU must match the format XXXXXX-DDDD where 'X' is a capital letter and 'D' is a single digit";
+
+  public static final String MOVIE_SKU_ALREADY_EXISTS = "Movie SKU already exists";
   // Error Messages - Purchase Products Validation
   public static final String PRODUCT_INACTIVE = "Product(s) must be active in order to be purchased";
   public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Purchase must have products";
