@@ -1,6 +1,7 @@
 package io.catalyte.training.movierentals.domains.movie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.movierentals.constants.LoggingConstants;
 import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.RequestConflict;
@@ -44,6 +45,7 @@ public class MovieServiceImpl implements MovieService {
    */
   public List<Movie> getMovies(Movie movie) {
     try {
+      logger.info(LoggingConstants.GET_MOVIES);
       return movieRepository.findAll(Example.of(movie));
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -61,6 +63,7 @@ public class MovieServiceImpl implements MovieService {
     Movie movie;
 
     try {
+      logger.info(LoggingConstants.GET_MOVIE_BY_ID(id));
       movie = movieRepository.findById(id).orElse(null);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -70,8 +73,8 @@ public class MovieServiceImpl implements MovieService {
     if (movie != null) {
       return movie;
     } else {
-      logger.info("Get by id failed, it does not exist in the database: " + id);
-      throw new ResourceNotFound("Get by id failed, it does not exist in the database: " + id);
+      logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
+      throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
     }
   }
 
@@ -91,6 +94,7 @@ public class MovieServiceImpl implements MovieService {
       throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
     }
     try {
+      logger.info(LoggingConstants.POST_MOVIE);
       return movieRepository.save(movie);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -100,7 +104,7 @@ public class MovieServiceImpl implements MovieService {
 
   public Movie updateMovie(Long id, Movie movie){
     Movie findMovie = movieRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound("Cannot update a movie that does not exist."));
+        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE));
 
     List<String> movieErrors = getMovieErrors(movie);
     Boolean skuExists = movieSkuExists(findMovie);
@@ -120,20 +124,21 @@ public class MovieServiceImpl implements MovieService {
       findMovie.setTitle(movie.getTitle());
       findMovie.setDailyRentalCost(movie.getDailyRentalCost());
       findMovie.setId(id);
+      logger.info(LoggingConstants.UPDATE_MOVIE(id));
       return movieRepository.save(findMovie);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
-
       throw new ServerError(e.getMessage());
     }
   }
 
   public void deleteMovie(Long id){
     if(movieRepository.findById(id) == null){
-      throw new ResourceNotFound("You cannot delete a movie that doesn't exist.");
+      throw new ResourceNotFound(LoggingConstants.DELETE_MOVIE_FAILURE);
     }
 
     try {
+      logger.info(LoggingConstants.DELETE_MOVIE(id));
       movieRepository.deleteById(id);
     } catch (DataAccessException e){
       logger.error(e.getMessage());

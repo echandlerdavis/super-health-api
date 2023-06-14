@@ -4,24 +4,39 @@ package io.catalyte.training.movierentals.constants;
  * Class for logging statements
  */
 public class LoggingConstants {
+  //Movie endpoints logging constants
+  public static final String GET_MOVIES = "Received request to get all movies";
+  public static final String GET_MOVIE_BY_ID(Long id){
+    return "Received request to get movie by id: " + id;
+  }
+  public static final String POST_MOVIE = "Received request to post movie";
 
-  //User domain logging statements
-  //Google authentication failure
-  public static final String GOOGLE_AUTHENTICATION_FAILURE =
-      "Email in the request body does not match email from JWT Token";
-  public static final String UPDATED_USER_FORMAT = "Updated user %d";
-  public static final String UPDATED_LAST_ACTIVE_FORMAT = "Set last active for user %d";
-  public static final String NO_EXISTING_USER_FORMAT = "User with id: %d does not exist";
-  public static final String SAVED_USER = "Saved user";
-  public static final String EMAIL_NULL = "User must have an email";
-  public static final String EMAIL_TAKEN = "Email is unavailable";
-  public static final String NO_USER_WITH_EMAIL_FORMAT = "User with email %s does not exist";
-  public static final String UPDATE_USER_REQUEST = "Request received for updateUser";
-  public static final String UPDATE_LAST_ACTIVE = "Request received to update last active time";
-  public static final String GET_PROMOCODE_FORMAT = "Get request for promocode %s";
-  public static final String POST_PURCHASE = "Received request to post purchase";
-  public static final String GET_STATES = "Received request for State options";
-  public static final String REJECTED_GET_ALL_PURCHASES = "Rejected request to get all purchases";
-  public static final String GET_USER_PURCHASES_FORMAT = "Received request to get all purchases with email %s";
+  public static final String UPDATE_MOVIE(Long id){
+    return "Received request to update movie: " + id;
+  }
+  public static final String DELETE_MOVIE(Long id){
+    return "Received request to delete movie: " + id;
+  }
+  //Rental Logging Constants
+  public static final String GET_RENTALS = "Received request to get all rentals";
+  public static final String GET_RENTAL_BY_ID(Long id){
+    return "Received request to get rental by id: " + id;
+  }
+  public static final String POST_RENTAL = "Received request to post rental";
+
+  public static final String UPDATE_RENTAL(Long id){
+    return "Received request to update rental: " + id;
+  }
+  public static final String DELETE_RENTAL(Long id){
+    return "Received request to delete rental: " + id;
+  }
+  //Failures
+  public static final String GET_BY_ID_FAILURE(Long id){
+    return "Get by id failed, it does not exist in the database: " + id;
+  }
+  public static final String UPDATE_MOVIE_FAILURE = "You cannot update a movie that does not exist.";
+  public static final String DELETE_MOVIE_FAILURE = "You cannot delete a movie that does not exist.";
+  public static final String UPDATE_RENTAL_FAILURE = "You cannot update a rental that does not exist.";
+  public static final String DELETE_RENTAL_FAILURE = "You cannot delete a rental that does not exist.";
 
 }

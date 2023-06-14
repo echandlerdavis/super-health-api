@@ -1,35 +1,21 @@
 package io.catalyte.training.movierentals.domains.rental;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.movierentals.constants.LoggingConstants;
 import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.domains.movie.Movie;
 import io.catalyte.training.movierentals.domains.movie.MovieRepository;
-import io.catalyte.training.movierentals.domains.movie.MovieService;
-import io.catalyte.training.movierentals.domains.rental.Rental;
-import io.catalyte.training.movierentals.domains.rental.RentalRepository;
-import io.catalyte.training.movierentals.domains.rental.RentalService;
-import io.catalyte.training.movierentals.domains.rental.RentedMovie;
-import io.catalyte.training.movierentals.domains.rental.RentedMovieRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
-import io.catalyte.training.movierentals.exceptions.MultipleUnprocessableContent;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServerError;
-import io.catalyte.training.movierentals.exceptions.UnprocessableContent;
 import java.lang.reflect.Field;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +46,7 @@ public class RentalServiceImpl implements RentalService {
    */
   public List<Rental> getRentals() {
     try {
+      logger.info(LoggingConstants.GET_RENTALS);
       return rentalRepository.findAll();
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -77,6 +64,7 @@ public class RentalServiceImpl implements RentalService {
     Rental rental;
 
     try{
+      logger.info(LoggingConstants.GET_RENTAL_BY_ID(id));
       rental = rentalRepository.findById(id).orElse(null);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -86,8 +74,8 @@ public class RentalServiceImpl implements RentalService {
     if(rental !=null){
       return rental;
     } else {
-      logger.info("Get by id failed, it does not exist in the database: " + id);
-      throw new ResourceNotFound("Get by id failed, it does not exist in the database: " + id);
+      logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
+      throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
     }
   }
 
@@ -107,6 +95,7 @@ public class RentalServiceImpl implements RentalService {
     Rental savedRental;
 
     try {
+      logger.info(LoggingConstants.POST_RENTAL);
       savedRental = rentalRepository.save(newRental);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -146,7 +135,7 @@ public class RentalServiceImpl implements RentalService {
 
   public Rental updateRental(Long id, Rental updatedRental){
     Rental findRental = rentalRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound("Cannot update a rental that does not exist."));
+        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_RENTAL_FAILURE));
 
     List<String> rentalErrors = getRentalErrors(updatedRental);
 
@@ -162,6 +151,7 @@ public class RentalServiceImpl implements RentalService {
     handleRentedMovies(findRental);
     findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
     try {
+      logger.info(LoggingConstants.UPDATE_RENTAL(id));
       savedRental = rentalRepository.save(findRental);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -172,10 +162,11 @@ public class RentalServiceImpl implements RentalService {
 
   public void deleteRentalById(Long id){
     if(rentalRepository.findById(id) == null){
-      throw new ResourceNotFound("You cannot delete a rental that doesn't exist.");
+      throw new ResourceNotFound(LoggingConstants.DELETE_RENTAL_FAILURE);
     }
 
     try {
+      logger.info(LoggingConstants.DELETE_RENTAL(id));
       rentalRepository.deleteById(id);
     } catch (DataAccessException e){
       logger.error(e.getMessage());

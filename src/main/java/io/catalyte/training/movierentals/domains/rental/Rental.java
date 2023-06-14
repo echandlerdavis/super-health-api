@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -47,18 +46,6 @@ public class Rental {
   public void setId(Long id) {
     this.id = id;
   }
-// TODO: Figure out if you need this.
-//  /**
-//   * Get the total cost of all the line items
-//   *
-//   * @return Double
-//   */
-//  public Double calcRentedMoviesTotal() {
-//    return rentedMovies.stream()
-//        .map(line -> line.getMovieId().getPrice() * line.getQuantity())
-//        .reduce(0.0, (runningTotal, lineTotal) -> runningTotal + lineTotal);
-//  }
-
 
   public String getRentalDate() {
     return rentalDate;

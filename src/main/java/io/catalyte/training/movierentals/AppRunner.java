@@ -20,7 +20,7 @@ public class AppRunner {
   }
 
   /**
-   * Configuration to allow cross origin requests from the front-end
+   * Configuration to allow cross-origin requests from the front-end
    */
   @Bean
   public WebMvcConfigurer corsConfigurer() {

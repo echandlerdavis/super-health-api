@@ -1,9 +1,5 @@
 package io.catalyte.training.movierentals.domains.rental;
 
-import static io.catalyte.training.movierentals.constants.LoggingConstants.GET_STATES;
-import static io.catalyte.training.movierentals.constants.LoggingConstants.GET_USER_PURCHASES_FORMAT;
-import static io.catalyte.training.movierentals.constants.LoggingConstants.POST_PURCHASE;
-import static io.catalyte.training.movierentals.constants.LoggingConstants.REJECTED_GET_ALL_PURCHASES;
 import static io.catalyte.training.movierentals.constants.Paths.RENTALS_PATH;
 
 import io.catalyte.training.movierentals.domains.movie.Movie;
