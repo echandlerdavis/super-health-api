@@ -293,8 +293,7 @@ public class RentalServiceImpl implements RentalService {
       }
       if(rentedMovie.getMovieId() == null){
         nullFields.add("movieId");
-      }
-      if(rentedMovie.getMovieId().toString().trim() == ""){
+      }else if(rentedMovie.getMovieId().toString().trim() == ""){
         emptyFields.add("movieId");
       }
       if(rentedMovie.getDaysRented() <= 0){
