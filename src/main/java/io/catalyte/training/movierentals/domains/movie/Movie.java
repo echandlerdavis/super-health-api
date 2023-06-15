@@ -33,9 +33,8 @@ public class Movie {
   public Movie() {
   }
 
-  public Movie(Long id, String sku, String title, String genre, String director,
+  public Movie(String sku, String title, String genre, String director,
       Double dailyRentalCost) {
-    this.id = id;
     this.sku = sku;
     this.title = title;
     this.genre = genre;

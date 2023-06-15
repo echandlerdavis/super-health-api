@@ -20,7 +20,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 /**
@@ -41,12 +40,12 @@ public class MovieServiceImpl implements MovieService {
   /**
    * Retrieves all products from the database, optionally making use of an example if it is passed.
    *
-   * @param movie - an example product to use for querying
+   * @param movie - an example movie to use for querying
    * @return - a list of products matching the example, or all products if no example was passed
    */
-  public List<Movie> getMovies(Movie movie) {
+  public List<Movie> getMovies() {
     try {
-      return movieRepository.findAll(Example.of(movie));
+      return movieRepository.findAll();
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -96,7 +95,7 @@ public class MovieServiceImpl implements MovieService {
       return movieRepository.save(movie);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
   }
 

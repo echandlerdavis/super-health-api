@@ -38,10 +38,10 @@ public class MovieController {
    * @return all movies in the database.
    */
   @GetMapping
-  public ResponseEntity<List<Movie>> getMovies(Movie movie) {
+  public ResponseEntity<List<Movie>> getMovies() {
     logger.info(LoggingConstants.GET_MOVIES);
 
-    return new ResponseEntity<>(movieService.getMovies(movie), HttpStatus.OK);
+    return new ResponseEntity<>(movieService.getMovies(), HttpStatus.OK);
   }
 
   /**
