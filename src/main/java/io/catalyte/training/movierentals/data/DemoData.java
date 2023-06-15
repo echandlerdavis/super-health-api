@@ -69,7 +69,7 @@ public class DemoData implements CommandLineRunner {
     rentalRepository.saveAll(rentalList);
 
     for (Rental rental : rentalList){
-      Set<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
+      List<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
       rental.setRentedMovies(rentedMovieSet);
       rentedMovieRepository.saveAll(rentedMovieSet);
     }

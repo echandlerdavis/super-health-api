@@ -112,8 +112,8 @@ public class RentalServiceImpl implements RentalService {
   }
 
   private void handleRentedMovies(Rental rental){
-    Set<RentedMovie> rentedMovieSet = rental.getRentedMovies();
-    Set<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
+    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
+    List<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
 
     if(findRentedMovies != null){
       rentedMovieRepository.deleteAll(findRentedMovies);
@@ -281,7 +281,7 @@ public class RentalServiceImpl implements RentalService {
   //Validation examples below (likely too complicated)
   private Set<String> getRentedMovieErrors(Rental rental) {
     // Get rentedMovies from each Rental
-    Set<RentedMovie> rentedMovieSet = rental.getRentedMovies();
+    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
     Set<String> rentedMovieErrors = new HashSet<>();
 
     // If no rentedMovies add to error list

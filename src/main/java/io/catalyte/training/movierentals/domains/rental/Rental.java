@@ -1,5 +1,6 @@
 package io.catalyte.training.movierentals.domains.rental;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Entity;
@@ -23,14 +24,14 @@ public class Rental {
 
   @OneToMany(mappedBy = "rental")
   @OnDelete(action = OnDeleteAction.CASCADE)
-  public Set<RentedMovie> rentedMovies;
+  public List<RentedMovie> rentedMovies;
 
   private Double rentalTotalCost;
 
   public Rental() {
   }
 
-  public Rental(Long id, String rentalDate, Set<RentedMovie> rentedMovies,
+  public Rental(Long id, String rentalDate, List<RentedMovie> rentedMovies,
       Double rentalTotalCost) {
     this.id = id;
     this.rentalDate = rentalDate;
@@ -55,11 +56,11 @@ public class Rental {
     this.rentalDate = rentalDate;
   }
 
-  public Set<RentedMovie> getRentedMovies() {
+  public List<RentedMovie> getRentedMovies() {
     return rentedMovies;
   }
 
-  public void setRentedMovies(Set<RentedMovie> rentedMovies) {
+  public void setRentedMovies(List<RentedMovie> rentedMovies) {
     this.rentedMovies = rentedMovies;
   }
 
@@ -90,12 +91,12 @@ public class Rental {
       return false;
     }
     Rental rental = (Rental) o;
-    return id.equals(rental.id) && rentalDate.equals(rental.rentalDate) && rentedMovies.equals(
+    return rentalDate.equals(rental.rentalDate) && rentedMovies.equals(
         rental.rentedMovies) && rentalTotalCost.equals(rental.rentalTotalCost);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, rentalDate, rentedMovies, rentalTotalCost);
+    return Objects.hash(rentalDate, rentedMovies, rentalTotalCost);
   }
 }

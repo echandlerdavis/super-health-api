@@ -86,19 +86,12 @@ public class RentedMovie {
       return false;
     }
     RentedMovie that = (RentedMovie) o;
-
-    if(movieId != that.movieId){
-      return false;
-    }
-    if(daysRented != that.daysRented){
-      return false;
-    }
-    return Objects.equals(rental, that.rental);
-
+    return daysRented == that.daysRented
+        && Objects.equals(movieId, that.movieId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, movieId, daysRented);
+    return Objects.hash(rental, movieId, daysRented);
   }
 }
