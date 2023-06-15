@@ -7,6 +7,7 @@ import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.RequestConflict;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServerError;
+import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +49,7 @@ public class MovieServiceImpl implements MovieService {
       return movieRepository.findAll(Example.of(movie));
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
   }
 
@@ -65,7 +66,7 @@ public class MovieServiceImpl implements MovieService {
       movie = movieRepository.findById(id).orElse(null);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
 
     if (movie != null) {
@@ -124,7 +125,7 @@ public class MovieServiceImpl implements MovieService {
       return movieRepository.save(findMovie);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
   }
 
@@ -137,7 +138,7 @@ public class MovieServiceImpl implements MovieService {
       movieRepository.deleteById(id);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
 
   }

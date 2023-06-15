@@ -4,6 +4,7 @@ import static io.catalyte.training.movierentals.constants.StringConstants.BAD_RE
 import static io.catalyte.training.movierentals.constants.StringConstants.CONFLICT;
 import static io.catalyte.training.movierentals.constants.StringConstants.NOT_FOUND;
 import static io.catalyte.training.movierentals.constants.StringConstants.SERVER_ERROR;
+import static io.catalyte.training.movierentals.constants.StringConstants.SERVICE_UNAVAILABLE;
 import static io.catalyte.training.movierentals.constants.StringConstants.UNPROCESSABLE_ITEMS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -76,20 +77,11 @@ public class ExceptionController {
     return new ResponseEntity<>(response, HttpStatus.CONFLICT);
   }
 
-  @ExceptionHandler(UnprocessableContent.class)
-  protected ResponseEntity<ExceptionResponse> unprocessableContent(UnprocessableContent exception)
-      throws JsonProcessingException {
-    ExceptionResponse response = new ExceptionResponse(UNPROCESSABLE_ITEMS, new Date(),
-        exception.getMessage(), exception.getUnprocessed());
-    return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
-  }
-
-  @ExceptionHandler(MultipleUnprocessableContent.class)
-  protected ResponseEntity<ExceptionResponse> multipleUnprocessableContent(
-      MultipleUnprocessableContent exception) throws JsonProcessingException {
-    ExceptionResponse response = new ExceptionResponse(UNPROCESSABLE_ITEMS, new Date(),
-        exception.getMessage(), exception.getUnprocessed());
-    return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
+  @ExceptionHandler(ServiceUnavailable.class)
+  protected ResponseEntity<ExceptionResponse> serviceUnavailable(ServiceUnavailable exception){
+    ExceptionResponse response = new ExceptionResponse(SERVICE_UNAVAILABLE, new Date(),
+        exception.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
   }
 
   /**

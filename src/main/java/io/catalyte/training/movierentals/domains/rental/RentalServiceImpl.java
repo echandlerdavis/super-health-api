@@ -8,6 +8,7 @@ import io.catalyte.training.movierentals.domains.movie.MovieRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServerError;
+import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class RentalServiceImpl implements RentalService {
       return rentalRepository.findAll();
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
   }
 
@@ -70,7 +71,7 @@ public class RentalServiceImpl implements RentalService {
       rental = rentalRepository.findById(id).orElse(null);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
 
     if(rental !=null){
@@ -101,7 +102,7 @@ public class RentalServiceImpl implements RentalService {
       savedRental = rentalRepository.save(newRental);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
 
     newRental.setId(savedRental.getId());
@@ -129,7 +130,7 @@ public class RentalServiceImpl implements RentalService {
           rentedMovieRepository.save(rentedMovie);
         } catch (DataAccessException e) {
           logger.error(e.getMessage());
-          throw new ServerError(e.getMessage());
+          throw new ServiceUnavailable(e.getMessage());
         }
       });
     }
@@ -157,7 +158,7 @@ public class RentalServiceImpl implements RentalService {
       savedRental = rentalRepository.save(findRental);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
     return savedRental;
   }
@@ -172,7 +173,7 @@ public class RentalServiceImpl implements RentalService {
       rentalRepository.deleteById(id);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
-      throw new ServerError(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
     }
   }
 
