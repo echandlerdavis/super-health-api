@@ -45,7 +45,6 @@ public class MovieServiceImpl implements MovieService {
    */
   public List<Movie> getMovies(Movie movie) {
     try {
-      logger.info(LoggingConstants.GET_MOVIES);
       return movieRepository.findAll(Example.of(movie));
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -63,7 +62,6 @@ public class MovieServiceImpl implements MovieService {
     Movie movie;
 
     try {
-      logger.info(LoggingConstants.GET_MOVIE_BY_ID(id));
       movie = movieRepository.findById(id).orElse(null);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -94,7 +92,6 @@ public class MovieServiceImpl implements MovieService {
       throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
     }
     try {
-      logger.info(LoggingConstants.POST_MOVIE);
       return movieRepository.save(movie);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -124,7 +121,6 @@ public class MovieServiceImpl implements MovieService {
       findMovie.setTitle(movie.getTitle());
       findMovie.setDailyRentalCost(movie.getDailyRentalCost());
       findMovie.setId(id);
-      logger.info(LoggingConstants.UPDATE_MOVIE(id));
       return movieRepository.save(findMovie);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -138,7 +134,6 @@ public class MovieServiceImpl implements MovieService {
     }
 
     try {
-      logger.info(LoggingConstants.DELETE_MOVIE(id));
       movieRepository.deleteById(id);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -210,8 +205,8 @@ public class MovieServiceImpl implements MovieService {
   public Boolean validateMovieSkuFormat(Movie movie) {
     String regex = "^[A-Z]{6}-\\d{4}$";
     Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(movie.getSku());
     if (movie.getSku() != null) {
+      Matcher matcher = pattern.matcher(movie.getSku());
       return matcher.matches();
     }
     return false;

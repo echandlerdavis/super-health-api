@@ -2,6 +2,7 @@ package io.catalyte.training.movierentals.domains.movie;
 
 import static io.catalyte.training.movierentals.constants.Paths.MOVIES_PATH;
 
+import io.catalyte.training.movierentals.constants.LoggingConstants;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +39,7 @@ public class MovieController {
    */
   @GetMapping
   public ResponseEntity<List<Movie>> getMovies(Movie movie) {
-    logger.info("Request received for getMovies");
+    logger.info(LoggingConstants.GET_MOVIES);
 
     return new ResponseEntity<>(movieService.getMovies(movie), HttpStatus.OK);
   }
@@ -53,7 +54,7 @@ public class MovieController {
   @GetMapping(value = "/{id}")
   @ResponseStatus(value = HttpStatus.OK)
   public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
-    logger.info("Request received for getMovieById: " + id);
+    logger.info(LoggingConstants.GET_MOVIE_BY_ID(id));
 
     return new ResponseEntity<>(movieService.getMovieById(id), HttpStatus.OK);
   }
@@ -67,22 +68,20 @@ public class MovieController {
    * @return movie(s) added to database
    */
   @PostMapping
-  @ResponseStatus(value = HttpStatus.OK)
   public ResponseEntity<Movie> postMovie(@RequestBody Movie movie) {
-    logger.info("Request received for postMovie");
+    logger.info(LoggingConstants.POST_MOVIE);
     return new ResponseEntity<>(movieService.saveMovie(movie), HttpStatus.CREATED);
   }
 
   @PutMapping(value = "/{id}")
-  @ResponseStatus(value = HttpStatus.OK)
   public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie){
-    logger.info("Request received to updateMovie: " + id);
+    logger.info(LoggingConstants.UPDATE_MOVIE(id));
     return new ResponseEntity<>(movieService.updateMovie(id, movie), HttpStatus.OK);
   }
 
   @DeleteMapping(value = "/{id}")
   public ResponseEntity<?> deleteMovie(@PathVariable Long id){
-    logger.info("Request received to delete movie by id: " + id);
+    logger.info(LoggingConstants.DELETE_MOVIE(id));
     movieService.deleteMovie(id);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

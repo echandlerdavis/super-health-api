@@ -100,7 +100,7 @@ public class Movie {
       return false;
     }
     Movie movie = (Movie) o;
-    return id.equals(movie.id) && sku.equals(movie.sku) && title.equals(movie.title)
+    return sku.equals(movie.sku) && title.equals(movie.title)
         && genre.equals(
         movie.genre) && director.equals(movie.director) && dailyRentalCost.equals(
         movie.dailyRentalCost);
