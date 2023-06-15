@@ -3,11 +3,14 @@ package io.catalyte.training.movierentals.domains.rental;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -24,6 +27,7 @@ public class Rental {
 
   @OneToMany(mappedBy = "rental")
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @NotFound(action = NotFoundAction.IGNORE)
   public List<RentedMovie> rentedMovies;
 
   private Double rentalTotalCost;

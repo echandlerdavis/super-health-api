@@ -189,7 +189,7 @@ public class MovieApiTest {
   public void UpdateMovieReturns200WithMovieObject() throws Exception {
     Movie updatedMovie = movieFactory.createRandomMovie();
     ObjectMapper mapper = new ObjectMapper();
-    MockHttpServletResponse response = mockMvc.perform(put(MOVIES_PATH + "/" + testMovie1.getId().toString())
+    MockHttpServletResponse response = mockMvc.perform(put(MOVIES_PATH + "/1")
             .contentType("application/json")
             .content(mapper.writeValueAsString(updatedMovie)))
         .andExpect(status().isOk())

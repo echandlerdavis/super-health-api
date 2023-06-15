@@ -6,8 +6,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -119,8 +121,8 @@ public class RentalApiTest {
     newRental.setRentedMovies(newRentedMovies);
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-        .contentType("application/json")
-        .content(mapper.writeValueAsString(newRental)))
+          .contentType("application/json")
+          .content(mapper.writeValueAsString(newRental)))
         .andExpect(status().isCreated())
         .andReturn().getResponse();
 
@@ -130,304 +132,7 @@ public class RentalApiTest {
     assertNotNull(returnedRental.getId());
   }
 
-//  @Test
-//  public void savePurchasesWithoutCreditCardReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card number less than 16 digits
-//    testRental.setCreditCard(null);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
 
-//  @Test
-//  public void savePurchasesWithoutCardNumberReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with null credit card number
-//    testCreditCard.setCardNumber(null);
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-
-//  @Test
-//  public void savePurchasesWithoutCVVReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card number less than 16 digits
-//    testCreditCard.setCvv(null);
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  public void savePurchasesWithoutExpirationReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card number less than 16 digits
-//    testCreditCard.setExpiration(null);
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-
-//  @Test
-//  public void savePurchasesWithCCNumberLessThan16DigitsReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card number less than 16 digits
-//    testCreditCard.setCardNumber("123456");
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  public void savePurchasesWithCCNumberGreaterThan16DigitsReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card number less than 16 digits
-//    testCreditCard.setCardNumber("12345678901234567");
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  public void savePurchasesWithCCNumberWithLettersReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card number less than 16 digits
-//    testCreditCard.setCardNumber("123456abcde12345");
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//
-//  @Test
-//  public void savePurchaseWithCVVLessThan3Digits() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card CVV less than 3 digits
-//    testCreditCard.setCvv("01");
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  public void savePurchaseWithCVVWithLettersReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set test purchase with credit card CVV less than 3 digits
-//    testCreditCard.setCvv("01a");
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  public void savePurchaseWithCardWithExpirationDateNotCorrectFormatReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // set test purchase with card that has expiration not in format MM/YY
-//    testCreditCard.setExpiration("04/2027");
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  public void savePurchaseWithExpiredCardReturns400() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // set test purchase with expired credit card
-//    testCreditCard.setExpiration("04/20");
-//    testRental.setCreditCard(testCreditCard);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  public void dataBaseFixtureTest() throws Exception {
-//    saveTestPurchasesToRepositoryWithDifferentEmails();
-//    List<Purchase> testPurchases = purchaseRepository.findAll();
-//    assertTrue(testPurchases.size() > 0);
-//  }
-//
-//  @Test
-//  public void findPurchasesByEmailReturnsEmailList() throws Exception {
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    for (String email : emails) {
-//      MockHttpServletResponse response = mockMvc.perform(get(PURCHASES_PATH + "/" + email))
-//          .andReturn().getResponse();
-//      List<Purchase> purchases = mapper.readValue(response.getContentAsString(),
-//          new TypeReference<List<Purchase>>() {
-//          });
-//      assertEquals(purchaseCounts.get(email), Integer.valueOf(purchases.size()));
-//    }
-//
-//    String purchasesJson =
-//        mockMvc.perform(
-//                get(PURCHASES_PATH + "/" + emails[0]))
-//            .andReturn()
-//            .getResponse()
-//            .getContentAsString();
-//    Integer numPurchases =
-//        mapper.readValue(purchasesJson, new TypeReference<List<Purchase>>() {
-//        }).size();
-//    assertEquals(Integer.valueOf(2), numPurchases);
-//  }
-//
-//  @Test
-//  public void findPurchasesByEmailEmailNotFoundReturnsEmptyList() throws Exception {
-//    String purchases = mockMvc.perform(get(PURCHASES_PATH + "/not@anEmail.com"))
-//        .andReturn().getResponse().getContentAsString();
-//    assertEquals("[]", purchases);
-//  }
-//
-//  @Test
-//  public void findPurchasesByEmailEmailNotFoundReturnsOk() throws Exception {
-//    mockMvc.perform(get(PURCHASES_PATH + "/not@anEmail.com"))
-//        .andExpect(status().isOk());
-//  }
-//
-//  @Test
-//  public void getAllPurchasesReturns404() throws Exception {
-//    mockMvc.perform(get(PURCHASES_PATH))
-//        .andExpect(status().is(404));
-//  }
-//
-//  @Test
-//  public void savingPurchaseWithAllInactiveProductsThrowsError() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set all test products to inactive
-//    testProducts.forEach(product -> product.setActive(false));
-//    movieRepository.saveAll(testProducts);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isUnprocessableEntity());
-//  }
-//
-//  @Test
-//  public void savingPurchaseWithOneInactiveProductThrowsError() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set one test product to be inactive
-//    testProducts.get(2).setActive(false);
-//    movieRepository.save(testProducts.get(2));
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isUnprocessableEntity());
-//  }
 //
 //  @Test
 //  public void savingPurchaseWithoutAnyProductsThrowsError() throws Exception {
@@ -448,44 +153,6 @@ public class RentalApiTest {
 //  }
 //
 //  @Test
-//  public void savingPurchaseIfEveryProductActiveStatusIsNullThrowsError() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set all test products active status to be null
-//    testProducts.forEach(product -> product.setActive(null));
-//    movieRepository.saveAll(testProducts);
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isUnprocessableEntity());
-//  }
-//
-//  @Test
-//  public void savingPurchaseIfOneProductActiveStatusIsNullThrowsError() throws Exception {
-//    // object mapper for creating a json string
-//    ObjectMapper mapper = new ObjectMapper();
-//
-//    // Set one product to null active status
-//    testProducts.get(0).setActive(null);
-//    movieRepository.save(testProducts.get(0));
-//
-//    // Convert purchase to json string
-//    String JsonString = mapper.writeValueAsString(testRental);
-//
-//    mockMvc.perform(post(PURCHASES_PATH)
-//            .content(JsonString)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isUnprocessableEntity());
-//  }
-//
-//  @Test
 //  public void postPurchasesReturnsPurchaseObject() throws Exception {
 //    //This test fails when run with coverage
 //    ObjectMapper mapper = new ObjectMapper();
@@ -503,145 +170,32 @@ public class RentalApiTest {
 //  }
 //
 
-//
-//  @Test
-//  public void updateInventoryTest() throws Exception {
-//    //This test fails when run with coverage
-//    int expectedEndingInventory = INVENTORY_QUANTITY - PURCHASE_QUANTITY;
-//    ObjectMapper mapper = new ObjectMapper();
-//    mockMvc.perform(
-//            post(PURCHASES_PATH)
-//                .contentType("application/json")
-//                .content(mapper.writeValueAsString(testRental)))
-//        .andReturn().getResponse();
-//
-//    for (Product p : testProducts) {
-//      Product updatedProduct = movieRepository.findById(p.getId()).get();
-//      assertEquals(Long.valueOf(expectedEndingInventory),
-//          Long.valueOf(updatedProduct.getQuantity()));
-//    }
-//  }
-//
-//  @Test
-//  public void shippingChargeIs0WhenPurchaseAbove50() throws Exception {
-//    ObjectMapper mapper = new ObjectMapper();
-//    //Update the prices on the purchase items
-//    double price = 16.67;
-//    int purchaseQty = 1;
-//    for (Product p : testProducts) {
-//      p.setPrice(price);
-//      movieRepository.save(p);
-//    }
-//    //update the purchase quantities
-//    for (LineItem l : testRental.getProducts()) {
-//      l.setQuantity(purchaseQty);
-//    }
-//    //set state
-//    testRental.getDeliveryAddress().setDeliveryState(StateEnum.ID.fullName);
-//    //save purchase
-//    MockHttpServletResponse result = mockMvc.perform(
-//            post(PURCHASES_PATH)
-//                .contentType("application/json")
-//                .content(mapper.writeValueAsString(testRental)))
-//        .andReturn().getResponse();
-//    String json = result.getContentAsString();
-//    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
-//    //assertions
-//    assertFalse(returnedPurchase.applyShippingCharge());
-//    assertEquals(0.00, returnedPurchase.getShippingCharge(), .001);
-//
-//  }
-//
-//  @Test
-//  public void shippingChargeIs5WhenPurchaseBelow50AndDeliverToLower48() throws Exception {
-//    ObjectMapper mapper = new ObjectMapper();
-//    StateEnum state = StateEnum.AL;
-//    //Update the prices on the purchase items
-//    double price = 16.66;
-//    int purchaseQty = 1;
-//    for (Product p : testProducts) {
-//      p.setPrice(price);
-//      movieRepository.save(p);
-//    }
-//    //update the purchase quantities
-//    for (LineItem l : testRental.getProducts()) {
-//      l.setQuantity(purchaseQty);
-//    }
-//    //set state
-//    testRental.getDeliveryAddress().setDeliveryState(state.fullName);
-//    //save purchase
-//    MockHttpServletResponse result = mockMvc.perform(
-//            post(PURCHASES_PATH)
-//                .contentType("application/json")
-//                .content(mapper.writeValueAsString(testRental)))
-//        .andReturn().getResponse();
-//    String json = result.getContentAsString();
-//    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
-//    //assertions
-//    assertTrue(returnedPurchase.applyShippingCharge());
-//    assertEquals(state.shippingCost, returnedPurchase.getShippingCharge(), .001);
-//
-//  }
-//
-//  @Test
-//  public void shippingChargeIs10WhenShippingToAlaska() throws Exception {
-//    StateEnum state = StateEnum.AK;
-//    ObjectMapper mapper = new ObjectMapper();
-//    //Update the prices on the purchase items
-//    double price = 100.00;
-//    int purchaseQty = 1;
-//    for (Product p : testProducts) {
-//      p.setPrice(price);
-//      movieRepository.save(p);
-//    }
-//    //update the purchase quantities
-//    for (LineItem l : testRental.getProducts()) {
-//      l.setQuantity(purchaseQty);
-//    }
-//    //set state
-//    testRental.getDeliveryAddress().setDeliveryState(state.fullName);
-//    //save purchase
-//    MockHttpServletResponse result = mockMvc.perform(
-//            post(PURCHASES_PATH)
-//                .contentType("application/json")
-//                .content(mapper.writeValueAsString(testRental)))
-//        .andReturn().getResponse();
-//    String json = result.getContentAsString();
-//    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
-//    //assertions
-//    assertTrue(returnedPurchase.applyShippingCharge());
-//    assertEquals(state.shippingCost, returnedPurchase.getShippingCharge(), .001);
-//
-//  }
-//
-//  @Test
-//  public void shippingChargeIs10WhenShippingToHawaii() throws Exception {
-//    StateEnum state = StateEnum.HI;
-//    ObjectMapper mapper = new ObjectMapper();
-//    //Update the prices on the purchase items
-//    double price = 100.00;
-//    int purchaseQty = 1;
-//    for (Product p : testProducts) {
-//      p.setPrice(price);
-//      movieRepository.save(p);
-//    }
-//    //update the purchase quantities
-//    for (LineItem l : testRental.getProducts()) {
-//      l.setQuantity(purchaseQty);
-//    }
-//    //set state
-//    testRental.getDeliveryAddress().setDeliveryState(state.fullName);
-//    //save purchase
-//    MockHttpServletResponse result = mockMvc.perform(
-//            post(PURCHASES_PATH)
-//                .contentType("application/json")
-//                .content(mapper.writeValueAsString(testRental)))
-//        .andReturn().getResponse();
-//    String json = result.getContentAsString();
-//    Purchase returnedPurchase = mapper.readValue(json, Purchase.class);
-//    //assertions
-//    assertTrue(returnedPurchase.applyShippingCharge());
-//    assertEquals(state.shippingCost, returnedPurchase.getShippingCharge(), .001);
-//
-//  }
+
+
+  @Test
+  public void UpdateRentalReturns200WithMovieObject() throws Exception {
+    Rental updatedRental = rentalFactory.createRandomRental();
+    List<RentedMovie> updatedRentedMovies = rentedMovieFactory.generateRandomRentedMovies(updatedRental);
+    updatedRental.setRentedMovies(updatedRentedMovies);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(put(RENTALS_PATH + "/1")
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(updatedRental)))
+        .andExpect(status().isOk())
+        .andReturn().getResponse();
+
+    Rental returnedRental = mapper.readValue(response.getContentAsString(), Rental.class);
+
+    assert (returnedRental.equals(updatedRental));
+    assertNotNull(returnedRental.getId());
+  }
+
+
+  @Test
+  public void DeleteRentalReturns204() throws Exception {
+    mockMvc.perform(delete(RENTALS_PATH + "/1"))
+        .andExpect(status().isNoContent());
+  }
+
+
 }
