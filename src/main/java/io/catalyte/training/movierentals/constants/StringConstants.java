@@ -23,6 +23,9 @@ public class StringConstants {
   public static final String RENTAL_DATE_STRING_INVALID = "Rental Date must match format 'YYYY-MM-DD'";
   public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Rental must have at least one rentedMovie";
   public static final String RENTED_MOVIE_DAYS_RENTED_INVALID = "The number of days rented must be greater than 0";
+
+  public static final String RENTAL_TOTAL_COST_INVALID = "Total rental cost must be a number greater than 0 with 2 digits after the decimal place";
+
   public static final String RENTED_MOVIEID_INVALID(List<Long> invalidMovieIds){
     String fieldsToString = StringUtils.join(invalidMovieIds, ", ");
     return "The following movie ids do not exist: " + fieldsToString;

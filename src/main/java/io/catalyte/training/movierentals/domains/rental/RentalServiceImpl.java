@@ -198,7 +198,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     if (validateTotalRentalCost(rental)) {
-      errors.add(StringConstants.MOVIE_RENTAL_COST_INVALID);
+      errors.add(StringConstants.RENTAL_TOTAL_COST_INVALID);
     }
 
     if(!validateDateStringFormat(rental)){

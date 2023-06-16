@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.data.MovieFactory;
 import io.catalyte.training.movierentals.data.RentalFactory;
 import io.catalyte.training.movierentals.data.RentedMovieFactory;
@@ -132,6 +133,39 @@ public class RentalApiTest {
     assertNotNull(returnedRental.getId());
   }
 
+  @Test
+  public void saveRentalReturns400WhenTotalRentalCostIsNegativeNumber() throws Exception{
+    Rental newRental = rentalFactory.createRandomRental();
+    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
+    newRental.setRentedMovies(newRentedMovies);
+    newRental.setRentalTotalCost(-1.00);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(newRental)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.RENTAL_TOTAL_COST_INVALID));
+  }
+
+  @Test
+  public void saveRentalReturns400WhenTotalRentalDateIsInvalid() throws Exception{
+    Rental newRental = rentalFactory.createRandomRental();
+    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
+    newRental.setRentedMovies(newRentedMovies);
+    newRental.setRentalDate("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(newRental)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.RENTAL_DATE_STRING_INVALID));
+  }
 
 //
 //  @Test
