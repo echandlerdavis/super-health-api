@@ -3,19 +3,19 @@
 ## Description
 This is a backend set up for a Movie Rental application. There are three classes created which
 each correspond to a Table in the SQL database:
-    1. Movie
+### 1. Movie
         - id(Long)
         - sku(String)
         - title(String)
         - genre(String)
         - director(String)
         - dailyRentalCost(Double)
-    2. Rental
+### 2. Rental
         - id(Long)
         - rentalDate(String)
         - rentedMovies (List of Rented Movie Objects)
         - rentalTotalCost(Double)
-    3. Rented Movie
+### 3. Rented Movie
         - id(Long)
         - movieId(Long)
         - daysRented(int)
@@ -32,7 +32,7 @@ to the postman collection.
 Right-click AppRunner, and select "Run 'AppRunner.main()'"
 
 ## PostMan Collection Link
-https://www.postman.com/cdavis2903/workspace/chandler-s-public-workspace/environment/26507437-5c30f867-597c-4f62-91f1-e55bd79998e9
+[Link to Postman Collection](https://www.postman.com/cdavis2903/workspace/chandler-s-public-workspace/environment/26507437-5c30f867-597c-4f62-91f1-e55bd79998e9)
 
 ### Connections
 
