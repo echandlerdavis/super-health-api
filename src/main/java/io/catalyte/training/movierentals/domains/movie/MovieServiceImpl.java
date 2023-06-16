@@ -110,17 +110,18 @@ public class MovieServiceImpl implements MovieService {
       throw new BadRequest(String.join("\n", movieErrors));
     }
 
+    findMovie.setSku(movie.getSku());
+    findMovie.setGenre(movie.getGenre());
+    findMovie.setDirector(movie.getDirector());
+    findMovie.setTitle(movie.getTitle());
+    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
+    findMovie.setId(id);
+
     if(skuExists){
       throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
     }
 
     try{
-      findMovie.setSku(movie.getSku());
-      findMovie.setGenre(movie.getGenre());
-      findMovie.setDirector(movie.getDirector());
-      findMovie.setTitle(movie.getTitle());
-      findMovie.setDailyRentalCost(movie.getDailyRentalCost());
-      findMovie.setId(id);
       return movieRepository.save(findMovie);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -129,9 +130,8 @@ public class MovieServiceImpl implements MovieService {
   }
 
   public void deleteMovie(Long id){
-    if(movieRepository.findById(id) == null){
-      throw new ResourceNotFound(LoggingConstants.DELETE_MOVIE_FAILURE);
-    }
+    movieRepository.findById(id)
+        .orElseThrow(() ->  new ResourceNotFound(LoggingConstants.DELETE_MOVIE_FAILURE));
 
     try {
       movieRepository.deleteById(id);

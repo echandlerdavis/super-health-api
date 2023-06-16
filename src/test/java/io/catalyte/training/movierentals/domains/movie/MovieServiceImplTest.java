@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import io.catalyte.training.movierentals.data.MovieFactory;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
+import io.catalyte.training.movierentals.exceptions.RequestConflict;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
 import java.util.ArrayList;
@@ -132,6 +133,20 @@ public class MovieServiceImplTest {
   }
 
   @Test
+  public void saveMovieThrowsBadRequestWhenSkuIsInvalidFormat(){
+    testMovie1.setSku("ab-123");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsRequestConflictWhenSkuAlreadyExists(){
+    testMovie1.setSku(testMovie2.getSku());
+    testMovie1.setId(1L);
+    assertThrows(RequestConflict.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+
+  @Test
   public void saveMovieThrowsBadRequestWhenTitleIsNull(){
     testMovie1.setTitle(null);
     assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
@@ -143,7 +158,47 @@ public class MovieServiceImplTest {
     assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
   }
 
+  @Test
+  public void saveMovieThrowsBadRequestWhenGenreIsNull(){
+    testMovie1.setGenre(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
 
+  @Test
+  public void saveMovieThrowsBadRequestWhenGenreIsEmpty(){
+    testMovie1.setGenre("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenDailyRentalCostIsNull(){
+    testMovie1.setDailyRentalCost(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenDailyRentalCostIsNegative(){
+    testMovie1.setDailyRentalCost(-1.00);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenDailyRentalCostHasMoreThanTwoDecimals(){
+    testMovie1.setDailyRentalCost(1.123);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenDirectorIsNull(){
+    testMovie1.setDirector(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenDirectorIsEmpty(){
+    testMovie1.setDirector("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
 
   @Test
   public void updateValidMovieReturnsMovie(){
@@ -161,6 +216,92 @@ public class MovieServiceImplTest {
   }
 
   @Test
+  public void updateMovieByIdThrowsErrorWhenNotFound() {
+    when(movieRepository.findById(anyLong())).thenReturn(Optional.empty());
+    assertThrows(ResourceNotFound.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenSkuIsNull(){
+    testMovie1.setSku(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenSkuIsEmpty(){
+    testMovie1.setSku("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenSkuIsInvalidFormat(){
+    testMovie1.setSku("ab-123");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsRequestConflictWhenSkuAlreadyExists(){
+    testMovie1.setSku(testMovie2.getSku());
+    testMovie1.setId(1L);
+    assertThrows(RequestConflict.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenTitleIsNull(){
+    testMovie1.setTitle(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenTitleIsEmpty(){
+    testMovie1.setTitle("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenGenreIsNull(){
+    testMovie1.setGenre(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenGenreIsEmpty(){
+    testMovie1.setGenre("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenDailyRentalCostIsNull(){
+    testMovie1.setDailyRentalCost(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenDailyRentalCostIsNegative(){
+    testMovie1.setDailyRentalCost(-1.00);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenDailyRentalCostHasMoreThanTwoDecimals(){
+    testMovie1.setDailyRentalCost(1.123);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenDirectorIsNull(){
+    testMovie1.setDirector(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
+  public void updateMovieThrowsBadRequestWhenDirectorIsEmpty(){
+    testMovie1.setDirector("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.updateMovie(123L, testMovie1));
+  }
+
+  @Test
   public void deleteMovieReturnsVoid(){
     movieServiceImpl.deleteMovie(123L);
     verify(movieRepository).deleteById(anyLong());
@@ -174,7 +315,7 @@ public class MovieServiceImplTest {
   }
   @Test
   public void deleteMovieByIdThrowsErrorWhenNotFound() {
-    when(movieRepository.findById(anyLong())).thenReturn(null);
+    when(movieRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThrows(ResourceNotFound.class, () -> movieServiceImpl.deleteMovie(123L));
   }
 //  @Test
