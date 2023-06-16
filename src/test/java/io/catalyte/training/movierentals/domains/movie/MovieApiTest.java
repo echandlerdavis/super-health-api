@@ -66,7 +66,7 @@ public class MovieApiTest {
 
   @Test
   public void getMovieByIdReturnsMovieWith200() throws Exception {
-    mockMvc.perform(get(MOVIES_PATH + "/1"))
+    mockMvc.perform(get(MOVIES_PATH + "/" + testMovie1.getId().toString()))
         .andExpect(status().isOk());
   }
 
@@ -189,7 +189,7 @@ public class MovieApiTest {
   public void UpdateMovieReturns200WithMovieObject() throws Exception {
     Movie updatedMovie = movieFactory.createRandomMovie();
     ObjectMapper mapper = new ObjectMapper();
-    MockHttpServletResponse response = mockMvc.perform(put(MOVIES_PATH + "/1")
+    MockHttpServletResponse response = mockMvc.perform(put(MOVIES_PATH + "/" + testMovie1.getId().toString())
             .contentType("application/json")
             .content(mapper.writeValueAsString(updatedMovie)))
         .andExpect(status().isOk())
@@ -203,7 +203,7 @@ public class MovieApiTest {
 
   @Test
   public void DeleteMovieReturns204() throws Exception {
-    mockMvc.perform(delete(MOVIES_PATH + "/1"))
+    mockMvc.perform(delete(MOVIES_PATH + "/" + testMovie1.getId().toString()))
         .andExpect(status().isNoContent());
   }
 }
