@@ -106,6 +106,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     newRental.setId(savedRental.getId());
+    newRental.setRentedMovies(savedRental.getRentedMovies());
     handleRentedMovies(newRental);
     savedRental.setRentedMovies(rentedMovieRepository.findByRental(newRental));
 
@@ -201,7 +202,9 @@ public class RentalServiceImpl implements RentalService {
       errors.add(StringConstants.RENTAL_TOTAL_COST_INVALID);
     }
 
-    if(!validateDateStringFormat(rental)){
+    if(!validateDateStringFormat(rental) &&
+        !emptyFields.contains("rentalDate") &&
+        !nullFields.contains("rentalDate")){
       errors.add(StringConstants.RENTAL_DATE_STRING_INVALID);
     }
 
@@ -294,10 +297,9 @@ public class RentalServiceImpl implements RentalService {
       rentedMovieErrors.add(StringConstants.RENTAL_HAS_NO_RENTED_MOVIE);
     }else {
       rentedMovieSet.forEach(rentedMovie -> {
-        if (!validateMovieIdExists(rentedMovie)) {
+        if (!validateMovieIdExists(rentedMovie) && rentedMovie.getMovieId() != null) {
           invalidMovieIds.add(rentedMovie.getMovieId());
-        }
-        if (rentedMovie.getMovieId() == null) {
+        }else if (rentedMovie.getMovieId() == null) {
           nullFields.add("movieId");
         } else if (rentedMovie.getMovieId().toString().trim() == "") {
           emptyFields.add("movieId");
@@ -326,7 +328,7 @@ public class RentalServiceImpl implements RentalService {
     private Boolean validateMovieIdExists(RentedMovie rentedMovie){
       List<Movie> allMovies = movieRepository.findAll();
       for(Movie movie : allMovies){
-        if(movie.getId() == rentedMovie.getMovieId() || rentedMovie.getId() == null){
+        if(movie.getId() == rentedMovie.getMovieId()){
           return true;
         }
       }
