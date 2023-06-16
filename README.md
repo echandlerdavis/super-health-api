@@ -32,7 +32,7 @@ to the postman collection.
 Right-click AppRunner, and select "Run 'AppRunner.main()'"
 
 ## PostMan Collection Link
-[Link]https://www.postman.com/cdavis2903/workspace/chandler-s-public-workspace/environment/26507437-5c30f867-597c-4f62-91f1-e55bd79998e9
+https://www.postman.com/cdavis2903/workspace/chandler-s-public-workspace/environment/26507437-5c30f867-597c-4f62-91f1-e55bd79998e9
 
 ### Connections
 
