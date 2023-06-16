@@ -35,9 +35,8 @@ public class Rental {
   public Rental() {
   }
 
-  public Rental(Long id, String rentalDate, List<RentedMovie> rentedMovies,
+  public Rental(String rentalDate, List<RentedMovie> rentedMovies,
       Double rentalTotalCost) {
-    this.id = id;
     this.rentalDate = rentalDate;
     this.rentedMovies = rentedMovies;
     this.rentalTotalCost = rentalTotalCost;

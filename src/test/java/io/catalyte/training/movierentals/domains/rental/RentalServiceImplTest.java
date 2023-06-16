@@ -1,177 +1,180 @@
-//package io.catalyte.training.movierentals.domains.purchase;
-//
-//import static org.junit.Assert.assertNotNull;
-//import static org.junit.Assert.assertNull;
-//import static org.junit.Assert.assertTrue;
-//import static org.junit.Assert.fail;
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.mockito.ArgumentMatchers.anyString;
-//import static org.mockito.Mockito.any;
-//import static org.mockito.Mockito.doThrow;
-//import static org.mockito.Mockito.when;
-//
-//import io.catalyte.training.movierentals.data.ProductFactory;
-//import io.catalyte.training.movierentals.domains.movie.Product;
-//import io.catalyte.training.movierentals.domains.movie.MovieRepository;
-//import io.catalyte.training.movierentals.domains.movie.MovieService;
-//import io.catalyte.training.movierentals.domains.promotions.PromotionalCode;
-//import io.catalyte.training.movierentals.domains.promotions.PromotionalCodeService;
-//import io.catalyte.training.movierentals.domains.promotions.PromotionalCodeType;
-//import io.catalyte.training.movierentals.exceptions.BadRequest;
-//import io.catalyte.training.movierentals.exceptions.MultipleUnprocessableContent;
-//import io.catalyte.training.movierentals.exceptions.ServerError;
-//import io.catalyte.training.movierentals.exceptions.UnprocessableContent;
-//import java.math.BigDecimal;
-//import java.util.ArrayList;
-//import java.util.Date;
-//import java.util.HashSet;
-//import java.util.Iterator;
-//import java.util.List;
-//import java.util.Set;
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.runner.RunWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.MockitoAnnotations;
-//import org.mockito.junit.MockitoJUnitRunner;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.dao.DataAccessException;
-//
-//@RunWith(MockitoJUnitRunner.class)
-//@WebMvcTest(PurchaseServiceImpl.class)
-//public class PurchaseServiceImplTest {
-//
-//  private final int INVENTORY_QUANTITY = 100;
-//  private final int PURCHASE_QUANTITY = 1;
-//  private final long TEST_CODE_RATE = 25;
-//  CreditCard testCreditCard = new CreditCard("1234567890123456", "111", "04/30", "Visa");
-//  Purchase testPurchase = new Purchase();
-//  String testEmail = "test@validEmail.com";
-//  PromotionalCode promoCode;
-//  ArrayList<Purchase> testPurchases = new ArrayList<>();
-//  @InjectMocks
-//  private PurchaseServiceImpl purchaseServiceImpl;
-//  @Mock
-//  private PurchaseRepository purchaseRepository;
-//  @Mock
-//  private MovieService movieService;
-//  @Mock
-//  private LineItemRepository lineItemRepository;
-//  @Mock
-//  private MovieRepository movieRepository;
-//  @Mock
-//  private PromotionalCodeService promotionalCodeService;
-//  private ProductFactory productFactory = new ProductFactory();
-//  private List<Product> testProducts;
-//
-//  @Before
-//  public void setUp() {
-//
-//    //Initialize Mocks
-//    MockitoAnnotations.initMocks(this);
-//
-//    // Generate list of test products to add to a purchase
-//    productFactory = new ProductFactory();
-//    testProducts = productFactory.generateRandomProducts(3);
-//
-//    //set the valid promocode
-//    Long dateMilliseconds = new Date().getTime();
-//    promoCode = new PromotionalCode(
-//        "Test",
-//        "description",
-//        PromotionalCodeType.FLAT,
-//        BigDecimal.valueOf(TEST_CODE_RATE),
-//        new Date(dateMilliseconds),
-//        new Date(dateMilliseconds * 1000 * 60 * 60 * 24)
-//    );
-//
-//    // Initialize a test purchase instance and list of purchases
-//    setTestPurchase();
-//    testPurchases.add(testPurchase);
-//
-//    // Set repository to return list of test purchases when calling findByBillingAddressEmail
-//    when(purchaseRepository.findByBillingAddressEmail(anyString())).thenReturn(testPurchases);
-//
-//    // Set consecutive mock calls for product service since Purchase service consecutively calls this for each item in a purchase
-//    //set mock for productService.getProductsByIds
-//    when(movieService.getProductsByIds(any()))
-//        .thenReturn(testProducts);
-//
-//    when(movieService.getProductsByIds(any())).thenReturn(testProducts);
-//
-//    //Set repository to return a copy of testPurchase with an id when calling save
-//    when(purchaseRepository.save(any(Purchase.class))).thenAnswer((p) -> {
-//      Purchase copyPurchase = new Purchase();
-//      Purchase passedPurchase = p.getArgument(0);
-//      copyPurchase.setId(9L);
-//      copyPurchase.setCreditCard(passedPurchase.getCreditCard());
-//      copyPurchase.setBillingAddress(passedPurchase.getBillingAddress());
-//      copyPurchase.setDeliveryAddress(passedPurchase.getDeliveryAddress());
-//      copyPurchase.setDate(passedPurchase.getDate());
-//      copyPurchase.setPromoCode(passedPurchase.getPromoCode());
-//      copyPurchase.setShippingCharge(passedPurchase.getShippingCharge());
-//
-//      return copyPurchase;
-//    });
-//
-//    //Set promotional code repo to return a valid promocode by default
-//    when(promotionalCodeService.getPromotionalCodeByTitle(anyString())).thenReturn(promoCode);
-//
-//    //Set lineItemRepository.save to add product to testPurchased
-//    when(lineItemRepository.findByPurchase(any(Purchase.class))).thenAnswer((l) -> {
-//      return testPurchase.getProducts();
-//    });
-//
-//  }
-//
-//  /**
-//   * Helper Method to initialize a test purchase with a billing address, delivery address, credit
-//   * card info, and a random generated product
-//   */
-//  private void setTestPurchase() {
-//    BillingAddress testBillingAddress = new BillingAddress(
-//        "123 No Name Street",
-//        null,
-//        "No City",
-//        "Virginia",
-//        12345,
-//        testEmail,
-//        "800-555-5555");
-//
-//    DeliveryAddress testDeliveryAddress = new DeliveryAddress(
-//        "first",
-//        "last",
-//        "123 No Name Street",
-//        null,
-//        "No City",
-//        "Virginia",
-//        12345);
-//
-//    // Get List of test products to add to purchase
-//    Set<LineItem> purchasesList = new HashSet<>();
-//    Long id = 0L;
-//
-//    for (Product product : testProducts) {
-//      product.setActive(true);
-//      product.setId(id);
-//      product.setQuantity(INVENTORY_QUANTITY);
-//      ++id;
-//      LineItem purchaseLineItem = new LineItem();
-//      purchaseLineItem.setProduct(product);
-//      purchaseLineItem.setQuantity(PURCHASE_QUANTITY);
-//      purchasesList.add(purchaseLineItem);
-//    }
-//
-//    testPurchase.setProducts(purchasesList);
-//    testPurchase.setBillingAddress(testBillingAddress);
-//    testPurchase.setDeliveryAddress(testDeliveryAddress);
-//    testPurchase.setCreditCard(testCreditCard);
-//    testPurchase.setPromoCode(promoCode);
-//  }
-//
+package io.catalyte.training.movierentals.domains.rental;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import io.catalyte.training.movierentals.data.MovieFactory;
+import io.catalyte.training.movierentals.data.RentedMovieFactory;
+import io.catalyte.training.movierentals.domains.movie.Movie;
+import io.catalyte.training.movierentals.domains.movie.MovieRepository;
+import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
+import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.dao.DataAccessException;
+
+@RunWith(MockitoJUnitRunner.class)
+@WebMvcTest(RentalServiceImpl.class)
+public class RentalServiceImplTest {
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+  private final int INVENTORY_QUANTITY = 100;
+  private final int PURCHASE_QUANTITY = 1;
+  private final long TEST_CODE_RATE = 25;
+  Rental testRental;
+  List<Rental> testRentals = new ArrayList<>();
+  MovieFactory movieFactory;
+
+  @InjectMocks
+  private RentalServiceImpl rentalServiceImpl;
+  @Mock
+  private RentalRepository rentalRepository;
+  @Mock
+  private RentedMovieRepository rentedMovieRepository;
+  @Mock
+  private MovieRepository movieRepository;
+
+
+  @Before
+  public void setUp() {
+
+    //Initialize Mocks
+    MockitoAnnotations.initMocks(this);
+
+    //Generate random movies to have movieIds to pull from;
+    movieFactory = new MovieFactory();
+    List<Movie> movieList = movieFactory.generateRandomMovieList(1);
+
+    // Initialize a test purchase instance and list of purchases
+    setTestRental();
+    testRentals.add(testRental);
+
+    when(rentalRepository.findAll()).thenReturn(testRentals);
+    when(rentalRepository.findById(anyLong())).thenReturn(Optional.of(testRental));
+    when(rentalRepository.save(any())).thenReturn(testRental);
+
+    //Set rentedMovieRepository.save to add rentedMovie to testRental
+    when(rentedMovieRepository.findByRental(any(Rental.class))).thenAnswer((l) -> {
+      return testRental.getRentedMovies();
+    });
+
+    when(movieRepository.findAll()).thenAnswer((l) -> {
+      return movieList;
+    });
+
+  }
+
+  /**
+   * Helper Method to initialize a test purchase with a billing address, delivery address, credit
+   * card info, and a random generated product
+   */
+  private void setTestRental() {
+    testRental = new Rental(
+        "2023-06-17",
+        null,
+        10.45
+    );
+
+    List<RentedMovie> rentedMovieList = new ArrayList<>();
+    RentedMovie rentedMovie = new RentedMovie(
+        1L,
+        10,
+        testRental
+        );
+    rentedMovieList.add(rentedMovie);
+    testRental.setRentedMovies(rentedMovieList);
+  }
+
+  @Test
+  public void getMovieByIdReturnsRental() {
+    Rental actual = rentalServiceImpl.getRentalById(123L);
+    assertEquals(testRental, actual);
+  }
+
+  @Test
+  public void getMovieByIdThrowsErrorWhenNotFound() {
+    when(rentalRepository.findById(anyLong())).thenReturn(Optional.empty());
+    assertThrows(ResourceNotFound.class, () -> rentalServiceImpl.getRentalById(123L));
+  }
+
+  @Test
+  public void getMovieByIdThrowsServiceUnavailable() {
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(rentalRepository).findById(anyLong());
+    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.getRentalById(123L));
+  }
+
+  @Test
+  public void getAllRentalsReturnsAllRentals(){
+    List<Rental> actual = rentalServiceImpl.getRentals();
+    assertEquals(testRentals, actual);
+  }
+
+  @Test
+  public void getAllMoviesThrowsServiceUnavailable(){
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(rentalRepository).findAll();
+    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.getRentals());
+  }
+
+  @Test
+  public void saveValidRentalReturnsRental() {
+    assertEquals(testRental, rentalServiceImpl.saveRental(testRental));
+  }
+
+  @Test
+  public void saveRentalThrowsServiceUnavailable() {
+    //This test fails when run with coverage
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(rentalRepository).save(any());
+    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.saveRental(testRental));
+  }
+
+  @Test
+  public void updateValidRentalReturnsRental(){
+    assertEquals(testRental, rentalServiceImpl.updateRental(1L, testRental));
+  }
+
+  @Test
+  public void updateRentalThrowsServiceUnavailable() {
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(rentalRepository).save(any());
+    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+  }
+
+  @Test
+  public void deleteRentalReturnsVoid(){
+    rentalServiceImpl.deleteRentalById(123L);
+    verify(rentalRepository).deleteById(anyLong());
+  }
+
+  @Test
+  public void deleteRentalThrowsServiceUnavailable(){
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(rentalRepository).deleteById(anyLong());
+    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.deleteRentalById(123L));
+  }
 //  @Test
 //  public void savePurchaseReturnsPurchaseForValidInfo() {
 //
@@ -522,4 +525,4 @@
 //
 //  }
 //
-//}
+}

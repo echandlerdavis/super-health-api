@@ -31,8 +31,7 @@ public class RentedMovie {
   public RentedMovie() {
   }
 
-  public RentedMovie(Long id, Long movieId, int daysRented, Rental rental) {
-    this.id = id;
+  public RentedMovie(Long movieId, int daysRented, Rental rental) {
     this.movieId = movieId;
     this.daysRented = daysRented;
     this.rental = rental;
