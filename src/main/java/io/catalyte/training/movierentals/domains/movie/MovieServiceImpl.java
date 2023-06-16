@@ -103,6 +103,13 @@ public class MovieServiceImpl implements MovieService {
     Movie findMovie = movieRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE));
 
+    findMovie.setSku(movie.getSku());
+    findMovie.setGenre(movie.getGenre());
+    findMovie.setDirector(movie.getDirector());
+    findMovie.setTitle(movie.getTitle());
+    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
+    findMovie.setId(id);
+
     List<String> movieErrors = getMovieErrors(movie);
     Boolean skuExists = movieSkuExists(findMovie);
 
@@ -110,12 +117,7 @@ public class MovieServiceImpl implements MovieService {
       throw new BadRequest(String.join("\n", movieErrors));
     }
 
-    findMovie.setSku(movie.getSku());
-    findMovie.setGenre(movie.getGenre());
-    findMovie.setDirector(movie.getDirector());
-    findMovie.setTitle(movie.getTitle());
-    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
-    findMovie.setId(id);
+
 
     if(skuExists){
       throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);

@@ -26,10 +26,6 @@ public class Movie {
 
   private Double dailyRentalCost;
 
-//  @OneToMany(mappedBy = "product")
-//  @OnDelete(action = OnDeleteAction.CASCADE)
-//  private List<Review> reviews;
-
   public Movie() {
   }
 
