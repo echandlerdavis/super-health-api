@@ -110,7 +110,7 @@ public class RentalApiTest {
 
   @Test
   public void getRentalByIdReturnsRentalWith200() throws Exception {
-    mockMvc.perform(get(RENTALS_PATH + "/"))
+    mockMvc.perform(get(RENTALS_PATH + "/" + testRental1.getId().toString()))
         .andExpect(status().isOk());
   }
 
@@ -178,7 +178,7 @@ public class RentalApiTest {
     List<RentedMovie> updatedRentedMovies = rentedMovieFactory.generateRandomRentedMovies(updatedRental);
     updatedRental.setRentedMovies(updatedRentedMovies);
     ObjectMapper mapper = new ObjectMapper();
-    MockHttpServletResponse response = mockMvc.perform(put(RENTALS_PATH + "/1")
+    MockHttpServletResponse response = mockMvc.perform(put(RENTALS_PATH + "/" + testRental1.getId())
             .contentType("application/json")
             .content(mapper.writeValueAsString(updatedRental)))
         .andExpect(status().isOk())
@@ -193,7 +193,7 @@ public class RentalApiTest {
 
   @Test
   public void DeleteRentalReturns204() throws Exception {
-    mockMvc.perform(delete(RENTALS_PATH + "/1"))
+    mockMvc.perform(delete(RENTALS_PATH + "/" + testRental1.getId().toString()))
         .andExpect(status().isNoContent());
   }
 
