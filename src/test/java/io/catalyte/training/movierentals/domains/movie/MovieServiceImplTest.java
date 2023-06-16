@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.movierentals.data.MovieFactory;
+import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
 import java.util.ArrayList;
@@ -117,6 +118,32 @@ public class MovieServiceImplTest {
     }).when(movieRepository).save(any());
     assertThrows(ServiceUnavailable.class, () -> movieServiceImpl.saveMovie(testMovie2));
   }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenSkuIsNull(){
+    testMovie1.setSku(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenSkuIsEmpty(){
+    testMovie1.setSku("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenTitleIsNull(){
+    testMovie1.setTitle(null);
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+  @Test
+  public void saveMovieThrowsBadRequestWhenTitleIsEmpty(){
+    testMovie1.setTitle("");
+    assertThrows(BadRequest.class, () -> movieServiceImpl.saveMovie(testMovie1));
+  }
+
+
 
   @Test
   public void updateValidMovieReturnsMovie(){
