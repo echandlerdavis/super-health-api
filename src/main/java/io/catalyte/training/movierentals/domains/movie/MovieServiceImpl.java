@@ -40,7 +40,6 @@ public class MovieServiceImpl implements MovieService {
   /**
    * Retrieves all products from the database, optionally making use of an example if it is passed.
    *
-   * @param movie - an example movie to use for querying
    * @return - a list of products matching the example, or all products if no example was passed
    */
   public List<Movie> getMovies() {
@@ -99,6 +98,12 @@ public class MovieServiceImpl implements MovieService {
     }
   }
 
+  /**
+   * Updates movie in the database.
+   * @param id - id of movie to be updated
+   * @param movie - updated movie payload
+   * @return - updated movie object
+   */
   public Movie updateMovie(Long id, Movie movie){
     Movie findMovie = movieRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE));
@@ -117,8 +122,6 @@ public class MovieServiceImpl implements MovieService {
       throw new BadRequest(String.join("\n", movieErrors));
     }
 
-
-
     if(skuExists){
       throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
     }
@@ -131,6 +134,10 @@ public class MovieServiceImpl implements MovieService {
     }
   }
 
+  /**
+   * Deletes movie in the database.
+   * @param id - id of the movie to be deleted
+   */
   public void deleteMovie(Long id){
     movieRepository.findById(id)
         .orElseThrow(() ->  new ResourceNotFound(LoggingConstants.DELETE_MOVIE_FAILURE));
@@ -146,7 +153,7 @@ public class MovieServiceImpl implements MovieService {
 
 
   /**
-   * Helper method that reads a movie and validates it's properties
+   * Helper method that reads a movie and validates its properties
    *
    * @param movie movie to be validated
    * @return a list of errors
@@ -199,7 +206,8 @@ public class MovieServiceImpl implements MovieService {
   }
 
   /**
-   * Validates the format of a movie SKU to match "
+   * Validates the format of a movie SKU to match 'XXXX-DDDD' where X is a capital letter
+   * and D is a digit.
    *
    * @param movie product to be validated
    * @return boolean if product has valid quantity
@@ -214,6 +222,11 @@ public class MovieServiceImpl implements MovieService {
     return false;
   }
 
+  /**
+   * Checks whether the sku of a movie attempting to be added or updated already exists in the database.
+   * @param newMovie - movie to be saved
+   * @return Boolean if the sku exists already.
+   */
   public Boolean movieSkuExists(Movie newMovie){
     List<Movie> allMovies = movieRepository.findAll();
     if(newMovie.getSku() != null){

@@ -2,7 +2,7 @@ package io.catalyte.training.movierentals.domains.rental;
 
 import static io.catalyte.training.movierentals.constants.Paths.RENTALS_PATH;
 
-import io.catalyte.training.movierentals.domains.movie.Movie;
+import io.catalyte.training.movierentals.constants.LoggingConstants;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +41,7 @@ public class RentalController {
    */
   @GetMapping
   public ResponseEntity<List<Rental>> getRentals() {
-    logger.info("Request received for getRentals");
+    logger.info(LoggingConstants.GET_RENTALS);
     return new ResponseEntity<>(rentalService.getRentals(), HttpStatus.OK);
   }
 
@@ -54,7 +53,7 @@ public class RentalController {
    */
   @GetMapping(value = "/{id}")
   public ResponseEntity getRentalById(@PathVariable Long id) {
-    logger.info("Request received for getRentalById: " + id);
+    logger.info(LoggingConstants.GET_RENTAL_BY_ID(id));
     return new ResponseEntity(rentalService.getRentalById(id), HttpStatus.OK);
   }
 
@@ -67,21 +66,35 @@ public class RentalController {
    */
   @PostMapping
   public ResponseEntity savePurchase(@RequestBody Rental rental) {
-    logger.info("Request received for postRental");
+    logger.info(LoggingConstants.POST_RENTAL);;
     Rental newRental = rentalService.saveRental(rental);
     return new ResponseEntity<>(newRental, HttpStatus.CREATED);
   }
 
+  /**
+   * Handles a PUT request to /rentals/id. This updates an existing rental object that gets saved to the
+   * database.
+   *
+   * @param rental - rental object
+   * @param id - id of rental to be updated
+   * @return rental updated to database
+   */
   @PutMapping(value = "/{id}")
   @ResponseStatus(value = HttpStatus.OK)
   public ResponseEntity<Rental> updateRental(@PathVariable Long id, @RequestBody Rental rental){
-    logger.info("Request received to updateRental: " + id);
+    logger.info(LoggingConstants.UPDATE_RENTAL(id));
     return new ResponseEntity<>(rentalService.updateRental(id, rental), HttpStatus.OK);
   }
 
+  /**
+   * Handles a DELETE request to /rentals/id. This deletes an existing rental object.
+   *
+   * @param id - id of rental to be deleted
+   * @return no content response entity
+   */
   @DeleteMapping(value = "/{id}")
   public ResponseEntity<?> deleteRentalById(@PathVariable Long id){
-    logger.info("Request received to delete rental by id: " + id);
+    logger.info(LoggingConstants.DELETE_RENTAL(id));;
     rentalService.deleteRentalById(id);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

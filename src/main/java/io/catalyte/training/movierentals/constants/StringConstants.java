@@ -12,7 +12,6 @@ public class StringConstants {
   public static final String CONFLICT = "409 Conflict";
   public static final String SERVER_ERROR = "500 An unexpected error occurred.";
   public static final String SERVICE_UNAVAILABLE = "503 Service Unavailable";
-  public static final String UNPROCESSABLE_ITEMS = "Unable to process the following Items";
 
   // Error Messages - Movie Validation
   public static final String MOVIE_RENTAL_COST_INVALID = "Daily rental cost must be a number greater than 0 with 2 digits after the decimal place";

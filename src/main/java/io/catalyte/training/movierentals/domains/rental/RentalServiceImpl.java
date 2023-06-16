@@ -7,7 +7,6 @@ import io.catalyte.training.movierentals.domains.movie.Movie;
 import io.catalyte.training.movierentals.domains.movie.MovieRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
-import io.catalyte.training.movierentals.exceptions.ServerError;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -43,13 +42,12 @@ public class RentalServiceImpl implements RentalService {
   }
 
   /**
-   * Retrieves all purchases from the database
+   * Retrieves all rentals from the database
    *
-   * @return
+   * @return list of rentals
    */
   public List<Rental> getRentals() {
     try {
-      logger.info(LoggingConstants.GET_RENTALS);
       return rentalRepository.findAll();
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
@@ -67,7 +65,6 @@ public class RentalServiceImpl implements RentalService {
     Rental rental;
 
     try{
-      logger.info(LoggingConstants.GET_RENTAL_BY_ID(id));
       rental = rentalRepository.findById(id).orElse(null);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -98,7 +95,6 @@ public class RentalServiceImpl implements RentalService {
     Rental savedRental;
 
     try {
-      logger.info(LoggingConstants.POST_RENTAL);
       savedRental = rentalRepository.save(newRental);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -113,6 +109,10 @@ public class RentalServiceImpl implements RentalService {
     return savedRental;
   }
 
+  /**
+   * Persists nested rented movie list to the database from a rental request object.
+   * @param rental rental to be saved or updated
+   */
   private void handleRentedMovies(Rental rental){
     List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
     List<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
@@ -137,6 +137,12 @@ public class RentalServiceImpl implements RentalService {
     }
   }
 
+  /**
+   * Updates and existing rental in the database
+   * @param id - id of the existing rental to be updated
+   * @param updatedRental - updated rental request object
+   * @return updated Rental object
+   */
   public Rental updateRental(Long id, Rental updatedRental){
     Rental findRental = rentalRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_RENTAL_FAILURE));
@@ -155,7 +161,6 @@ public class RentalServiceImpl implements RentalService {
     handleRentedMovies(findRental);
     findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
     try {
-      logger.info(LoggingConstants.UPDATE_RENTAL(id));
       savedRental = rentalRepository.save(findRental);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -164,13 +169,15 @@ public class RentalServiceImpl implements RentalService {
     return savedRental;
   }
 
+  /**
+   * Deletes rental in the database.
+   * @param id - id of the rental to be deleted
+   */
   public void deleteRentalById(Long id){
     rentalRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_RENTAL_FAILURE));
-
+        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.DELETE_RENTAL_FAILURE));
 
     try {
-      logger.info(LoggingConstants.DELETE_RENTAL(id));
       rentalRepository.deleteById(id);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
@@ -247,7 +254,7 @@ public class RentalServiceImpl implements RentalService {
   }
 
   /**
-   * Reads a rental fields and checks for fields that are empty or null
+   * Reads rental fields and checks for fields that are empty or null
    *
    * @param rental movie to be validated
    * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
@@ -281,8 +288,12 @@ public class RentalServiceImpl implements RentalService {
     return results;
   }
 
-
-  //Validation examples below (likely too complicated)
+  /**
+   * Reads and validates nested rented movie objects from a rental attempting to be saved to the
+   * database.
+   * @param rental - rental to be saved or updated
+   * @return list of errors pertaining to the nested rented movie list.
+   */
   private Set<String> getRentedMovieErrors(Rental rental) {
     // Get rentedMovies from each Rental
     List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
@@ -325,7 +336,12 @@ public class RentalServiceImpl implements RentalService {
     return rentedMovieErrors;
     }
 
-    private Boolean validateMovieIdExists(RentedMovie rentedMovie){
+  /**
+   * Checks the movie repository for a valid movieId from a nested rented movie object.
+   * @param rentedMovie - request object with a movie Id
+   * @return Boolean if the movieId exists
+   */
+  private Boolean validateMovieIdExists(RentedMovie rentedMovie){
       List<Movie> allMovies = movieRepository.findAll();
       for(Movie movie : allMovies){
         if(movie.getId() == rentedMovie.getMovieId()){

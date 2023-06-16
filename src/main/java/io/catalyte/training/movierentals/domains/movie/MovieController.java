@@ -34,7 +34,6 @@ public class MovieController {
   /**
    * Handles a GET request to /movies - returns all movies in the database.
    *
-   * @param movie - optional movie example to be passed
    * @return all movies in the database.
    */
   @GetMapping
@@ -61,7 +60,7 @@ public class MovieController {
 
 
   /**
-   * Handles a POST request to /movies. This creates a new product object that gets saved to the
+   * Handles a POST request to /movies. This creates a new movie object that gets saved to the
    * database.
    *
    * @param movie - movie object
@@ -73,12 +72,26 @@ public class MovieController {
     return new ResponseEntity<>(movieService.saveMovie(movie), HttpStatus.CREATED);
   }
 
+  /**
+   * Handles a PUT request to /movies/id. This updates an existing movie object that gets saved to the
+   * database.
+   *
+   * @param movie - movie object
+   * @param id - id of movie to be updated
+   * @return movie(s) updated to database
+   */
   @PutMapping(value = "/{id}")
   public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie){
     logger.info(LoggingConstants.UPDATE_MOVIE(id));
     return new ResponseEntity<>(movieService.updateMovie(id, movie), HttpStatus.OK);
   }
 
+  /**
+   * Handles a DELETE request to /movies/id. This deletes an existing movie object.
+   *
+   * @param id - id of movie to be deleted
+   * @return no content response entity
+   */
   @DeleteMapping(value = "/{id}")
   public ResponseEntity<?> deleteMovie(@PathVariable Long id){
     logger.info(LoggingConstants.DELETE_MOVIE(id));

@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
 
-//  List<Movie> findByIdIn(List<Long> ids);
 }

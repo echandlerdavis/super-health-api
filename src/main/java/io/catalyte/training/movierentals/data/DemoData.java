@@ -7,7 +7,6 @@ import io.catalyte.training.movierentals.domains.rental.RentalRepository;
 import io.catalyte.training.movierentals.domains.rental.RentedMovie;
 import io.catalyte.training.movierentals.domains.rental.RentedMovieRepository;
 import java.util.List;
-import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

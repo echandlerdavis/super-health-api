@@ -5,9 +5,7 @@ import static io.catalyte.training.movierentals.constants.StringConstants.CONFLI
 import static io.catalyte.training.movierentals.constants.StringConstants.NOT_FOUND;
 import static io.catalyte.training.movierentals.constants.StringConstants.SERVER_ERROR;
 import static io.catalyte.training.movierentals.constants.StringConstants.SERVICE_UNAVAILABLE;
-import static io.catalyte.training.movierentals.constants.StringConstants.UNPROCESSABLE_ITEMS;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Date;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;

@@ -5,14 +5,9 @@ import io.catalyte.training.movierentals.domains.rental.Rental;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import org.springframework.security.core.parameters.P;
 
 public class RentalFactory {
 
