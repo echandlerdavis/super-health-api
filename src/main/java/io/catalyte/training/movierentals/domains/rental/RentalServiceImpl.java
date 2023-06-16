@@ -164,9 +164,9 @@ public class RentalServiceImpl implements RentalService {
   }
 
   public void deleteRentalById(Long id){
-    if(rentalRepository.findById(id) == null){
-      throw new ResourceNotFound(LoggingConstants.DELETE_RENTAL_FAILURE);
-    }
+    rentalRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_RENTAL_FAILURE));
+
 
     try {
       logger.info(LoggingConstants.DELETE_RENTAL(id));
@@ -236,8 +236,8 @@ public class RentalServiceImpl implements RentalService {
   public Boolean validateDateStringFormat(Rental rental) {
     String regex = "^\\d{4}-\\d{2}-\\d{2}$";
     Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(rental.getRentalDate());
     if (rental.getRentalDate() != null) {
+      Matcher matcher = pattern.matcher(rental.getRentalDate());
       return matcher.matches();
     }
     return false;
@@ -285,30 +285,28 @@ public class RentalServiceImpl implements RentalService {
     List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
     Set<String> rentedMovieErrors = new HashSet<>();
 
-    // If no rentedMovies add to error list
-    if (rentedMovieSet == null || rentedMovieSet.size() == 0) {
-      rentedMovieErrors.add(StringConstants.RENTAL_HAS_NO_RENTED_MOVIE);
-    }
-
     //Goes through each and adds invalid movie ids to error list.
     List<Long> invalidMovieIds = new ArrayList<>();
     Set<String> emptyFields = new HashSet<>();
     Set<String> nullFields = new HashSet<>();
-    rentedMovieSet.forEach(rentedMovie -> {
-      if(!validateMovieIdExists(rentedMovie)){
-        invalidMovieIds.add(rentedMovie.getMovieId());
-      }
-      if(rentedMovie.getMovieId() == null){
-        nullFields.add("movieId");
-      }else if(rentedMovie.getMovieId().toString().trim() == ""){
-        emptyFields.add("movieId");
-      }
-      if(rentedMovie.getDaysRented() <= 0){
-        rentedMovieErrors.add(StringConstants.RENTED_MOVIE_DAYS_RENTED_INVALID);
-      }
-
-
-    });
+    // If no rentedMovies add to error list
+    if (rentedMovieSet == null || rentedMovieSet.size() == 0) {
+      rentedMovieErrors.add(StringConstants.RENTAL_HAS_NO_RENTED_MOVIE);
+    }else {
+      rentedMovieSet.forEach(rentedMovie -> {
+        if (!validateMovieIdExists(rentedMovie)) {
+          invalidMovieIds.add(rentedMovie.getMovieId());
+        }
+        if (rentedMovie.getMovieId() == null) {
+          nullFields.add("movieId");
+        } else if (rentedMovie.getMovieId().toString().trim() == "") {
+          emptyFields.add("movieId");
+        }
+        if (rentedMovie.getDaysRented() <= 0) {
+          rentedMovieErrors.add(StringConstants.RENTED_MOVIE_DAYS_RENTED_INVALID);
+        }
+      });
+    }
 
     if(!invalidMovieIds.isEmpty()){
       rentedMovieErrors.add(StringConstants.RENTED_MOVIEID_INVALID(invalidMovieIds));
