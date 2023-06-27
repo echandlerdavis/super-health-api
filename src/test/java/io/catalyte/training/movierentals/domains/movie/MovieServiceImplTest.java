@@ -8,7 +8,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.catalyte.training.movierentals.data.MovieFactory;
+import io.catalyte.training.movierentals.data.EncounterFactory;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.RequestConflict;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
@@ -36,7 +36,7 @@ public class MovieServiceImplTest {
   public ExpectedException thrown = ExpectedException.none();
   Encounter testMovie1;
   Encounter testMovie2;
-  MovieFactory movieFactory;
+  EncounterFactory encounterFactory;
   List<Encounter> testMoviesList = new ArrayList<>();
   @InjectMocks
   private EncounterServiceImpl movieServiceImpl;
@@ -57,7 +57,7 @@ public class MovieServiceImplTest {
   private void setTestMovies() {
 
     // Create Two Random Test Products
-    movieFactory = new MovieFactory();
+    encounterFactory = new EncounterFactory();
     testMovie1 = new Encounter(
         "ABCDEF-1234",
         "Test Title1",

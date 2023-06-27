@@ -29,11 +29,11 @@ public class EncounterServiceImpl implements EncounterService {
 
   private final Logger logger = LogManager.getLogger(EncounterServiceImpl.class);
 
-  EncounterRepository movieRepository;
+  EncounterRepository encounterRepository;
 
   @Autowired
-  public EncounterServiceImpl(EncounterRepository movieRepository) {
-    this.movieRepository = movieRepository;
+  public EncounterServiceImpl(EncounterRepository encounterRepository) {
+    this.encounterRepository = encounterRepository;
   }
 
   /**
@@ -41,9 +41,9 @@ public class EncounterServiceImpl implements EncounterService {
    *
    * @return - a list of products matching the example, or all products if no example was passed
    */
-  public List<Encounter> getMovies() {
+  public List<Encounter> getEncounters() {
     try {
-      return movieRepository.findAll();
+      return encounterRepository.findAll();
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -56,18 +56,18 @@ public class EncounterServiceImpl implements EncounterService {
    * @param id - the id of the product to retrieve
    * @return - the product
    */
-  public Encounter getMovieById(Long id) {
-    Encounter movie;
+  public Encounter getEncounterById(Long id) {
+    Encounter encounter;
 
     try {
-      movie = movieRepository.findById(id).orElse(null);
+      encounter = encounterRepository.findById(id).orElse(null);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
     }
 
-    if (movie != null) {
-      return movie;
+    if (encounter != null) {
+      return encounter;
     } else {
       logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
       throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
@@ -77,20 +77,17 @@ public class EncounterServiceImpl implements EncounterService {
   /**
    * Adds a movie to the database
    *
-   * @param movie - product object
+   * @param encounter - product object
    * @return list of movie objects that are added to database
    */
-  public Encounter saveMovie(Encounter movie) {
-    List<String> movieErrors = getMovieErrors(movie);
-    Boolean skuExists = movieSkuExists(movie);
-    if (!movieErrors.isEmpty()) {
-      throw new BadRequest(String.join("\n", movieErrors));
-    }
-    if(skuExists){
-      throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
-    }
+  public Encounter saveEncounter(Encounter encounter) {
+//    List<String> encounterErrors = getMovieErrors(encounter);
+//    if (!movieErrors.isEmpty()) {
+//      throw new BadRequest(String.join("\n", movieErrors));
+//    }
+
     try {
-      return movieRepository.save(movie);
+      return encounterRepository.save(encounter);
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -100,33 +97,37 @@ public class EncounterServiceImpl implements EncounterService {
   /**
    * Updates movie in the database.
    * @param id - id of movie to be updated
-   * @param movie - updated movie payload
+   * @param encounter - updated movie payload
    * @return - updated movie object
    */
-  public Encounter updateMovie(Long id, Encounter movie){
-    Encounter findMovie = movieRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE));
 
+  //TODO: Update Logging constants for Resource not found, etc.
+  public Encounter updateMovie(Long id, Encounter encounter){
+    Encounter findEncounter;
+
+    try {
+     findEncounter  = encounterRepository.findById(id).orElse(null);
+    }catch(DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE);
+    }
+
+  if(findEncounter != null) {
 //    findMovie.setSku(movie.getSku());
 //    findMovie.setGenre(movie.getGenre());
 //    findMovie.setDirector(movie.getDirector());
 //    findMovie.setTitle(movie.getTitle());
 //    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
 //    findMovie.setId(id);
-
-    List<String> movieErrors = getMovieErrors(movie);
-    Boolean skuExists = movieSkuExists(findMovie);
+  }
+    List<String> movieErrors = getMovieErrors(encounter);
 
     if (!movieErrors.isEmpty()) {
       throw new BadRequest(String.join("\n", movieErrors));
     }
 
-    if(skuExists){
-      throw new RequestConflict(StringConstants.MOVIE_SKU_ALREADY_EXISTS);
-    }
-
     try{
-      return movieRepository.save(findMovie);
+      return encounterRepository.save(findEncounter);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -138,14 +139,24 @@ public class EncounterServiceImpl implements EncounterService {
    * @param id - id of the movie to be deleted
    */
   public void deleteMovie(Long id){
-    movieRepository.findById(id)
-        .orElseThrow(() ->  new ResourceNotFound(LoggingConstants.DELETE_MOVIE_FAILURE));
+    Encounter findEncounter;
 
     try {
-      movieRepository.deleteById(id);
-    } catch (DataAccessException e){
+      findEncounter  = encounterRepository.findById(id).orElse(null);
+    }catch(DataAccessException e) {
       logger.error(e.getMessage());
-      throw new ServiceUnavailable(e.getMessage());
+      throw new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE);
+    }
+
+    //validation for if there are encounters already?
+
+    if(findEncounter != null){
+      try {
+        encounterRepository.deleteById(id);
+      } catch (DataAccessException e){
+        logger.error(e.getMessage());
+        throw new ServiceUnavailable(e.getMessage());
+      }
     }
 
   }
@@ -162,7 +173,7 @@ public class EncounterServiceImpl implements EncounterService {
     Boolean dailyRentalCostIsNotValid = validateDailyRentalCost(movie);
     List<String> emptyFields = getFieldsEmptyOrNull(movie).get("emptyFields");
     List<String> nullFields = getFieldsEmptyOrNull(movie).get("nullFields");
-    Boolean skuFormatIsValid= validateMovieSkuFormat(movie);
+//    Boolean skuFormatIsValid= validateMovieSkuFormat(movie);
 
     if (!nullFields.isEmpty()) {
       errors.add(StringConstants.MOVIE_FIELDS_NULL(nullFields));
@@ -200,7 +211,7 @@ public class EncounterServiceImpl implements EncounterService {
 //      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
 //      Boolean priceLessThanZero = movie.getDailyRentalCost() < 0;
 //      return priceLessThanZero || priceMoreThan2Decimals;
-    }
+//    }
     return false;
   }
 
@@ -211,58 +222,58 @@ public class EncounterServiceImpl implements EncounterService {
    * @param movie product to be validated
    * @return boolean if product has valid quantity
    */
-  public Boolean validateMovieSkuFormat(Encounter movie) {
-    String regex = "^[A-Z]{6}-\\d{4}$";
-    Pattern pattern = Pattern.compile(regex);
-//    if (movie.getSku() != null) {
-//      Matcher matcher = pattern.matcher(movie.getSku());
-//      return matcher.matches();
-//    }
-//    return false;
-  }
+//  public Boolean validateMovieSkuFormat(Encounter movie) {
+//    String regex = "^[A-Z]{6}-\\d{4}$";
+//    Pattern pattern = Pattern.compile(regex);
+////    if (movie.getSku() != null) {
+////      Matcher matcher = pattern.matcher(movie.getSku());
+////      return matcher.matches();
+////    }
+////    return false;
+//  };
 
   /**
    * Checks whether the sku of a movie attempting to be added or updated already exists in the database.
    * @param newMovie - movie to be saved
    * @return Boolean if the sku exists already.
    */
-  public Boolean movieSkuExists(Encounter newMovie){
-    List<Encounter> allMovies = movieRepository.findAll();
+//  public Boolean movieSkuExists(Encounter newMovie){
+//    List<Encounter> allMovies = movieRepository.findAll();
 //    if(newMovie.getSku() != null){
-      for(Encounter movie : allMovies){
-//          if (movie.getSku().equals(newMovie.getSku()) && movie.getId() != newMovie.getId()) {
-//            return true;
+//      for(Encounter movie : allMovies){
+//        if (movie.getSku().equals(newMovie.getSku()) && movie.getId() != newMovie.getId()) {
+//        return true;
 //          }
-      }
-    }
-    return false;
-  }
+//      }
+//    }
+//    return false;
+//  }
 
   /**
    * Reads a movie fields and checks for fields that are empty or null
    *
-   * @param movie movie to be validated
+   * @param encounter movie to be validated
    * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
    */
-  public HashMap<String, List<String>> getFieldsEmptyOrNull(Encounter movie) {
-    List<Field> movieFields = Arrays.asList(Encounter.class.getDeclaredFields());
-    List<String> movieFieldNames = new ArrayList<>();
+  public HashMap<String, List<String>> getFieldsEmptyOrNull(Encounter encounter) {
+    List<Field> encounterFields = Arrays.asList(Encounter.class.getDeclaredFields());
+    List<String> encounterFieldNames = new ArrayList<>();
     List<String> emptyFields = new ArrayList<>();
     List<String> nullFields = new ArrayList<>();
     HashMap<String, List<String>> results = new HashMap<>();
     //Get product field names
-    movieFields.forEach((field -> movieFieldNames.add(field.getName())));
+    encounterFields.forEach((field -> encounterFieldNames.add(field.getName())));
     //Remove id as product will not have an id before it is saved
-    movieFieldNames.remove("id");
+    encounterFieldNames.remove("id");
     //Convert product to a HashMap
     ObjectMapper mapper = new ObjectMapper();
-    Map movieMap = mapper.convertValue(movie, HashMap.class);
+    Map encounterMap = mapper.convertValue(encounter, HashMap.class);
     //Loop through each fieldName to retrieve each product mapping value of the field
-    movieFieldNames.forEach((field) -> {
+    encounterFieldNames.forEach((field) -> {
       //Check if the value for the product's field is null or empty and place in the corresponding list
-      if (movieMap.get(field) == null) {
+      if (encounterMap.get(field) == null) {
         nullFields.add(field);
-      } else if (movieMap.get(field).toString().trim() == "") {
+      } else if (encounterMap.get(field).toString().trim() == "") {
         emptyFields.add(field);
       }
     });

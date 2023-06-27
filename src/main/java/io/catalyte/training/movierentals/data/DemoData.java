@@ -23,7 +23,7 @@ public class DemoData implements CommandLineRunner {
 
   public static final int DEFAULT_NUMBER_OF_PRODUCTS = 500;
   private final Logger logger = LogManager.getLogger(DemoData.class);
-  private final MovieFactory movieFactory = new MovieFactory();
+  private final EncounterFactory encounterFactory = new EncounterFactory();
   private final RentalFactory rentalFactory = new RentalFactory();
   private final RentedMovieFactory rentedMovieFactory = new RentedMovieFactory();
   @Autowired
@@ -54,7 +54,7 @@ public class DemoData implements CommandLineRunner {
     int numberOfMovies = 20;
     int numberOfRentals = 10;
     // Generate products
-    List<Encounter> movieList = movieFactory.generateRandomMovieList(numberOfMovies);
+    List<Encounter> movieList = encounterFactory.generateRandomMovieList(numberOfMovies);
     List<Patient> rentalList = rentalFactory.generateRandomRentalList(numberOfRentals);
 
     // Persist them to the database and save list to purchaseFactory

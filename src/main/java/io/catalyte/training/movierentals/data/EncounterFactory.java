@@ -10,32 +10,31 @@ import org.apache.commons.lang3.RandomStringUtils;
 /**
  * This class provides tools for random generation of products.
  */
-public class MovieFactory {
+public class EncounterFactory {
 
-  private static final String[] titles = {
-      "Grand Budapest Hotel",
-      "Avatar",
-      "The Little Mermaid",
-      "Jaws",
-      "Rear Window",
-      "The Shawshank Redemption",
-      "The Godfather",
-      "Caddy Shack",
-      "The Lego Movie",
-      "Cabin in the Woods",
-      "The Babadook"
+  private static final String[] firstNames = {
+      "Megan",
+      "Taylor",
+      "Chandler",
+      "Devin",
+      "Hayes",
+      "Kathleen",
+      "Blake",
+      "Alyssa",
+      "Britta",
+      "Jan"
   };
 
-  private static final String[] genres = {
-      "drama",
-      "horror",
-      "comedy",
-      "action",
-      "rom-com",
+  private static final String[] lastNames = {
+      "Rapinoe",
+      "Swift",
+      "Davis",
+      "Duvall",
+      "",
       "fantasy",
       "thriller",
   };
-  private static final String[] directors = {
+  private static final String[] emails = {
       "Wes Anderson",
       "Alfred Hitchcock",
       "Greta Gerwig",

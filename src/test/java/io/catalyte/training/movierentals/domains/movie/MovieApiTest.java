@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.movierentals.constants.StringConstants;
-import io.catalyte.training.movierentals.data.MovieFactory;
+import io.catalyte.training.movierentals.data.EncounterFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +34,9 @@ public class MovieApiTest {
 
   @Autowired
   EncounterRepository movieRepository;
-  MovieFactory movieFactory = new MovieFactory();
-  Encounter testMovie1 = movieFactory.createRandomMovie();
-  Encounter testMovie2 = movieFactory.createRandomMovie();
+  EncounterFactory encounterFactory = new EncounterFactory();
+  Encounter testMovie1 = encounterFactory.createRandomMovie();
+  Encounter testMovie2 = encounterFactory.createRandomMovie();
   @Autowired
   private WebApplicationContext wac;
   private MockMvc mockMvc;
@@ -87,7 +87,7 @@ public class MovieApiTest {
 
   @Test
   public void saveMovieReturns400IfDailyRentalCostIsNegativeNumber() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setDailyRentalCost(-1.00);
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(MOVIES_PATH)
@@ -102,7 +102,7 @@ public class MovieApiTest {
   @Test
   public void saveMovieReturns400IfSkuIsInvalid() throws Exception {
     //This test fails when run with coverage
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setSku("XX-12");
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(MOVIES_PATH)
@@ -116,7 +116,7 @@ public class MovieApiTest {
 
   @Test
   public void saveMovieReturns409IfSkuAlreadyExists() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setSku(testMovie1.getSku());
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(MOVIES_PATH)
@@ -131,7 +131,7 @@ public class MovieApiTest {
 
   @Test
   public void saveMovieReturns400IfFieldsAreNull() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setTitle(null);
     newMovie.setDirector(null);
     ObjectMapper mapper = new ObjectMapper();
@@ -147,7 +147,7 @@ public class MovieApiTest {
 
   @Test
   public void saveMovieReturns400IfFieldsAreEmpty() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setTitle("");
     newMovie.setDirector("");
     ObjectMapper mapper = new ObjectMapper();
@@ -163,7 +163,7 @@ public class MovieApiTest {
 
   @Test
   public void saveMovieReturns400WithListOfAllErrors() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setGenre(null);
     newMovie.setDirector("");
     newMovie.setDailyRentalCost(-2.00);
@@ -187,7 +187,7 @@ public class MovieApiTest {
 
   @Test
   public void updateMovieReturns200WithMovieObject() throws Exception {
-    Encounter updatedMovie = movieFactory.createRandomMovie();
+    Encounter updatedMovie = encounterFactory.createRandomMovie();
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(
         put(MOVIES_PATH + "/" + testMovie1.getId().toString())
@@ -204,7 +204,7 @@ public class MovieApiTest {
 
   @Test
   public void updateMovieReturns400IfDailyRentalCostIsNegativeNumber() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setDailyRentalCost(-1.00);
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(
@@ -220,7 +220,7 @@ public class MovieApiTest {
   @Test
   public void updateMovieReturns400IfSkuIsInvalid() throws Exception {
     //This test fails when run with coverage
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setSku("XX-12");
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(
@@ -235,7 +235,7 @@ public class MovieApiTest {
 
   @Test
   public void updateMovieReturns409IfSkuAlreadyExists() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setSku(testMovie1.getSku());
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(
@@ -251,7 +251,7 @@ public class MovieApiTest {
 
   @Test
   public void updateMovieReturns400IfFieldsAreNull() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setTitle(null);
     newMovie.setDirector(null);
     ObjectMapper mapper = new ObjectMapper();
@@ -268,7 +268,7 @@ public class MovieApiTest {
 
   @Test
   public void updateMovieReturns400IfFieldsAreEmpty() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setTitle("");
     newMovie.setDirector("");
     ObjectMapper mapper = new ObjectMapper();
@@ -285,7 +285,7 @@ public class MovieApiTest {
 
   @Test
   public void updateMovieReturns400WithListOfAllErrors() throws Exception {
-    Encounter newMovie = movieFactory.createRandomMovie();
+    Encounter newMovie = encounterFactory.createRandomMovie();
     newMovie.setGenre(null);
     newMovie.setDirector("");
     newMovie.setDailyRentalCost(-2.00);

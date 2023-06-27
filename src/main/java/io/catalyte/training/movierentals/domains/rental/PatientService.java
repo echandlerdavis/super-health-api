@@ -4,14 +4,14 @@ import java.util.List;
 
 public interface PatientService {
 
-  List<Patient> getRentals();
+  List<Patient> getPatients();
 
-  Patient getRentalById(Long id);
+  Patient getPatientById(Long id);
 
-  Patient saveRental(Patient rentalToSave);
+  Patient savePatient(Patient rentalToSave);
 
-  Patient updateRental(Long id, Patient rentalToUpdate);
+  Patient updatePatient(Long id, Patient rentalToUpdate);
 
-  void deleteRentalById(Long id);
+  void deletePatientById(Long id);
 
 }

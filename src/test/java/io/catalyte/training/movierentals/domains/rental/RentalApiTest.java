@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.movierentals.constants.StringConstants;
-import io.catalyte.training.movierentals.data.MovieFactory;
+import io.catalyte.training.movierentals.data.EncounterFactory;
 import io.catalyte.training.movierentals.data.RentalFactory;
 import io.catalyte.training.movierentals.data.RentedMovieFactory;
 import io.catalyte.training.movierentals.domains.movie.Encounter;
@@ -42,7 +42,7 @@ public class RentalApiTest {
 
   private final RentalFactory rentalFactory = new RentalFactory();
   private final RentedMovieFactory rentedMovieFactory = new RentedMovieFactory();
-  private final MovieFactory movieFactory = new MovieFactory();
+  private final EncounterFactory encounterFactory = new EncounterFactory();
   Patient testRental1;
   Patient testRental2;
 
@@ -68,7 +68,7 @@ public class RentalApiTest {
    * info, and product with id of 1 to be sent in POST method
    */
   private void setTestRentals() {
-    randomMovieList = movieFactory.generateRandomMovieList(20);
+    randomMovieList = encounterFactory.generateRandomMovieList(20);
     testRental1 = rentalFactory.createRandomRental();
     testRental2 = rentalFactory.createRandomRental();
     List<Patient> testRentals = new ArrayList<>();

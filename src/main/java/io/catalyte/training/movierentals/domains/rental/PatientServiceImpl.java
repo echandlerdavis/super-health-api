@@ -30,15 +30,13 @@ public class PatientServiceImpl implements PatientService {
   private final Logger logger = LogManager.getLogger(PatientServiceImpl.class);
 
   PatientRepository patientRepository;
-  RentedMovieRepository rentedMovieRepository;
-  EncounterRepository movieRepository;
+  EncounterRepository encounterRepository;
 
   @Autowired
   public PatientServiceImpl(PatientRepository patientRepository,
-      RentedMovieRepository rentedMovieRepository, EncounterRepository movieRepository) {
+       EncounterRepository encounterRepository) {
     this.patientRepository = patientRepository;
-    this.rentedMovieRepository = rentedMovieRepository;
-    this.movieRepository = movieRepository;
+=    this.encounterRepository = encounterRepository;
   }
 
   /**
@@ -113,29 +111,29 @@ public class PatientServiceImpl implements PatientService {
    * Persists nested rented movie list to the database from a rental request object.
    * @param rental rental to be saved or updated
    */
-  private void handleRentedMovies(Patient rental){
-    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
-    List<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
-
-    if(findRentedMovies != null){
-      rentedMovieRepository.deleteAll(findRentedMovies);
-    }
-
-    if(rentedMovieSet != null){
-      rentedMovieSet.forEach(rentedMovie -> {
-
-        rentedMovie.setRental(rental);
-        rentedMovie.setId(null);
-
-        try {
-          rentedMovieRepository.save(rentedMovie);
-        } catch (DataAccessException e) {
-          logger.error(e.getMessage());
-          throw new ServiceUnavailable(e.getMessage());
-        }
-      });
-    }
-  }
+//  private void handleRentedMovies(Patient rental){
+//    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
+//    List<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
+//
+//    if(findRentedMovies != null){
+//      rentedMovieRepository.deleteAll(findRentedMovies);
+//    }
+//
+//    if(rentedMovieSet != null){
+//      rentedMovieSet.forEach(rentedMovie -> {
+//
+//        rentedMovie.setRental(rental);
+//        rentedMovie.setId(null);
+//
+//        try {
+//          rentedMovieRepository.save(rentedMovie);
+//        } catch (DataAccessException e) {
+//          logger.error(e.getMessage());
+//          throw new ServiceUnavailable(e.getMessage());
+//        }
+//      });
+//    }
+//  }
 
   /**
    * Updates and existing rental in the database

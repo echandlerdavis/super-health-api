@@ -8,7 +8,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.catalyte.training.movierentals.data.MovieFactory;
+import io.catalyte.training.movierentals.data.EncounterFactory;
 import io.catalyte.training.movierentals.domains.movie.Encounter;
 import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
@@ -36,7 +36,7 @@ public class PatientServiceImplTest {
   public ExpectedException thrown = ExpectedException.none();
   Patient testRental;
   List<Patient> testRentals = new ArrayList<>();
-  MovieFactory movieFactory;
+  EncounterFactory encounterFactory;
 
   RentedMovie rentedMovie;
   @InjectMocks
@@ -56,8 +56,8 @@ public class PatientServiceImplTest {
     MockitoAnnotations.initMocks(this);
 
     //Generate random movies to have movieIds to pull from;
-    movieFactory = new MovieFactory();
-    List<Encounter> movieList = movieFactory.generateRandomMovieList(1);
+    encounterFactory = new EncounterFactory();
+    List<Encounter> movieList = encounterFactory.generateRandomMovieList(1);
 
     // Initialize a test purchase instance and list of purchases
     setTestRental();
