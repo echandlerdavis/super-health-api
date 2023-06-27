@@ -1,12 +1,9 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.rental.Rental;
-import io.catalyte.training.movierentals.domains.rental.RentedMovie;
+import io.catalyte.training.movierentals.domains.rental.Patient;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class RentedMovieFactory {
 
@@ -20,7 +17,7 @@ public class RentedMovieFactory {
     return randomGenerator.nextInt(29) + 1;
   }
 
-  public static RentedMovie createRandomRentedMovie(Rental rental){
+  public static RentedMovie createRandomRentedMovie(Patient rental){
     RentedMovie rentedMovie = new RentedMovie();
 
 //    Setters
@@ -32,7 +29,7 @@ public class RentedMovieFactory {
   }
 
 
-  public static List<RentedMovie> generateRandomRentedMovies(Rental rental){
+  public static List<RentedMovie> generateRandomRentedMovies(Patient rental){
     List<RentedMovie> rentedMovieList = new ArrayList<>();
     int numberOfMovies = randomGenerator.nextInt(9) + 1;
 

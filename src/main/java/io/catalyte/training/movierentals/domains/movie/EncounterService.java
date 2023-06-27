@@ -5,15 +5,15 @@ import java.util.List;
 /**
  * This interface provides an abstraction layer for the Products Service
  */
-public interface MovieService {
+public interface EncounterService {
 
-  List<Movie> getMovies();
+  List<Encounter> getMovies();
 
-  Movie getMovieById(Long id);
+  Encounter getMovieById(Long id);
 
-  Movie saveMovie(Movie movie);
+  Encounter saveMovie(Encounter movie);
 
-  Movie updateMovie(Long id, Movie movie);
+  Encounter updateMovie(Long id, Encounter movie);
 
   void deleteMovie(Long id);
 

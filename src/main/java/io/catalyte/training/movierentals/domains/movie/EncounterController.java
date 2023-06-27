@@ -24,12 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = MOVIES_PATH)
-public class MovieController {
+public class EncounterController {
 
-  Logger logger = LogManager.getLogger(MovieController.class);
+  Logger logger = LogManager.getLogger(EncounterController.class);
 
   @Autowired
-  private MovieService movieService;
+  private EncounterService movieService;
 
   /**
    * Handles a GET request to /movies - returns all movies in the database.
@@ -37,7 +37,7 @@ public class MovieController {
    * @return all movies in the database.
    */
   @GetMapping
-  public ResponseEntity<List<Movie>> getMovies() {
+  public ResponseEntity<List<Encounter>> getMovies() {
     logger.info(LoggingConstants.GET_MOVIES);
 
     return new ResponseEntity<>(movieService.getMovies(), HttpStatus.OK);
@@ -52,7 +52,7 @@ public class MovieController {
    */
   @GetMapping(value = "/{id}")
   @ResponseStatus(value = HttpStatus.OK)
-  public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
+  public ResponseEntity<Encounter> getMovieById(@PathVariable Long id) {
     logger.info(LoggingConstants.GET_MOVIE_BY_ID(id));
 
     return new ResponseEntity<>(movieService.getMovieById(id), HttpStatus.OK);
@@ -67,7 +67,7 @@ public class MovieController {
    * @return movie(s) added to database
    */
   @PostMapping
-  public ResponseEntity<Movie> postMovie(@RequestBody Movie movie) {
+  public ResponseEntity<Encounter> postMovie(@RequestBody Encounter movie) {
     logger.info(LoggingConstants.POST_MOVIE);
     return new ResponseEntity<>(movieService.saveMovie(movie), HttpStatus.CREATED);
   }
@@ -81,7 +81,7 @@ public class MovieController {
    * @return movie(s) updated to database
    */
   @PutMapping(value = "/{id}")
-  public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie){
+  public ResponseEntity<Encounter> updateMovie(@PathVariable Long id, @RequestBody Encounter movie){
     logger.info(LoggingConstants.UPDATE_MOVIE(id));
     return new ResponseEntity<>(movieService.updateMovie(id, movie), HttpStatus.OK);
   }

@@ -6,7 +6,6 @@ import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.RequestConflict;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
-import io.catalyte.training.movierentals.exceptions.ServerError;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,14 +25,14 @@ import org.springframework.stereotype.Service;
  * This class provides the implementation for the ProductService interface.
  */
 @Service
-public class MovieServiceImpl implements MovieService {
+public class EncounterServiceImpl implements EncounterService {
 
-  private final Logger logger = LogManager.getLogger(MovieServiceImpl.class);
+  private final Logger logger = LogManager.getLogger(EncounterServiceImpl.class);
 
-  MovieRepository movieRepository;
+  EncounterRepository movieRepository;
 
   @Autowired
-  public MovieServiceImpl(MovieRepository movieRepository) {
+  public EncounterServiceImpl(EncounterRepository movieRepository) {
     this.movieRepository = movieRepository;
   }
 
@@ -42,7 +41,7 @@ public class MovieServiceImpl implements MovieService {
    *
    * @return - a list of products matching the example, or all products if no example was passed
    */
-  public List<Movie> getMovies() {
+  public List<Encounter> getMovies() {
     try {
       return movieRepository.findAll();
     } catch (DataAccessException e) {
@@ -57,8 +56,8 @@ public class MovieServiceImpl implements MovieService {
    * @param id - the id of the product to retrieve
    * @return - the product
    */
-  public Movie getMovieById(Long id) {
-    Movie movie;
+  public Encounter getMovieById(Long id) {
+    Encounter movie;
 
     try {
       movie = movieRepository.findById(id).orElse(null);
@@ -81,7 +80,7 @@ public class MovieServiceImpl implements MovieService {
    * @param movie - product object
    * @return list of movie objects that are added to database
    */
-  public Movie saveMovie(Movie movie) {
+  public Encounter saveMovie(Encounter movie) {
     List<String> movieErrors = getMovieErrors(movie);
     Boolean skuExists = movieSkuExists(movie);
     if (!movieErrors.isEmpty()) {
@@ -104,16 +103,16 @@ public class MovieServiceImpl implements MovieService {
    * @param movie - updated movie payload
    * @return - updated movie object
    */
-  public Movie updateMovie(Long id, Movie movie){
-    Movie findMovie = movieRepository.findById(id)
+  public Encounter updateMovie(Long id, Encounter movie){
+    Encounter findMovie = movieRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE));
 
-    findMovie.setSku(movie.getSku());
-    findMovie.setGenre(movie.getGenre());
-    findMovie.setDirector(movie.getDirector());
-    findMovie.setTitle(movie.getTitle());
-    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
-    findMovie.setId(id);
+//    findMovie.setSku(movie.getSku());
+//    findMovie.setGenre(movie.getGenre());
+//    findMovie.setDirector(movie.getDirector());
+//    findMovie.setTitle(movie.getTitle());
+//    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
+//    findMovie.setId(id);
 
     List<String> movieErrors = getMovieErrors(movie);
     Boolean skuExists = movieSkuExists(findMovie);
@@ -158,7 +157,7 @@ public class MovieServiceImpl implements MovieService {
    * @param movie movie to be validated
    * @return a list of errors
    */
-  public List<String> getMovieErrors(Movie movie) {
+  public List<String> getMovieErrors(Encounter movie) {
     List<String> errors = new ArrayList<>();
     Boolean dailyRentalCostIsNotValid = validateDailyRentalCost(movie);
     List<String> emptyFields = getFieldsEmptyOrNull(movie).get("emptyFields");
@@ -194,13 +193,13 @@ public class MovieServiceImpl implements MovieService {
    * @param movie movie to be validated
    * @return boolean if dailyRentalCost is valid
    */
-  public Boolean validateDailyRentalCost(Movie movie) {
-    if (movie.getDailyRentalCost() != null) {
-      //Split price by the decimal
-      String[] rentalCostString = String.valueOf(movie.getDailyRentalCost()).split("\\.");
-      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
-      Boolean priceLessThanZero = movie.getDailyRentalCost() < 0;
-      return priceLessThanZero || priceMoreThan2Decimals;
+  public Boolean validateDailyRentalCost(Encounter movie) {
+//    if (movie.getDailyRentalCost() != null) {
+//      //Split price by the decimal
+//      String[] rentalCostString = String.valueOf(movie.getDailyRentalCost()).split("\\.");
+//      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
+//      Boolean priceLessThanZero = movie.getDailyRentalCost() < 0;
+//      return priceLessThanZero || priceMoreThan2Decimals;
     }
     return false;
   }
@@ -212,14 +211,14 @@ public class MovieServiceImpl implements MovieService {
    * @param movie product to be validated
    * @return boolean if product has valid quantity
    */
-  public Boolean validateMovieSkuFormat(Movie movie) {
+  public Boolean validateMovieSkuFormat(Encounter movie) {
     String regex = "^[A-Z]{6}-\\d{4}$";
     Pattern pattern = Pattern.compile(regex);
-    if (movie.getSku() != null) {
-      Matcher matcher = pattern.matcher(movie.getSku());
-      return matcher.matches();
-    }
-    return false;
+//    if (movie.getSku() != null) {
+//      Matcher matcher = pattern.matcher(movie.getSku());
+//      return matcher.matches();
+//    }
+//    return false;
   }
 
   /**
@@ -227,13 +226,13 @@ public class MovieServiceImpl implements MovieService {
    * @param newMovie - movie to be saved
    * @return Boolean if the sku exists already.
    */
-  public Boolean movieSkuExists(Movie newMovie){
-    List<Movie> allMovies = movieRepository.findAll();
-    if(newMovie.getSku() != null){
-      for(Movie movie : allMovies){
-          if (movie.getSku().equals(newMovie.getSku()) && movie.getId() != newMovie.getId()) {
-            return true;
-          }
+  public Boolean movieSkuExists(Encounter newMovie){
+    List<Encounter> allMovies = movieRepository.findAll();
+//    if(newMovie.getSku() != null){
+      for(Encounter movie : allMovies){
+//          if (movie.getSku().equals(newMovie.getSku()) && movie.getId() != newMovie.getId()) {
+//            return true;
+//          }
       }
     }
     return false;
@@ -245,8 +244,8 @@ public class MovieServiceImpl implements MovieService {
    * @param movie movie to be validated
    * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
    */
-  public HashMap<String, List<String>> getFieldsEmptyOrNull(Movie movie) {
-    List<Field> movieFields = Arrays.asList(Movie.class.getDeclaredFields());
+  public HashMap<String, List<String>> getFieldsEmptyOrNull(Encounter movie) {
+    List<Field> movieFields = Arrays.asList(Encounter.class.getDeclaredFields());
     List<String> movieFieldNames = new ArrayList<>();
     List<String> emptyFields = new ArrayList<>();
     List<String> nullFields = new ArrayList<>();

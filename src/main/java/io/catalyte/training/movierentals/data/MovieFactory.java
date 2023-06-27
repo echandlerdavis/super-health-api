@@ -1,6 +1,6 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.movie.Movie;
+import io.catalyte.training.movierentals.domains.movie.Encounter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,12 +103,12 @@ public class MovieFactory {
    * @param numberOfMovies - the number of random products to generate
    * @return - a list of random products
    */
-  public List<Movie> generateRandomMovieList(Integer numberOfMovies) {
+  public List<Encounter> generateRandomMovieList(Integer numberOfMovies) {
 
-    List<Movie> movieList = new ArrayList<>();
+    List<Encounter> movieList = new ArrayList<>();
 
     for (int i = 0; i < numberOfMovies; i++) {
-      movieList.add(createRandomMovie());
+//      movieList.add(createRandomMovie());
     }
 
     return movieList;
@@ -119,17 +119,17 @@ public class MovieFactory {
    *
    * @return - a randomly generated product
    */
-  public Movie createRandomMovie() {
-    Movie movie = new Movie();
-//    Setters
-    movie.setTitle(MovieFactory.getTitle());
-    movie.setDailyRentalCost(MovieFactory.getDailyRentalCost(1.0, 15.0));
-    movie.setDirector(MovieFactory.getDirector());
-    movie.setGenre(MovieFactory.getGenre());
-    movie.setSku(MovieFactory.getRandomSku());
-
-
-    return movie;
-  }
+//  public Encounter createRandomMovie() {
+//    Encounter movie = new Encounter();
+////    Setters
+//    movie.setTitle(MovieFactory.getTitle());
+//    movie.setDailyRentalCost(MovieFactory.getDailyRentalCost(1.0, 15.0));
+//    movie.setDirector(MovieFactory.getDirector());
+//    movie.setGenre(MovieFactory.getGenre());
+//    movie.setSku(MovieFactory.getRandomSku());
+//
+//
+//    return movie;
+//  }
 
 }

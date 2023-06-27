@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.movierentals.data.MovieFactory;
-import io.catalyte.training.movierentals.domains.movie.Movie;
-import io.catalyte.training.movierentals.domains.movie.MovieRepository;
+import io.catalyte.training.movierentals.domains.movie.Encounter;
+import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
@@ -30,23 +30,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataAccessException;
 
 @RunWith(MockitoJUnitRunner.class)
-@WebMvcTest(RentalServiceImpl.class)
-public class RentalServiceImplTest {
+@WebMvcTest(PatientServiceImpl.class)
+public class PatientServiceImplTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
-  Rental testRental;
-  List<Rental> testRentals = new ArrayList<>();
+  Patient testRental;
+  List<Patient> testRentals = new ArrayList<>();
   MovieFactory movieFactory;
 
   RentedMovie rentedMovie;
   @InjectMocks
-  private RentalServiceImpl rentalServiceImpl;
+  private PatientServiceImpl patientServiceImpl;
   @Mock
-  private RentalRepository rentalRepository;
+  private PatientRepository patientRepository;
   @Mock
   private RentedMovieRepository rentedMovieRepository;
   @Mock
-  private MovieRepository movieRepository;
+  private EncounterRepository movieRepository;
 
 
   @Before
@@ -57,18 +57,18 @@ public class RentalServiceImplTest {
 
     //Generate random movies to have movieIds to pull from;
     movieFactory = new MovieFactory();
-    List<Movie> movieList = movieFactory.generateRandomMovieList(1);
+    List<Encounter> movieList = movieFactory.generateRandomMovieList(1);
 
     // Initialize a test purchase instance and list of purchases
     setTestRental();
     testRentals.add(testRental);
 
-    when(rentalRepository.findAll()).thenReturn(testRentals);
-    when(rentalRepository.findById(anyLong())).thenReturn(Optional.of(testRental));
-    when(rentalRepository.save(any())).thenReturn(testRental);
+    when(patientRepository.findAll()).thenReturn(testRentals);
+    when(patientRepository.findById(anyLong())).thenReturn(Optional.of(testRental));
+    when(patientRepository.save(any())).thenReturn(testRental);
 
     //Set rentedMovieRepository.save to add rentedMovie to testRental
-    when(rentedMovieRepository.findByRental(any(Rental.class))).thenAnswer((l) -> {
+    when(rentedMovieRepository.findByRental(any(Patient.class))).thenAnswer((l) -> {
       return testRental.getRentedMovies();
     });
 
@@ -84,7 +84,7 @@ public class RentalServiceImplTest {
    * card info, and a random generated product
    */
   private void setTestRental() {
-    testRental = new Rental(
+    testRental = new Patient(
         "2023-06-17",
         null,
         10.45
@@ -102,207 +102,207 @@ public class RentalServiceImplTest {
 
   @Test
   public void getMovieByIdReturnsRental() {
-    Rental actual = rentalServiceImpl.getRentalById(123L);
+    Patient actual = patientServiceImpl.getRentalById(123L);
     assertEquals(testRental, actual);
   }
 
   @Test
   public void getMovieByIdThrowsErrorWhenNotFound() {
-    when(rentalRepository.findById(anyLong())).thenReturn(Optional.empty());
-    assertThrows(ResourceNotFound.class, () -> rentalServiceImpl.getRentalById(123L));
+    when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
+    assertThrows(ResourceNotFound.class, () -> patientServiceImpl.getRentalById(123L));
   }
 
   @Test
   public void getMovieByIdThrowsServiceUnavailable() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(rentalRepository).findById(anyLong());
-    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.getRentalById(123L));
+    }).when(patientRepository).findById(anyLong());
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.getRentalById(123L));
   }
 
   @Test
   public void getAllRentalsReturnsAllRentals(){
-    List<Rental> actual = rentalServiceImpl.getRentals();
+    List<Patient> actual = patientServiceImpl.getRentals();
     assertEquals(testRentals, actual);
   }
 
   @Test
   public void getAllMoviesThrowsServiceUnavailable(){
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(rentalRepository).findAll();
-    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.getRentals());
+    }).when(patientRepository).findAll();
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.getRentals());
   }
 
   @Test
   public void saveValidRentalReturnsRental() {
-    assertEquals(testRental, rentalServiceImpl.saveRental(testRental));
+    assertEquals(testRental, patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsServiceUnavailable() {
     //This test fails when run with coverage
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(rentalRepository).save(any());
-    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.saveRental(testRental));
+    }).when(patientRepository).save(any());
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentalDateNull(){
     testRental.setRentalDate(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentalDateEmpty(){
     testRental.setRentalDate("");
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentalDateIsInvalidFormat(){
     testRental.setRentalDate("Invalid Format");
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentalTotalCostIsNegative(){
     testRental.setRentalTotalCost(-1.00);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
   @Test
   public void saveRentalThrowsBadRequestWhenRentalTotalCostMoreThanTwoDecimals(){
     testRental.setRentalTotalCost(1.123);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
   @Test
   public void saveRentalThrowsBadRequestWhenRentedMoviesAreNull(){
     testRental.setRentedMovies(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentedMoviesAreEmpty(){
     List<RentedMovie> emptyList = new ArrayList<>();
     testRental.setRentedMovies(emptyList);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentalTotalCostIsNull(){
     testRental.setRentalTotalCost(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentedMovieMovieIdIsNull(){
     rentedMovie.setMovieId(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void saveRentalThrowsBadRequestWhenRentedMovieMovieIdDoesNotExist(){
-    List<Movie> emptyList = new ArrayList<>();
+    List<Encounter> emptyList = new ArrayList<>();
     when(movieRepository.findAll()).thenAnswer((l) -> {
       return emptyList;
     });
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.saveRental(testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
   }
 
   @Test
   public void updateValidRentalReturnsRental(){
-    assertEquals(testRental, rentalServiceImpl.updateRental(1L, testRental));
+    assertEquals(testRental, patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsServiceUnavailable() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(rentalRepository).save(any());
-    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    }).when(patientRepository).save(any());
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalRentalThrowsResourceNotFound(){
-    when(rentalRepository.findById(anyLong())).thenReturn(Optional.empty());
-    assertThrows(ResourceNotFound.class, () -> rentalServiceImpl.updateRental(123L, testRental));
+    when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
+    assertThrows(ResourceNotFound.class, () -> patientServiceImpl.updateRental(123L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentalDateNull(){
     testRental.setRentalDate(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentalDateEmpty(){
     testRental.setRentalDate("");
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentalDateIsInvalidFormat(){
     testRental.setRentalDate("Invalid Format");
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentalTotalCostIsNegative(){
     testRental.setRentalTotalCost(-1.00);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
   @Test
   public void updateRentalThrowsBadRequestWhenRentalTotalCostMoreThanTwoDecimals(){
     testRental.setRentalTotalCost(1.123);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
   @Test
   public void updateRentalThrowsBadRequestWhenRentedMoviesAreNull(){
     testRental.setRentedMovies(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentedMoviesAreEmpty(){
     List<RentedMovie> emptyList = new ArrayList<>();
     testRental.setRentedMovies(emptyList);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentalTotalCostIsNull(){
     testRental.setRentalTotalCost(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentedMovieMovieIdIsNull(){
     rentedMovie.setMovieId(null);
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void updateRentalThrowsBadRequestWhenRentedMovieMovieIdDoesNotExist(){
-    List<Movie> emptyList = new ArrayList<>();
+    List<Encounter> emptyList = new ArrayList<>();
     when(movieRepository.findAll()).thenAnswer((l) -> {
       return emptyList;
     });
-    assertThrows(BadRequest.class, () -> rentalServiceImpl.updateRental(1L, testRental));
+    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
   }
 
   @Test
   public void deleteRentalReturnsVoid(){
-    rentalServiceImpl.deleteRentalById(123L);
-    verify(rentalRepository).deleteById(anyLong());
+    patientServiceImpl.deleteRentalById(123L);
+    verify(patientRepository).deleteById(anyLong());
   }
 
   @Test
   public void deleteRentalThrowsServiceUnavailable(){
     doThrow(new DataAccessException("TEST EXCEPTION") {
-    }).when(rentalRepository).deleteById(anyLong());
-    assertThrows(ServiceUnavailable.class, () -> rentalServiceImpl.deleteRentalById(123L));
+    }).when(patientRepository).deleteById(anyLong());
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.deleteRentalById(123L));
   }
 
   @Test
   public void deleteRentalThrowsResourceNotFound(){
-    when(rentalRepository.findById(anyLong())).thenReturn(Optional.empty());
-    assertThrows(ResourceNotFound.class, () -> rentalServiceImpl.deleteRentalById(123L));
+    when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
+    assertThrows(ResourceNotFound.class, () -> patientServiceImpl.deleteRentalById(123L));
   }
 }

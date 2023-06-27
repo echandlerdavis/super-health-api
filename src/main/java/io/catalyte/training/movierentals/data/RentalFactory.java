@@ -1,7 +1,7 @@
 package io.catalyte.training.movierentals.data;
 
 
-import io.catalyte.training.movierentals.domains.rental.Rental;
+import io.catalyte.training.movierentals.domains.rental.Patient;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,8 +36,8 @@ public class RentalFactory {
     return Double.valueOf(df.format((randomGenerator.nextDouble() * (max-min)) + min));
   }
 
-  public Rental createRandomRental(){
-    Rental rental = new Rental();
+  public Patient createRandomRental(){
+    Patient rental = new Patient();
 //      Setters
     rental.setRentalDate(String.valueOf(
         between(LocalDate.parse("2000-01-01"), LocalDate.now())));
@@ -46,8 +46,8 @@ public class RentalFactory {
     return rental;
 
   }
-  public List<Rental> generateRandomRentalList(int numberOfRentals){
-    List<Rental> rentalList = new ArrayList<>();
+  public List<Patient> generateRandomRentalList(int numberOfRentals){
+    List<Patient> rentalList = new ArrayList<>();
 
     for(int i = 0; i < numberOfRentals; i++){
       rentalList.add(createRandomRental());

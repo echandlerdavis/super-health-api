@@ -29,19 +29,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataAccessException;
 
 @RunWith(MockitoJUnitRunner.class)
-@WebMvcTest(MovieServiceImpl.class)
+@WebMvcTest(EncounterServiceImpl.class)
 public class MovieServiceImplTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
-  Movie testMovie1;
-  Movie testMovie2;
+  Encounter testMovie1;
+  Encounter testMovie2;
   MovieFactory movieFactory;
-  List<Movie> testMoviesList = new ArrayList<>();
+  List<Encounter> testMoviesList = new ArrayList<>();
   @InjectMocks
-  private MovieServiceImpl movieServiceImpl;
+  private EncounterServiceImpl movieServiceImpl;
   @Mock
-  private MovieRepository movieRepository;
+  private EncounterRepository movieRepository;
 
   @Before
   public void setUp() {
@@ -58,14 +58,14 @@ public class MovieServiceImplTest {
 
     // Create Two Random Test Products
     movieFactory = new MovieFactory();
-    testMovie1 = new Movie(
+    testMovie1 = new Encounter(
         "ABCDEF-1234",
         "Test Title1",
         "Test Genre1",
         "Test Director1",
         3.45
     );
-    testMovie2 = new Movie(
+    testMovie2 = new Encounter(
         "ABCDEF-5678",
         "Test Title2",
         "Test Genre2",
@@ -80,7 +80,7 @@ public class MovieServiceImplTest {
 
   @Test
   public void getMovieByIdReturnsMovie() {
-    Movie actual = movieServiceImpl.getMovieById(123L);
+    Encounter actual = movieServiceImpl.getMovieById(123L);
     assertEquals(testMovie1, actual);
   }
 
@@ -98,7 +98,7 @@ public class MovieServiceImplTest {
   }
   @Test
   public void getAllMoviesReturnsAllMovies(){
-    List<Movie> actual = movieServiceImpl.getMovies();
+    List<Encounter> actual = movieServiceImpl.getMovies();
     assertEquals(testMoviesList, actual);
   }
   @Test

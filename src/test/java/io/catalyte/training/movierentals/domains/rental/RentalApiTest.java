@@ -1,6 +1,5 @@
 package io.catalyte.training.movierentals.domains.rental;
 
-import static io.catalyte.training.movierentals.constants.Paths.MOVIES_PATH;
 import static io.catalyte.training.movierentals.constants.Paths.RENTALS_PATH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -17,22 +16,19 @@ import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.data.MovieFactory;
 import io.catalyte.training.movierentals.data.RentalFactory;
 import io.catalyte.training.movierentals.data.RentedMovieFactory;
-import io.catalyte.training.movierentals.domains.movie.Movie;
-import io.catalyte.training.movierentals.domains.movie.MovieRepository;
+import io.catalyte.training.movierentals.domains.movie.Encounter;
+import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -47,16 +43,16 @@ public class RentalApiTest {
   private final RentalFactory rentalFactory = new RentalFactory();
   private final RentedMovieFactory rentedMovieFactory = new RentedMovieFactory();
   private final MovieFactory movieFactory = new MovieFactory();
-  Rental testRental1;
-  Rental testRental2;
+  Patient testRental1;
+  Patient testRental2;
 
-  List<Movie> randomMovieList;
+  List<Encounter> randomMovieList;
   @Autowired
-  public RentalRepository rentalRepository;
+  public PatientRepository patientRepository;
   @Autowired
   public RentedMovieRepository rentedMovieRepository;
   @Autowired
-  public MovieRepository movieRepository;
+  public EncounterRepository movieRepository;
   @Autowired
   private WebApplicationContext wac;
   private MockMvc mockMvc;
@@ -75,14 +71,14 @@ public class RentalApiTest {
     randomMovieList = movieFactory.generateRandomMovieList(20);
     testRental1 = rentalFactory.createRandomRental();
     testRental2 = rentalFactory.createRandomRental();
-    List<Rental> testRentals = new ArrayList<>();
+    List<Patient> testRentals = new ArrayList<>();
     testRentals.add(testRental1);
     testRentals.add(testRental2);
 
     movieRepository.saveAll(randomMovieList);
-    rentalRepository.saveAll(testRentals);
+    patientRepository.saveAll(testRentals);
 
-    for (Rental rental : testRentals){
+    for (Patient rental : testRentals){
       List<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
       rental.setRentedMovies(rentedMovieSet);
       rentedMovieRepository.saveAll(rentedMovieSet);
@@ -97,8 +93,8 @@ public class RentalApiTest {
   @After
   public void tearDown() {
     //delete rentals
-    rentalRepository.delete(testRental1);
-    rentalRepository.delete(testRental2);
+    patientRepository.delete(testRental1);
+    patientRepository.delete(testRental2);
 
     //delete rented movies
     rentedMovieRepository.deleteAll();
@@ -125,7 +121,7 @@ public class RentalApiTest {
   @Test
 //  @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
   public void saveRentalReturns201WithRentalObject() throws Exception {
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRental.setRentedMovies(newRentedMovies);
     ObjectMapper mapper = new ObjectMapper();
@@ -135,7 +131,7 @@ public class RentalApiTest {
         .andExpect(status().isCreated())
         .andReturn().getResponse();
 
-    Rental returnedRental = mapper.readValue(response.getContentAsString(), Rental.class);
+    Patient returnedRental = mapper.readValue(response.getContentAsString(), Patient.class);
 
     assert (returnedRental.equals(newRental));
     assertNotNull(returnedRental.getId());
@@ -143,7 +139,7 @@ public class RentalApiTest {
 
   @Test
   public void saveRentalReturns400WhenTotalRentalCostIsNegativeNumber() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRental.setRentedMovies(newRentedMovies);
     newRental.setRentalTotalCost(-1.00);
@@ -161,7 +157,7 @@ public class RentalApiTest {
   @DirtiesContext
   @Test
   public void saveRentalReturns400WhenTotalRentalDateIsInvalid() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRental.setRentedMovies(newRentedMovies);
     newRental.setRentalDate("Invalid");
@@ -178,7 +174,7 @@ public class RentalApiTest {
 
   @Test
   public void saveRentalReturns400WhenRentedMoviesAreNull() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     newRental.setRentedMovies(null);
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
@@ -198,7 +194,7 @@ public class RentalApiTest {
 
   @Test
   public void saveRentalReturns400WhenRentedMoviesAreEmpty() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     newRental.setRentedMovies(new ArrayList<>());
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
@@ -213,7 +209,7 @@ public class RentalApiTest {
 
   @Test
   public void saveRentalReturns400WhenFieldsEmpty() throws Exception {
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRental.setRentedMovies(newRentedMovies);
     newRental.setRentalDate("");
@@ -232,7 +228,7 @@ public class RentalApiTest {
   @DirtiesContext
   @Test
   public void saveRentalReturns400WhenFieldsNull() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRental.setRentedMovies(newRentedMovies);
     newRental.setRentalDate(null);
@@ -250,7 +246,7 @@ public class RentalApiTest {
   @DirtiesContext
   @Test
   public void saveRentalReturns400WhenRentedMovieDaysRentedInvalid() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRentedMovies.get(0).setDaysRented(-1);
     newRental.setRentedMovies(newRentedMovies);
@@ -268,7 +264,7 @@ public class RentalApiTest {
   @DirtiesContext
   @Test
   public void saveRentalReturns400WhenRentedMovieFieldsNull() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRentedMovies.get(0).setMovieId(null);
     newRental.setRentedMovies(newRentedMovies);
@@ -286,7 +282,7 @@ public class RentalApiTest {
 
   @Test
   public void saveRentalReturns400WhenRentedMovieMovieIdInvalid() throws Exception{
-    Rental newRental = rentalFactory.createRandomRental();
+    Patient newRental = rentalFactory.createRandomRental();
     List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
     newRentedMovies.get(0).setMovieId(50L);
     newRental.setRentedMovies(newRentedMovies);
@@ -306,7 +302,7 @@ public class RentalApiTest {
   @DirtiesContext
   @Test
   public void updateRentalReturns200WithMovieObject() throws Exception {
-    Rental updatedRental = rentalFactory.createRandomRental();
+    Patient updatedRental = rentalFactory.createRandomRental();
     List<RentedMovie> updatedRentedMovies = rentedMovieFactory.generateRandomRentedMovies(updatedRental);
     updatedRental.setRentedMovies(updatedRentedMovies);
     ObjectMapper mapper = new ObjectMapper();
@@ -316,7 +312,7 @@ public class RentalApiTest {
         .andExpect(status().isOk())
         .andReturn().getResponse();
 
-    Rental returnedRental = mapper.readValue(response.getContentAsString(), Rental.class);
+    Patient returnedRental = mapper.readValue(response.getContentAsString(), Patient.class);
 
     assert (returnedRental.equals(updatedRental));
     assertNotNull(returnedRental.getId());

@@ -1,6 +1,6 @@
 package io.catalyte.training.movierentals.exceptions;
 
-import io.catalyte.training.movierentals.domains.movie.Movie;
+import io.catalyte.training.movierentals.domains.movie.Encounter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,14 +34,14 @@ public class ExceptionResponse {
   }
 
   public ExceptionResponse(String error, Date timestamp, String errorMessage,
-      Map<String, List<Movie>> payload) {
+      Map<String, List<Encounter>> payload) {
     this(error, timestamp, error);
     List<String> consolidatedMap = new ArrayList<>();
     //consolidate map to list
     for (String errorType : payload.keySet()) {
       consolidatedMap.add(errorType);
-      List<Movie> associatedProducts = payload.get(errorType);
-      for (Movie p : associatedProducts) {
+      List<Encounter> associatedProducts = payload.get(errorType);
+      for (Encounter p : associatedProducts) {
         consolidatedMap.add(p.toString());
       }
     }

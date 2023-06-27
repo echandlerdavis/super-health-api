@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = RENTALS_PATH)
-public class RentalController {
+public class PatientController {
 
-  private final RentalService rentalService;
-  Logger logger = LogManager.getLogger(RentalController.class);
+  private final PatientService patientService;
+  Logger logger = LogManager.getLogger(PatientController.class);
 
   @Autowired
-  public RentalController(RentalService rentalService) {
-    this.rentalService = rentalService;
+  public PatientController(PatientService patientService) {
+    this.patientService = patientService;
   }
 
   /**
@@ -40,9 +40,9 @@ public class RentalController {
    * @return all rentals in database.
    */
   @GetMapping
-  public ResponseEntity<List<Rental>> getRentals() {
+  public ResponseEntity<List<Patient>> getRentals() {
     logger.info(LoggingConstants.GET_RENTALS);
-    return new ResponseEntity<>(rentalService.getRentals(), HttpStatus.OK);
+    return new ResponseEntity<>(patientService.getRentals(), HttpStatus.OK);
   }
 
   /**
@@ -54,7 +54,7 @@ public class RentalController {
   @GetMapping(value = "/{id}")
   public ResponseEntity getRentalById(@PathVariable Long id) {
     logger.info(LoggingConstants.GET_RENTAL_BY_ID(id));
-    return new ResponseEntity(rentalService.getRentalById(id), HttpStatus.OK);
+    return new ResponseEntity(patientService.getRentalById(id), HttpStatus.OK);
   }
 
   /**
@@ -65,9 +65,9 @@ public class RentalController {
    * @return valid rental that was saved
    */
   @PostMapping
-  public ResponseEntity savePurchase(@RequestBody Rental rental) {
+  public ResponseEntity savePurchase(@RequestBody Patient rental) {
     logger.info(LoggingConstants.POST_RENTAL);;
-    Rental newRental = rentalService.saveRental(rental);
+    Patient newRental = patientService.saveRental(rental);
     return new ResponseEntity<>(newRental, HttpStatus.CREATED);
   }
 
@@ -81,9 +81,9 @@ public class RentalController {
    */
   @PutMapping(value = "/{id}")
   @ResponseStatus(value = HttpStatus.OK)
-  public ResponseEntity<Rental> updateRental(@PathVariable Long id, @RequestBody Rental rental){
+  public ResponseEntity<Patient> updateRental(@PathVariable Long id, @RequestBody Patient rental){
     logger.info(LoggingConstants.UPDATE_RENTAL(id));
-    return new ResponseEntity<>(rentalService.updateRental(id, rental), HttpStatus.OK);
+    return new ResponseEntity<>(patientService.updateRental(id, rental), HttpStatus.OK);
   }
 
   /**
@@ -95,7 +95,7 @@ public class RentalController {
   @DeleteMapping(value = "/{id}")
   public ResponseEntity<?> deleteRentalById(@PathVariable Long id){
     logger.info(LoggingConstants.DELETE_RENTAL(id));;
-    rentalService.deleteRentalById(id);
+    patientService.deleteRentalById(id);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

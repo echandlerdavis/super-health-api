@@ -1,11 +1,9 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.movie.Movie;
-import io.catalyte.training.movierentals.domains.movie.MovieRepository;
-import io.catalyte.training.movierentals.domains.rental.Rental;
-import io.catalyte.training.movierentals.domains.rental.RentalRepository;
-import io.catalyte.training.movierentals.domains.rental.RentedMovie;
-import io.catalyte.training.movierentals.domains.rental.RentedMovieRepository;
+import io.catalyte.training.movierentals.domains.movie.Encounter;
+import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
+import io.catalyte.training.movierentals.domains.rental.Patient;
+import io.catalyte.training.movierentals.domains.rental.PatientRepository;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,11 +27,9 @@ public class DemoData implements CommandLineRunner {
   private final RentalFactory rentalFactory = new RentalFactory();
   private final RentedMovieFactory rentedMovieFactory = new RentedMovieFactory();
   @Autowired
-  private MovieRepository movieRepository;
+  private EncounterRepository movieRepository;
   @Autowired
-  private RentalRepository rentalRepository;
-  @Autowired
-  private RentedMovieRepository rentedMovieRepository;
+  private PatientRepository patientRepository;
   @Autowired
   private Environment env;
 
@@ -58,20 +54,20 @@ public class DemoData implements CommandLineRunner {
     int numberOfMovies = 20;
     int numberOfRentals = 10;
     // Generate products
-    List<Movie> movieList = movieFactory.generateRandomMovieList(numberOfMovies);
-    List<Rental> rentalList = rentalFactory.generateRandomRentalList(numberOfRentals);
+    List<Encounter> movieList = movieFactory.generateRandomMovieList(numberOfMovies);
+    List<Patient> rentalList = rentalFactory.generateRandomRentalList(numberOfRentals);
 
     // Persist them to the database and save list to purchaseFactory
     logger.info("Loading " + numberOfMovies + " movies...");
     movieRepository.saveAll(movieList);
     logger.info("Loading " + numberOfRentals + " rentals...");
-    rentalRepository.saveAll(rentalList);
+    patientRepository.saveAll(rentalList);
 
-    for (Rental rental : rentalList){
-      List<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
-      rental.setRentedMovies(rentedMovieSet);
-      rentedMovieRepository.saveAll(rentedMovieSet);
-    }
+//    for (Patient rental : rentalList){
+//      List<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
+//      rental.setRentedMovies(rentedMovieSet);
+//      rentedMovieRepository.saveAll(rentedMovieSet);
+//    }
 
     logger.info("Data load completed. You can make requests now.");
 

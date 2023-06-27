@@ -3,8 +3,8 @@ package io.catalyte.training.movierentals.domains.rental;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.movierentals.constants.LoggingConstants;
 import io.catalyte.training.movierentals.constants.StringConstants;
-import io.catalyte.training.movierentals.domains.movie.Movie;
-import io.catalyte.training.movierentals.domains.movie.MovieRepository;
+import io.catalyte.training.movierentals.domains.movie.Encounter;
+import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
@@ -25,18 +25,18 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RentalServiceImpl implements RentalService {
+public class PatientServiceImpl implements PatientService {
 
-  private final Logger logger = LogManager.getLogger(RentalServiceImpl.class);
+  private final Logger logger = LogManager.getLogger(PatientServiceImpl.class);
 
-  RentalRepository rentalRepository;
+  PatientRepository patientRepository;
   RentedMovieRepository rentedMovieRepository;
-  MovieRepository movieRepository;
+  EncounterRepository movieRepository;
 
   @Autowired
-  public RentalServiceImpl(RentalRepository rentalRepository,
-      RentedMovieRepository rentedMovieRepository, MovieRepository movieRepository) {
-    this.rentalRepository = rentalRepository;
+  public PatientServiceImpl(PatientRepository patientRepository,
+      RentedMovieRepository rentedMovieRepository, EncounterRepository movieRepository) {
+    this.patientRepository = patientRepository;
     this.rentedMovieRepository = rentedMovieRepository;
     this.movieRepository = movieRepository;
   }
@@ -46,9 +46,9 @@ public class RentalServiceImpl implements RentalService {
    *
    * @return list of rentals
    */
-  public List<Rental> getRentals() {
+  public List<Patient> getRentals() {
     try {
-      return rentalRepository.findAll();
+      return patientRepository.findAll();
     } catch (DataAccessException e) {
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -61,11 +61,11 @@ public class RentalServiceImpl implements RentalService {
    * @param id Long id
    * @return a single rental object.
    */
-  public Rental getRentalById(Long id) {
-    Rental rental;
+  public Patient getRentalById(Long id) {
+    Patient rental;
 
     try{
-      rental = rentalRepository.findById(id).orElse(null);
+      rental = patientRepository.findById(id).orElse(null);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -85,17 +85,17 @@ public class RentalServiceImpl implements RentalService {
    * @param newRental - the rental to persist
    * @return the persisted rental object
    */
-  public Rental saveRental(Rental newRental) {
+  public Patient saveRental(Patient newRental) {
     List<String> rentalErrors = getRentalErrors(newRental);
 
     if(!rentalErrors.isEmpty()){
       throw new BadRequest(String.join("\n", rentalErrors));
     }
 
-    Rental savedRental;
+    Patient savedRental;
 
     try {
-      savedRental = rentalRepository.save(newRental);
+      savedRental = patientRepository.save(newRental);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -113,7 +113,7 @@ public class RentalServiceImpl implements RentalService {
    * Persists nested rented movie list to the database from a rental request object.
    * @param rental rental to be saved or updated
    */
-  private void handleRentedMovies(Rental rental){
+  private void handleRentedMovies(Patient rental){
     List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
     List<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
 
@@ -143,8 +143,8 @@ public class RentalServiceImpl implements RentalService {
    * @param updatedRental - updated rental request object
    * @return updated Rental object
    */
-  public Rental updateRental(Long id, Rental updatedRental){
-    Rental findRental = rentalRepository.findById(id)
+  public Patient updateRental(Long id, Patient updatedRental){
+    Patient findRental = patientRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_RENTAL_FAILURE));
 
     List<String> rentalErrors = getRentalErrors(updatedRental);
@@ -153,7 +153,7 @@ public class RentalServiceImpl implements RentalService {
       throw new BadRequest(String.join("\n", rentalErrors));
     }
 
-    Rental savedRental;
+    Patient savedRental;
     findRental.setId(id);
     findRental.setRentalDate(updatedRental.getRentalDate());
     findRental.setRentedMovies(null);
@@ -161,7 +161,7 @@ public class RentalServiceImpl implements RentalService {
     handleRentedMovies(findRental);
     findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
     try {
-      savedRental = rentalRepository.save(findRental);
+      savedRental = patientRepository.save(findRental);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -174,11 +174,11 @@ public class RentalServiceImpl implements RentalService {
    * @param id - id of the rental to be deleted
    */
   public void deleteRentalById(Long id){
-    rentalRepository.findById(id)
+    patientRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFound(LoggingConstants.DELETE_RENTAL_FAILURE));
 
     try {
-      rentalRepository.deleteById(id);
+      patientRepository.deleteById(id);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
@@ -191,7 +191,7 @@ public class RentalServiceImpl implements RentalService {
    * @param rental rental to be validated
    * @return a list of errors
    */
-  public List<String> getRentalErrors(Rental rental) {
+  public List<String> getRentalErrors(Patient rental) {
     List<String> errors = new ArrayList<>();
     List<String> emptyFields = getRentalFieldsEmptyOrNull(rental).get("emptyFields");
     List<String> nullFields = getRentalFieldsEmptyOrNull(rental).get("nullFields");
@@ -232,7 +232,7 @@ public class RentalServiceImpl implements RentalService {
    * @param rental movie to be validated
    * @return boolean if dailyRentalCost is valid
    */
-  public Boolean validateTotalRentalCost(Rental rental) {
+  public Boolean validateTotalRentalCost(Patient rental) {
     if (rental.getRentalTotalCost() != null) {
       //Split price by the decimal
       String[] rentalCostString = String.valueOf(rental.getRentalTotalCost()).split("\\.");
@@ -243,7 +243,7 @@ public class RentalServiceImpl implements RentalService {
     return false;
   }
 
-  public Boolean validateDateStringFormat(Rental rental) {
+  public Boolean validateDateStringFormat(Patient rental) {
     String regex = "^\\d{4}-\\d{2}-\\d{2}$";
     Pattern pattern = Pattern.compile(regex);
     if (rental.getRentalDate() != null) {
@@ -259,8 +259,8 @@ public class RentalServiceImpl implements RentalService {
    * @param rental movie to be validated
    * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
    */
-  public HashMap<String, List<String>> getRentalFieldsEmptyOrNull(Rental rental) {
-    List<Field> rentalFields = Arrays.asList(Rental.class.getDeclaredFields());
+  public HashMap<String, List<String>> getRentalFieldsEmptyOrNull(Patient rental) {
+    List<Field> rentalFields = Arrays.asList(Patient.class.getDeclaredFields());
     List<String> rentalFieldNames = new ArrayList<>();
     List<String> emptyFields = new ArrayList<>();
     List<String> nullFields = new ArrayList<>();
@@ -294,7 +294,7 @@ public class RentalServiceImpl implements RentalService {
    * @param rental - rental to be saved or updated
    * @return list of errors pertaining to the nested rented movie list.
    */
-  private Set<String> getRentedMovieErrors(Rental rental) {
+  private Set<String> getRentedMovieErrors(Patient rental) {
     // Get rentedMovies from each Rental
     List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
     Set<String> rentedMovieErrors = new HashSet<>();
@@ -342,8 +342,8 @@ public class RentalServiceImpl implements RentalService {
    * @return Boolean if the movieId exists
    */
   private Boolean validateMovieIdExists(RentedMovie rentedMovie){
-      List<Movie> allMovies = movieRepository.findAll();
-      for(Movie movie : allMovies){
+      List<Encounter> allMovies = movieRepository.findAll();
+      for(Encounter movie : allMovies){
         if(movie.getId() == rentedMovie.getMovieId()){
           return true;
         }
