@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.movie;
+package io.catalyte.training.movierentals.domains.encounter;
 
 import static io.catalyte.training.movierentals.constants.Paths.MOVIES_PATH;
 import static org.junit.Assert.assertNotNull;

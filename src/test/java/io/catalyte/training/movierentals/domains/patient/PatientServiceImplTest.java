@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.rental;
+package io.catalyte.training.movierentals.domains.patient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.catalyte.training.movierentals.data.EncounterFactory;
-import io.catalyte.training.movierentals.domains.movie.Encounter;
-import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
+import io.catalyte.training.movierentals.domains.encounter.Encounter;
+import io.catalyte.training.movierentals.domains.encounter.EncounterRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;

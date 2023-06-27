@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.rental;
+package io.catalyte.training.movierentals.domains.patient;
 
 import java.util.List;
 

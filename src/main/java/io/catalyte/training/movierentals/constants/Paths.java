@@ -3,7 +3,7 @@ package io.catalyte.training.movierentals.constants;
 public class Paths {
 
   // Local
-  public static final String MOVIES_PATH = "/movies";
-  public static final String RENTALS_PATH = "/rentals";
+  public static final String PATIENTS_PATH = "/patients";
+  public static final String ENCOUNTERS_PATH = "/encounters";
 
 }

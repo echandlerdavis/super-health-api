@@ -1,6 +1,6 @@
 package io.catalyte.training.movierentals.exceptions;
 
-import io.catalyte.training.movierentals.domains.movie.Encounter;
+import io.catalyte.training.movierentals.domains.encounter.Encounter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

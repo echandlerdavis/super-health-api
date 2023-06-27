@@ -1,9 +1,9 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.movie.Encounter;
-import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
-import io.catalyte.training.movierentals.domains.rental.Patient;
-import io.catalyte.training.movierentals.domains.rental.PatientRepository;
+import io.catalyte.training.movierentals.domains.encounter.Encounter;
+import io.catalyte.training.movierentals.domains.encounter.EncounterRepository;
+import io.catalyte.training.movierentals.domains.patient.Patient;
+import io.catalyte.training.movierentals.domains.patient.PatientRepository;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

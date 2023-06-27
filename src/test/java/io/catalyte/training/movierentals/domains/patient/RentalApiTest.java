@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.rental;
+package io.catalyte.training.movierentals.domains.patient;
 
 import static io.catalyte.training.movierentals.constants.Paths.RENTALS_PATH;
 import static org.junit.Assert.assertEquals;
@@ -16,8 +16,8 @@ import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.data.EncounterFactory;
 import io.catalyte.training.movierentals.data.RentalFactory;
 import io.catalyte.training.movierentals.data.RentedMovieFactory;
-import io.catalyte.training.movierentals.domains.movie.Encounter;
-import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
+import io.catalyte.training.movierentals.domains.encounter.Encounter;
+import io.catalyte.training.movierentals.domains.encounter.EncounterRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

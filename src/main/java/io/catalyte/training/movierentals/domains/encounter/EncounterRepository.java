@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.movie;
+package io.catalyte.training.movierentals.domains.encounter;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

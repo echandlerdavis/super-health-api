@@ -1,7 +1,7 @@
-package io.catalyte.training.movierentals.domains.rental;
+package io.catalyte.training.movierentals.domains.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.catalyte.training.movierentals.domains.movie.Encounter;
+import io.catalyte.training.movierentals.domains.encounter.Encounter;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;

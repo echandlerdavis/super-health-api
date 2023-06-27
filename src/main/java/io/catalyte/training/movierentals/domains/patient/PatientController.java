@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.rental;
+package io.catalyte.training.movierentals.domains.patient;
 
 import static io.catalyte.training.movierentals.constants.Paths.RENTALS_PATH;
 

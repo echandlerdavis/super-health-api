@@ -1,4 +1,4 @@
-package io.catalyte.training.movierentals.domains.movie;
+package io.catalyte.training.movierentals.domains.encounter;
 
 import java.util.List;
 

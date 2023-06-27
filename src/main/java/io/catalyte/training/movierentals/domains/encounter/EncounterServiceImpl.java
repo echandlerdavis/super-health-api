@@ -1,10 +1,9 @@
-package io.catalyte.training.movierentals.domains.movie;
+package io.catalyte.training.movierentals.domains.encounter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.movierentals.constants.LoggingConstants;
 import io.catalyte.training.movierentals.constants.StringConstants;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
-import io.catalyte.training.movierentals.exceptions.RequestConflict;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;
 import java.lang.reflect.Field;
@@ -13,8 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

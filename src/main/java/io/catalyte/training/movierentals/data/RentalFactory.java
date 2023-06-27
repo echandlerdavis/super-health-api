@@ -1,7 +1,7 @@
 package io.catalyte.training.movierentals.data;
 
 
-import io.catalyte.training.movierentals.domains.rental.Patient;
+import io.catalyte.training.movierentals.domains.patient.Patient;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;

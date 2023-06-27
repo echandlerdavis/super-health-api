@@ -1,6 +1,6 @@
-package io.catalyte.training.movierentals.domains.movie;
+package io.catalyte.training.movierentals.domains.encounter;
 
-import io.catalyte.training.movierentals.domains.rental.Patient;
+import io.catalyte.training.movierentals.domains.patient.Patient;
 import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Entity;

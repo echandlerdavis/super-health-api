@@ -1,6 +1,6 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.movie.Encounter;
+import io.catalyte.training.movierentals.domains.encounter.Encounter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,21 +30,78 @@ public class EncounterFactory {
       "Swift",
       "Davis",
       "Duvall",
-      "",
-      "fantasy",
-      "thriller",
+      "McCardell",
+      "Gorman",
+      "Miller",
+      "Edwards",
+      "Filter",
+      "Sport"
   };
   private static final String[] emails = {
-      "Wes Anderson",
-      "Alfred Hitchcock",
-      "Greta Gerwig",
-      "Steven SpielBerg",
-      "Quentin Tarantino",
-      "Chloe Zhao",
-      "Patty Jenkins"
+      "megrapinoe@me.com",
+      "taylorswift@hotmail.com",
+      "chandlerdavis@cataylte.io",
+      "devinduvall@catalyte.io",
+      "hayesmccardell@catalyte.io",
+      "katleengorman@catalyte.io",
+      "blakemiller@catalyte.io",
+      "alyssaedwards@yahoo.com",
+      "brittafilter@cia.gov",
+      "jansport@icloud.com"
   };
 
+  private static final String[] streets = {
+      "Oak Ave.",
+      "Linden Ln.",
+      "Cherry Tree St.",
+      "HillView Dr.",
+      "Pike St.",
+      "Pine St.",
+      "Denny St.",
+      "Westlake Ave.",
+      "Yesler Dr."
+  };
 
+  private static final String[] city = {
+      "Wichita",
+      "Seattle",
+      "San Francisco",
+      "Los Angeles",
+      "Portland",
+      "Highlands",
+      "Houston",
+      "New Orleans",
+      "New York",
+      "Buffalo",
+      "Philadelphia"
+  };
+
+  private static final String[] states = {
+      "KS",
+      "CA",
+      "WA",
+      "OR",
+      "NC",
+      "PA",
+      "NY",
+      "AZ",
+      "TX",
+      "MI"
+  };
+
+  private static final String[] insurances = {
+      "Blue Cross",
+      "Molena",
+      "Apple Health",
+      "Universal Healthcare",
+      "Kaiser"
+  };
+
+  private static final String[] genders = {
+      "Male",
+      "Female",
+      "Other"
+  };
 
   private static final Random randomGenerator = new Random();
 
@@ -53,8 +110,8 @@ public class EncounterFactory {
    *
    * @return - a title string
    */
-  public static String getTitle() {
-    return titles[randomGenerator.nextInt(titles.length)];
+  public static String getFirstName() {
+    return firstNames[randomGenerator.nextInt(firstNames.length)];
   }
 
   /**
@@ -62,8 +119,20 @@ public class EncounterFactory {
    *
    * @return - a genre string
    */
-  public static String getGenre() {
-    return genres[randomGenerator.nextInt(genres.length)];
+  public static String getLastName() {
+    return lastNames[randomGenerator.nextInt(lastNames.length)];
+  }
+
+  /**
+   * Returns a random double between minimum and maximum parameters to two decimal places.
+   *
+   * @return - a double between minimum and maximum values as the price to two decimal places.
+   */
+  public static String getRandomSsn() {
+    int d1 = randomGenerator.nextInt(1000);
+    int d2 = randomGenerator.nextInt(100);
+    int d3 = randomGenerator.nextInt(10000);
+    return String.format("%03d-%02d-%04d", d1, d2, d3);
   }
 
   /**
@@ -71,30 +140,44 @@ public class EncounterFactory {
    *
    * @return - a director string
    */
-  public static String getDirector() {
-    return directors[randomGenerator.nextInt(directors.length)];
+  public static String getEmail() {
+    return emails[randomGenerator.nextInt(emails.length)];
   }
 
   /**
-   * Returns a random double between minimum and maximum parameters to two decimal places.
+   * Generates a random street.
    *
-   * @param min - a double minimum value
-   * @param max - a double maximum value
-   * @return - a double between minimum and maximum values as the price to two decimal places.
+   * @return - a street
    */
-  public static Double getDailyRentalCost(double min, double max) {
-    DecimalFormat df = new DecimalFormat("0.00");
-    return Double.valueOf(df.format((randomGenerator.nextDouble() * (max - min)) + min));
+  public static String getRandomStreet() {
+    return streets[randomGenerator.nextInt(streets.length)];
   }
 
   /**
-   * Generates a random sku.
+   * Generates a random state.
    *
-   * @return - a sku
+   * @return - a state
    */
-  public static String getRandomSku() {
-    return "ABCDEF-" + RandomStringUtils.random(4, false, true);
+  public static String getRandomState() {
+    return states[randomGenerator.nextInt(states.length)];
   }
+
+  /**
+   * Generates random zip code
+   */
+  public static String getRandomPostal(){
+    int number = randomGenerator.nextInt(100000);
+    return String.format("%05d", number);
+  }
+
+  public static String getRandomInsurance(){
+    return insurances[randomGenerator.nextInt(insurances.length)];
+  }
+
+  public static String getRandomGender(){
+    return genders[randomGenerator.nextInt(genders.length)];
+  }
+
 
   /**
    * Generates a number of random products based on input.

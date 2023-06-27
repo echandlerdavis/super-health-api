@@ -1,10 +1,10 @@
-package io.catalyte.training.movierentals.domains.rental;
+package io.catalyte.training.movierentals.domains.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.movierentals.constants.LoggingConstants;
 import io.catalyte.training.movierentals.constants.StringConstants;
-import io.catalyte.training.movierentals.domains.movie.Encounter;
-import io.catalyte.training.movierentals.domains.movie.EncounterRepository;
+import io.catalyte.training.movierentals.domains.encounter.Encounter;
+import io.catalyte.training.movierentals.domains.encounter.EncounterRepository;
 import io.catalyte.training.movierentals.exceptions.BadRequest;
 import io.catalyte.training.movierentals.exceptions.ResourceNotFound;
 import io.catalyte.training.movierentals.exceptions.ServiceUnavailable;

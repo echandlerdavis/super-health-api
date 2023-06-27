@@ -1,6 +1,6 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.rental.Patient;
+import io.catalyte.training.movierentals.domains.patient.Patient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
