@@ -99,14 +99,14 @@ public class EncounterServiceImpl implements EncounterService {
    */
 
   //TODO: Update Logging constants for Resource not found, etc.
-  public Encounter updateMovie(Long id, Encounter encounter){
+  public Encounter updateEncounter(Long id, Encounter encounter){
     Encounter findEncounter;
 
     try {
      findEncounter  = encounterRepository.findById(id).orElse(null);
     }catch(DataAccessException e) {
       logger.error(e.getMessage());
-      throw new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE);
+      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
     }
 
   if(findEncounter != null) {
@@ -135,14 +135,14 @@ public class EncounterServiceImpl implements EncounterService {
    * Deletes movie in the database.
    * @param id - id of the movie to be deleted
    */
-  public void deleteMovie(Long id){
+  public void deleteEncounter(Long id){
     Encounter findEncounter;
 
     try {
       findEncounter  = encounterRepository.findById(id).orElse(null);
     }catch(DataAccessException e) {
       logger.error(e.getMessage());
-      throw new ResourceNotFound(LoggingConstants.UPDATE_MOVIE_FAILURE);
+      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
     }
 
     //validation for if there are encounters already?
@@ -184,9 +184,9 @@ public class EncounterServiceImpl implements EncounterService {
       errors.add(StringConstants.MOVIE_RENTAL_COST_INVALID);
     }
 
-    if (!skuFormatIsValid) {
-      errors.add(StringConstants.MOVIE_SKU_INVALID);
-    }
+//    if (!skuFormatIsValid) {
+//      errors.add(StringConstants.MOVIE_SKU_INVALID);
+//    }
 
     return errors;
   }

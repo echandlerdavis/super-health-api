@@ -1,6 +1,5 @@
 package io.catalyte.training.movierentals.data;
 
-import io.catalyte.training.movierentals.domains.encounter.Encounter;
 import io.catalyte.training.movierentals.domains.encounter.EncounterRepository;
 import io.catalyte.training.movierentals.domains.patient.Patient;
 import io.catalyte.training.movierentals.domains.patient.PatientRepository;
@@ -21,13 +20,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DemoData implements CommandLineRunner {
 
-  public static final int DEFAULT_NUMBER_OF_PRODUCTS = 500;
   private final Logger logger = LogManager.getLogger(DemoData.class);
+  private final PatientFactory patientFactory = new PatientFactory();
   private final EncounterFactory encounterFactory = new EncounterFactory();
-  private final RentalFactory rentalFactory = new RentalFactory();
-  private final RentedMovieFactory rentedMovieFactory = new RentedMovieFactory();
   @Autowired
-  private EncounterRepository movieRepository;
+  private EncounterRepository encounterRepository;
   @Autowired
   private PatientRepository patientRepository;
   @Autowired
@@ -51,17 +48,15 @@ public class DemoData implements CommandLineRunner {
   }
 
   private void seedDatabase() {
-    int numberOfMovies = 20;
-    int numberOfRentals = 10;
-    // Generate products
-    List<Encounter> movieList = encounterFactory.generateRandomMovieList(numberOfMovies);
-    List<Patient> rentalList = rentalFactory.generateRandomRentalList(numberOfRentals);
+    int numberOfPatients = 10;
+
+    // Generate patients
+    List<Patient> patientList = patientFactory.generateRandomPatientList(numberOfPatients);
 
     // Persist them to the database and save list to purchaseFactory
-    logger.info("Loading " + numberOfMovies + " movies...");
-    movieRepository.saveAll(movieList);
-    logger.info("Loading " + numberOfRentals + " rentals...");
-    patientRepository.saveAll(rentalList);
+    logger.info("Loading " + numberOfPatients + " patients...");
+    patientRepository.saveAll(patientList);
+    logger.info("Loading random number of encounters...");
 
 //    for (Patient rental : rentalList){
 //      List<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);

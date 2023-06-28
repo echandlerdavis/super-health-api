@@ -30,13 +30,11 @@ public class PatientServiceImpl implements PatientService {
   private final Logger logger = LogManager.getLogger(PatientServiceImpl.class);
 
   PatientRepository patientRepository;
-  EncounterRepository encounterRepository;
+//  EncounterRepository encounterRepository;
 
   @Autowired
-  public PatientServiceImpl(PatientRepository patientRepository,
-       EncounterRepository encounterRepository) {
+  public PatientServiceImpl(PatientRepository patientRepository) {
     this.patientRepository = patientRepository;
-=    this.encounterRepository = encounterRepository;
   }
 
   /**
@@ -44,7 +42,7 @@ public class PatientServiceImpl implements PatientService {
    *
    * @return list of rentals
    */
-  public List<Patient> getRentals() {
+  public List<Patient> getPatients() {
     try {
       return patientRepository.findAll();
     } catch (DataAccessException e) {
@@ -59,18 +57,18 @@ public class PatientServiceImpl implements PatientService {
    * @param id Long id
    * @return a single rental object.
    */
-  public Patient getRentalById(Long id) {
-    Patient rental;
+  public Patient getPatientById(Long id) {
+    Patient patient;
 
     try{
-      rental = patientRepository.findById(id).orElse(null);
+      patient = patientRepository.findById(id).orElse(null);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
     }
 
-    if(rental !=null){
-      return rental;
+    if(patient !=null){
+      return patient;
     } else {
       logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
       throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
@@ -80,31 +78,31 @@ public class PatientServiceImpl implements PatientService {
   /**
    * Persists a rental to the database
    *
-   * @param newRental - the rental to persist
+   * @param newPatient - the rental to persist
    * @return the persisted rental object
    */
-  public Patient saveRental(Patient newRental) {
-    List<String> rentalErrors = getRentalErrors(newRental);
+  public Patient savePatient(Patient newPatient) {
+    List<String> patientErrors = getRentalErrors(newPatient);
 
-    if(!rentalErrors.isEmpty()){
-      throw new BadRequest(String.join("\n", rentalErrors));
+    if(!patientErrors.isEmpty()){
+      throw new BadRequest(String.join("\n", patientErrors));
     }
 
-    Patient savedRental;
+    Patient savedPatient;
 
     try {
-      savedRental = patientRepository.save(newRental);
+      savedPatient = patientRepository.save(newPatient);
     } catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
     }
 
-    newRental.setId(savedRental.getId());
-    newRental.setRentedMovies(savedRental.getRentedMovies());
-    handleRentedMovies(newRental);
-    savedRental.setRentedMovies(rentedMovieRepository.findByRental(newRental));
+    //TODO: find out if I need this
+    newPatient.setId(savedPatient.getId());
+//    newPatient.setRentedMovies(savedRental.getRentedMovies());
+//    handleRentedMovies(newRental);
 
-    return savedRental;
+    return savedPatient;
   }
 
   /**
@@ -138,42 +136,46 @@ public class PatientServiceImpl implements PatientService {
   /**
    * Updates and existing rental in the database
    * @param id - id of the existing rental to be updated
-   * @param updatedRental - updated rental request object
+   * @param updatedPatient - updated rental request object
    * @return updated Rental object
    */
-  public Patient updateRental(Long id, Patient updatedRental){
-    Patient findRental = patientRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.UPDATE_RENTAL_FAILURE));
+  public Patient updatePatient(Long id, Patient updatedPatient){
+    Patient findPatient;
+    try{
+      findPatient = patientRepository.findById(id).orElse(null);
+    }catch (DataAccessException e){
+      logger.error(e.getMessage());
+      throw new ResourceNotFound(LoggingConstants.UPDATE_PATIENT_FAILURE);
+    }
+    List<String> patientErrors = getRentalErrors(updatedPatient);
 
-    List<String> rentalErrors = getRentalErrors(updatedRental);
-
-    if(!rentalErrors.isEmpty()){
-      throw new BadRequest(String.join("\n", rentalErrors));
+    if(!patientErrors.isEmpty()){
+      throw new BadRequest(String.join("\n", patientErrors));
     }
 
-    Patient savedRental;
-    findRental.setId(id);
-    findRental.setRentalDate(updatedRental.getRentalDate());
-    findRental.setRentedMovies(null);
-    findRental.setRentedMovies(updatedRental.getRentedMovies());
-    handleRentedMovies(findRental);
-    findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
+    Patient savedPatient;
+    findPatient.setId(id);
+//    findRental.setRentalDate(updatedRental.getRentalDate());
+//    findRental.setRentedMovies(null);
+//    findRental.setRentedMovies(updatedRental.getRentedMovies());
+//    handleRentedMovies(findRental);
+//    findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
     try {
-      savedRental = patientRepository.save(findRental);
+      savedPatient = patientRepository.save(findPatient);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ServiceUnavailable(e.getMessage());
     }
-    return savedRental;
+    return savedPatient;
   }
 
   /**
    * Deletes rental in the database.
    * @param id - id of the rental to be deleted
    */
-  public void deleteRentalById(Long id){
+  public void deletePatientById(Long id){
     patientRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.DELETE_RENTAL_FAILURE));
+        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.DELETE_PATIENT_FAILURE));
 
     try {
       patientRepository.deleteById(id);
@@ -193,7 +195,7 @@ public class PatientServiceImpl implements PatientService {
     List<String> errors = new ArrayList<>();
     List<String> emptyFields = getRentalFieldsEmptyOrNull(rental).get("emptyFields");
     List<String> nullFields = getRentalFieldsEmptyOrNull(rental).get("nullFields");
-    Set<String> rentedMovieErrors = getRentedMovieErrors(rental);
+//    Set<String> rentedMovieErrors = getRentedMovieErrors(rental);
 
     if (!nullFields.isEmpty()) {
       errors.add(StringConstants.MOVIE_FIELDS_NULL(nullFields));
@@ -203,9 +205,9 @@ public class PatientServiceImpl implements PatientService {
       errors.add(StringConstants.MOVIE_FIELDS_EMPTY(emptyFields));
     }
 
-    if (validateTotalRentalCost(rental)) {
-      errors.add(StringConstants.RENTAL_TOTAL_COST_INVALID);
-    }
+//    if (validateTotalRentalCost(rental)) {
+//      errors.add(StringConstants.RENTAL_TOTAL_COST_INVALID);
+//    }
 
     if(!validateDateStringFormat(rental) &&
         !emptyFields.contains("rentalDate") &&
@@ -213,9 +215,9 @@ public class PatientServiceImpl implements PatientService {
       errors.add(StringConstants.RENTAL_DATE_STRING_INVALID);
     }
 
-    if(!rentedMovieErrors.isEmpty()){
-      errors.addAll(rentedMovieErrors);
-    }
+//    if(!rentedMovieErrors.isEmpty()){
+//      errors.addAll(rentedMovieErrors);
+//    }
 
     return errors;
   }
@@ -230,24 +232,24 @@ public class PatientServiceImpl implements PatientService {
    * @param rental movie to be validated
    * @return boolean if dailyRentalCost is valid
    */
-  public Boolean validateTotalRentalCost(Patient rental) {
-    if (rental.getRentalTotalCost() != null) {
-      //Split price by the decimal
-      String[] rentalCostString = String.valueOf(rental.getRentalTotalCost()).split("\\.");
-      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
-      Boolean priceLessThanZero = rental.getRentalTotalCost() < 0;
-      return priceLessThanZero || priceMoreThan2Decimals;
-    }
-    return false;
-  }
+//  public Boolean validateTotalRentalCost(Patient rental) {
+//    if (rental.getRentalTotalCost() != null) {
+//      //Split price by the decimal
+//      String[] rentalCostString = String.valueOf(rental.getRentalTotalCost()).split("\\.");
+//      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
+//      Boolean priceLessThanZero = rental.getRentalTotalCost() < 0;
+//      return priceLessThanZero || priceMoreThan2Decimals;
+//    }
+//    return false;
+//  }
 
   public Boolean validateDateStringFormat(Patient rental) {
-    String regex = "^\\d{4}-\\d{2}-\\d{2}$";
-    Pattern pattern = Pattern.compile(regex);
-    if (rental.getRentalDate() != null) {
-      Matcher matcher = pattern.matcher(rental.getRentalDate());
-      return matcher.matches();
-    }
+//    String regex = "^\\d{4}-\\d{2}-\\d{2}$";
+//    Pattern pattern = Pattern.compile(regex);
+//    if (rental.getRentalDate() != null) {
+//      Matcher matcher = pattern.matcher(rental.getRentalDate());
+//      return matcher.matches();
+//    }
     return false;
   }
 
@@ -292,62 +294,62 @@ public class PatientServiceImpl implements PatientService {
    * @param rental - rental to be saved or updated
    * @return list of errors pertaining to the nested rented movie list.
    */
-  private Set<String> getRentedMovieErrors(Patient rental) {
-    // Get rentedMovies from each Rental
-    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
-    Set<String> rentedMovieErrors = new HashSet<>();
-
-    //Goes through each and adds invalid movie ids to error list.
-    List<Long> invalidMovieIds = new ArrayList<>();
-    Set<String> emptyFields = new HashSet<>();
-    Set<String> nullFields = new HashSet<>();
-    // If no rentedMovies add to error list
-    if (rentedMovieSet == null || rentedMovieSet.size() == 0) {
-      rentedMovieErrors.add(StringConstants.RENTAL_HAS_NO_RENTED_MOVIE);
-    }else {
-      rentedMovieSet.forEach(rentedMovie -> {
-        if (!validateMovieIdExists(rentedMovie) && rentedMovie.getMovieId() != null) {
-          invalidMovieIds.add(rentedMovie.getMovieId());
-        }else if (rentedMovie.getMovieId() == null) {
-          nullFields.add("movieId");
-        } else if (rentedMovie.getMovieId().toString().trim() == "") {
-          emptyFields.add("movieId");
-        }
-        if (rentedMovie.getDaysRented() <= 0) {
-          rentedMovieErrors.add(StringConstants.RENTED_MOVIE_DAYS_RENTED_INVALID);
-        }
-      });
-    }
-
-    if(!invalidMovieIds.isEmpty()){
-      rentedMovieErrors.add(StringConstants.RENTED_MOVIEID_INVALID(invalidMovieIds));
-    }
-
-    if(!emptyFields.isEmpty()){
-      rentedMovieErrors.add(StringConstants.RENTED_MOVIE_FIELDS_EMPTY(emptyFields));
-    }
-
-    if(!nullFields.isEmpty()){
-      rentedMovieErrors.add(StringConstants.RENTED_MOVIE_FIELDS_NULL(nullFields));
-    }
-
-    return rentedMovieErrors;
-    }
+//  private Set<String> getRentedMovieErrors(Patient rental) {
+//    // Get rentedMovies from each Rental
+//    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
+//    Set<String> rentedMovieErrors = new HashSet<>();
+//
+//    //Goes through each and adds invalid movie ids to error list.
+//    List<Long> invalidMovieIds = new ArrayList<>();
+//    Set<String> emptyFields = new HashSet<>();
+//    Set<String> nullFields = new HashSet<>();
+//    // If no rentedMovies add to error list
+//    if (rentedMovieSet == null || rentedMovieSet.size() == 0) {
+//      rentedMovieErrors.add(StringConstants.RENTAL_HAS_NO_RENTED_MOVIE);
+//    }else {
+//      rentedMovieSet.forEach(rentedMovie -> {
+//        if (!validateMovieIdExists(rentedMovie) && rentedMovie.getMovieId() != null) {
+//          invalidMovieIds.add(rentedMovie.getMovieId());
+//        }else if (rentedMovie.getMovieId() == null) {
+//          nullFields.add("movieId");
+//        } else if (rentedMovie.getMovieId().toString().trim() == "") {
+//          emptyFields.add("movieId");
+//        }
+//        if (rentedMovie.getDaysRented() <= 0) {
+//          rentedMovieErrors.add(StringConstants.RENTED_MOVIE_DAYS_RENTED_INVALID);
+//        }
+//      });
+//    }
+//
+//    if(!invalidMovieIds.isEmpty()){
+//      rentedMovieErrors.add(StringConstants.RENTED_MOVIEID_INVALID(invalidMovieIds));
+//    }
+//
+//    if(!emptyFields.isEmpty()){
+//      rentedMovieErrors.add(StringConstants.RENTED_MOVIE_FIELDS_EMPTY(emptyFields));
+//    }
+//
+//    if(!nullFields.isEmpty()){
+//      rentedMovieErrors.add(StringConstants.RENTED_MOVIE_FIELDS_NULL(nullFields));
+//    }
+//
+//    return rentedMovieErrors;
+//    }
 
   /**
    * Checks the movie repository for a valid movieId from a nested rented movie object.
    * @param rentedMovie - request object with a movie Id
    * @return Boolean if the movieId exists
    */
-  private Boolean validateMovieIdExists(RentedMovie rentedMovie){
-      List<Encounter> allMovies = movieRepository.findAll();
-      for(Encounter movie : allMovies){
-        if(movie.getId() == rentedMovie.getMovieId()){
-          return true;
-        }
-      }
-      return false;
-    }
+//  private Boolean validateMovieIdExists(RentedMovie rentedMovie){
+//      List<Encounter> allMovies = movieRepository.findAll();
+//      for(Encounter movie : allMovies){
+//        if(movie.getId() == rentedMovie.getMovieId()){
+//          return true;
+//        }
+//      }
+//      return false;
+//    }
 
   }
 

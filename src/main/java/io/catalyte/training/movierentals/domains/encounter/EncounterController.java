@@ -1,7 +1,6 @@
 package io.catalyte.training.movierentals.domains.encounter;
 
 import static io.catalyte.training.movierentals.constants.Paths.ENCOUNTERS_PATH;
-import static io.catalyte.training.movierentals.constants.Paths.MOVIES_PATH;
 
 import io.catalyte.training.movierentals.constants.LoggingConstants;
 import java.util.List;
