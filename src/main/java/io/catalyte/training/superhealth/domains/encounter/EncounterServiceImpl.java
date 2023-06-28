@@ -3,6 +3,7 @@ package io.catalyte.training.superhealth.domains.encounter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.superhealth.constants.LoggingConstants;
 import io.catalyte.training.superhealth.constants.StringConstants;
+import io.catalyte.training.superhealth.domains.patient.PatientRepository;
 import io.catalyte.training.superhealth.exceptions.BadRequest;
 import io.catalyte.training.superhealth.exceptions.ResourceNotFound;
 import io.catalyte.training.superhealth.exceptions.ServiceUnavailable;
@@ -33,63 +34,63 @@ public class EncounterServiceImpl implements EncounterService {
     this.encounterRepository = encounterRepository;
   }
 
-  /**
-   * Retrieves all products from the database, optionally making use of an example if it is passed.
-   *
-   * @return - a list of products matching the example, or all products if no example was passed
-   */
-  public List<Encounter> getEncounters() {
-    try {
-      return encounterRepository.findAll();
-    } catch (DataAccessException e) {
-      logger.error(e.getMessage());
-      throw new ServiceUnavailable(e.getMessage());
-    }
-  }
+//  /**
+//   * Retrieves all products from the database, optionally making use of an example if it is passed.
+//   *
+//   * @return - a list of products matching the example, or all products if no example was passed
+//   */
+//  public List<Encounter> getEncounters() {
+//    try {
+//      return encounterRepository.findAll();
+//    } catch (DataAccessException e) {
+//      logger.error(e.getMessage());
+//      throw new ServiceUnavailable(e.getMessage());
+//    }
+//  }
 
-  /**
-   * Retrieves the product with the provided id from the database.
-   *
-   * @param id - the id of the product to retrieve
-   * @return - the product
-   */
-  public Encounter getEncounterById(Long id) {
-    Encounter encounter;
-
-    try {
-      encounter = encounterRepository.findById(id).orElse(null);
-    } catch (DataAccessException e) {
-      logger.error(e.getMessage());
-      throw new ServiceUnavailable(e.getMessage());
-    }
-
-    if (encounter != null) {
-      return encounter;
-    } else {
-      logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
-      throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
-    }
-  }
+//  /**
+//   * Retrieves the product with the provided id from the database.
+//   *
+//   * @param id - the id of the product to retrieve
+//   * @return - the product
+//   */
+//  public Encounter getEncounterById(Long id) {
+//    Encounter encounter;
+//
+//    try {
+//      encounter = encounterRepository.findById(id).orElse(null);
+//    } catch (DataAccessException e) {
+//      logger.error(e.getMessage());
+//      throw new ServiceUnavailable(e.getMessage());
+//    }
+//
+//    if (encounter != null) {
+//      return encounter;
+//    } else {
+//      logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
+//      throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
+//    }
+//  }
 
   /**
    * Adds a movie to the database
    *
    * @param encounter - product object
    * @return list of movie objects that are added to database
-   */
-  public Encounter saveEncounter(Encounter encounter) {
-//    List<String> encounterErrors = getMovieErrors(encounter);
-//    if (!movieErrors.isEmpty()) {
-//      throw new BadRequest(String.join("\n", movieErrors));
+//   */
+//  public Encounter saveEncounter(Long patientId, Encounter encounter) {
+////    List<String> encounterErrors = getMovieErrors(encounter);
+////    if (!movieErrors.isEmpty()) {
+////      throw new BadRequest(String.join("\n", movieErrors));
+////    }
+//
+//    try {
+//      return patientRepository.save(encounter);
+//    } catch (DataAccessException e) {
+//      logger.error(e.getMessage());
+//      throw new ServiceUnavailable(e.getMessage());
 //    }
-
-    try {
-      return encounterRepository.save(encounter);
-    } catch (DataAccessException e) {
-      logger.error(e.getMessage());
-      throw new ServiceUnavailable(e.getMessage());
-    }
-  }
+//  }
 
   /**
    * Updates movie in the database.
@@ -98,65 +99,65 @@ public class EncounterServiceImpl implements EncounterService {
    * @return - updated movie object
    */
 
-  //TODO: Update Logging constants for Resource not found, etc.
-  public Encounter updateEncounter(Long id, Encounter encounter){
-    Encounter findEncounter;
-
-    try {
-     findEncounter  = encounterRepository.findById(id).orElse(null);
-    }catch(DataAccessException e) {
-      logger.error(e.getMessage());
-      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
-    }
-
-  if(findEncounter != null) {
-//    findMovie.setSku(movie.getSku());
-//    findMovie.setGenre(movie.getGenre());
-//    findMovie.setDirector(movie.getDirector());
-//    findMovie.setTitle(movie.getTitle());
-//    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
-//    findMovie.setId(id);
-  }
-    List<String> movieErrors = getMovieErrors(encounter);
-
-    if (!movieErrors.isEmpty()) {
-      throw new BadRequest(String.join("\n", movieErrors));
-    }
-
-    try{
-      return encounterRepository.save(findEncounter);
-    }catch (DataAccessException e){
-      logger.error(e.getMessage());
-      throw new ServiceUnavailable(e.getMessage());
-    }
-  }
-
-  /**
-   * Deletes movie in the database.
-   * @param id - id of the movie to be deleted
-   */
-  public void deleteEncounter(Long id){
-    Encounter findEncounter;
-
-    try {
-      findEncounter  = encounterRepository.findById(id).orElse(null);
-    }catch(DataAccessException e) {
-      logger.error(e.getMessage());
-      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
-    }
-
-    //validation for if there are encounters already?
-
-    if(findEncounter != null){
-      try {
-        encounterRepository.deleteById(id);
-      } catch (DataAccessException e){
-        logger.error(e.getMessage());
-        throw new ServiceUnavailable(e.getMessage());
-      }
-    }
-
-  }
+//  //TODO: Update Logging constants for Resource not found, etc.
+//  public Encounter updateEncounter(Long id, Encounter encounter){
+//    Encounter findEncounter;
+//
+//    try {
+//     findEncounter  = encounterRepository.findById(id).orElse(null);
+//    }catch(DataAccessException e) {
+//      logger.error(e.getMessage());
+//      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
+//    }
+//
+//  if(findEncounter != null) {
+////    findMovie.setSku(movie.getSku());
+////    findMovie.setGenre(movie.getGenre());
+////    findMovie.setDirector(movie.getDirector());
+////    findMovie.setTitle(movie.getTitle());
+////    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
+////    findMovie.setId(id);
+//  }
+//    List<String> movieErrors = getMovieErrors(encounter);
+//
+//    if (!movieErrors.isEmpty()) {
+//      throw new BadRequest(String.join("\n", movieErrors));
+//    }
+//
+//    try{
+//      return encounterRepository.save(findEncounter);
+//    }catch (DataAccessException e){
+//      logger.error(e.getMessage());
+//      throw new ServiceUnavailable(e.getMessage());
+//    }
+//  }
+//
+//  /**
+//   * Deletes movie in the database.
+//   * @param id - id of the movie to be deleted
+//   */
+//  public void deleteEncounter(Long id){
+//    Encounter findEncounter;
+//
+//    try {
+//      findEncounter  = encounterRepository.findById(id).orElse(null);
+//    }catch(DataAccessException e) {
+//      logger.error(e.getMessage());
+//      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
+//    }
+//
+//    //validation for if there are encounters already?
+//
+//    if(findEncounter != null){
+//      try {
+//        encounterRepository.deleteById(id);
+//      } catch (DataAccessException e){
+//        logger.error(e.getMessage());
+//        throw new ServiceUnavailable(e.getMessage());
+//      }
+//    }
+//
+//  }
 
 
   /**

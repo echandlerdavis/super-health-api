@@ -7,15 +7,15 @@ import java.util.List;
  */
 public interface EncounterService {
 
-  List<Encounter> getEncounters();
+//  List<Encounter> getEncounters();
 
-  Encounter getEncounterById(Long id);
+//  Encounter getEncounterById(Long id);
 
-  Encounter saveEncounter(Encounter encounter);
-
-  Encounter updateEncounter(Long id, Encounter encounter);
-
-  void deleteEncounter(Long id);
+//  Encounter saveEncounter(Encounter encounter);
+//
+//  Encounter updateEncounter(Long id, Encounter encounter);
+//
+//  void deleteEncounter(Long id);
 
 
 }
