@@ -1,5 +1,6 @@
 package io.catalyte.training.superhealth.data;
 
+import io.catalyte.training.superhealth.domains.encounter.Encounter;
 import io.catalyte.training.superhealth.domains.encounter.EncounterRepository;
 import io.catalyte.training.superhealth.domains.patient.Patient;
 import io.catalyte.training.superhealth.domains.patient.PatientRepository;
@@ -22,7 +23,7 @@ public class DemoData implements CommandLineRunner {
 
   private final Logger logger = LogManager.getLogger(DemoData.class);
   private final PatientFactory patientFactory = new PatientFactory();
-//  private final EncounterFactory encounterFactory = new EncounterFactory();
+  private final EncounterFactory encounterFactory = new EncounterFactory();
   @Autowired
   private EncounterRepository encounterRepository;
   @Autowired
@@ -58,11 +59,11 @@ public class DemoData implements CommandLineRunner {
     patientRepository.saveAll(patientList);
     logger.info("Loading random number of encounters...");
 
-//    for (Patient rental : rentalList){
-//      List<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
-//      rental.setRentedMovies(rentedMovieSet);
-//      rentedMovieRepository.saveAll(rentedMovieSet);
-//    }
+    for (Patient patient : patientList){
+      List<Encounter> encounterList = encounterFactory.generateRandomEncounterList(patient);
+      patient.setEncounters(encounterList);
+      encounterRepository.saveAll(encounterList);
+    }
 
     logger.info("Data load completed. You can make requests now.");
 

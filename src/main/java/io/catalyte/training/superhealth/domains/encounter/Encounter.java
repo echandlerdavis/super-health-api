@@ -1,6 +1,8 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.catalyte.training.superhealth.domains.patient.Patient;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -23,6 +25,7 @@ public class Encounter {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "patientId", referencedColumnName = "id")
+  @JsonIgnore
   private Patient patient;
 
   private String notes;
@@ -47,14 +50,14 @@ public class Encounter {
 
   private int diastolic;
 
-  private Date date;
+  private LocalDate date;
 
   public Encounter() {
   }
 
   public Encounter(Long id, Patient patient, String notes, String visitCode, String provider,
       String billingCode, String icd10, double totalCost, double copay, String chiefComplaint,
-      int pulse, int systolic, int diastolic, Date date) {
+      int pulse, int systolic, int diastolic, LocalDate date) {
     this.id = id;
     this.patient = patient;
     this.notes = notes;
@@ -174,11 +177,11 @@ public class Encounter {
     this.diastolic = diastolic;
   }
 
-  public Date getDate() {
+  public LocalDate getDate() {
     return date;
   }
 
-  public void setDate(Date date) {
+  public void setDate(LocalDate date) {
     this.date = date;
   }
 

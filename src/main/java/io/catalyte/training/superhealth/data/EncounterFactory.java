@@ -20,6 +20,24 @@ public class EncounterFactory {
       "Patient seems very chill and nice and is my favorite patient"
   };
 
+  public static final String[] providers = {
+      "Dr. Dolittle",
+      "Dr. Zhivago",
+      "Nurse Ratchet",
+      "Dr. Howser",
+      "Dr. House",
+      "Dr. Brennan"
+  };
+
+  public static final String[] complaints = {
+      "headache",
+      "backache",
+      "stomach ache",
+      "broken bone",
+      "cold",
+      "cough",
+      "fever"
+  };
 
   private static final Random randomGenerator = new Random();
 
@@ -27,6 +45,46 @@ public class EncounterFactory {
   private static String getRandomNote(){
     return notes[randomGenerator.nextInt(notes.length)];
   };
+
+  private static Character getRandomLetter(){
+    String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return letters.charAt(randomGenerator.nextInt(letters.length()));
+  };
+  private static String getRandomVisitCode(){
+    String visitCode = "";
+    while(visitCode.length() < 6){
+      visitCode += getRandomLetter();
+      visitCode += String.valueOf(randomGenerator.nextInt(10));
+    }
+  return visitCode.substring(0, 3) + " " + visitCode.substring(3);
+  };
+
+  private static String getRandomProvider(){
+    return providers[randomGenerator.nextInt(providers.length)];
+  }
+
+  private static String getRandomBillingCode(){
+    int d1 = randomGenerator.nextInt(1000);
+    int d2 = randomGenerator.nextInt(1000);
+    int d3 = randomGenerator.nextInt(1000);
+    int d4 = randomGenerator.nextInt(100);
+    return String.format("%03d.%03d.%03d-%02d", d1, d2, d3, d4);
+
+  }
+
+  private static String getRandomIcd10(){
+    return getRandomLetter() + (String.format("%02d", randomGenerator.nextInt(100)));
+  }
+
+  public static Double generateRandomPrice(double min, double max){
+    DecimalFormat df = new DecimalFormat("0.00");
+    return Double.valueOf(df.format((randomGenerator.nextDouble() * (max-min)) + min));
+  }
+
+  public static String getChiefComplaint(){
+    return complaints[randomGenerator.nextInt(complaints.length)];
+  };
+
   /**
    * Finds a random date between two date bounds.
    *
@@ -44,31 +102,36 @@ public class EncounterFactory {
     return LocalDate.ofEpochDay(randomDay);
   }
 
-  public static Double generateRandomTotalCost(double min, double max){
-    DecimalFormat df = new DecimalFormat("0.00");
-    return Double.valueOf(df.format((randomGenerator.nextDouble() * (max-min)) + min));
-  }
+
 
   public Encounter createRandomEncounter(Patient patient){
     Encounter encounter = new Encounter();
 //      Setters
       encounter.setPatient(patient);
       encounter.setNotes(EncounterFactory.getRandomNote());
-//    rental.setRentalDate(String.valueOf(
-//        between(LocalDate.parse("2000-01-01"), LocalDate.now())));
-//    rental.setRentalTotalCost(generateRandomTotalCost(1.0, 200.0));
+      encounter.setVisitCode(EncounterFactory.getRandomVisitCode());
+      encounter.setProvider(EncounterFactory.getRandomProvider());
+      encounter.setBillingCode(EncounterFactory.getRandomBillingCode());
+      encounter.setIcd10(EncounterFactory.getRandomIcd10());
+      encounter.setTotalCost(EncounterFactory.generateRandomPrice(1.0, 500.0));
+      encounter.setCopay(EncounterFactory.generateRandomPrice(1.0, 25.0));
+      encounter.setChiefComplaint(EncounterFactory.getChiefComplaint());
+      encounter.setPulse(randomGenerator.nextInt(100) + 50);
+      encounter.setSystolic(randomGenerator.nextInt(100) + 50);
+      encounter.setDiastolic(randomGenerator.nextInt(50) + 50);
+      encounter.setDate(between(LocalDate.parse("2000-01-01"), LocalDate.now()));
 
     return encounter;
 
   }
-  public List<Patient> generateRandomRentalList(int numberOfRentals){
-    List<Patient> rentalList = new ArrayList<>();
-
-    for(int i = 0; i < numberOfRentals; i++){
-      rentalList.add(createRandomRental());
+  public List<Encounter> generateRandomEncounterList(Patient patient){
+    List<Encounter> encounterList = new ArrayList<>();
+    int numberOfEncounters = randomGenerator.nextInt(5);
+    for(int i = 0; i < numberOfEncounters; i++){
+      encounterList.add(createRandomEncounter(patient));
     }
 
-    return rentalList;
+    return encounterList;
   }
 
   }

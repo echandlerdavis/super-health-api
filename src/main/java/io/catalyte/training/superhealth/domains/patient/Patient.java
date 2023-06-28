@@ -28,7 +28,7 @@ public class Patient {
 
   private String ssn;
 
-  @Column(unique = true)
+//  @Column(unique = true)
   private String email;
 
   private String street;
@@ -51,7 +51,6 @@ public class Patient {
 
   @OneToMany(mappedBy = "patient")
   @OnDelete(action = OnDeleteAction.NO_ACTION)
-  @JsonIgnore
   public List<Encounter> encounters;
 
   public Patient() {
