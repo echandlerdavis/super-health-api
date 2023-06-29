@@ -34,43 +34,48 @@ public class EncounterServiceImpl implements EncounterService {
     this.encounterRepository = encounterRepository;
   }
 
-//  /**
-//   * Retrieves all products from the database, optionally making use of an example if it is passed.
-//   *
-//   * @return - a list of products matching the example, or all products if no example was passed
-//   */
-//  public List<Encounter> getEncounters() {
-//    try {
-//      return encounterRepository.findAll();
-//    } catch (DataAccessException e) {
-//      logger.error(e.getMessage());
-//      throw new ServiceUnavailable(e.getMessage());
-//    }
-//  }
+  /**
+   * Retrieves all encounters from the database
+   *
+   * @return - all encounters
+   */
+  public List<Encounter> getEncounters() {
+    try {
+      return encounterRepository.findAll();
+    } catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
+    }
+  }
 
-//  /**
-//   * Retrieves the product with the provided id from the database.
-//   *
-//   * @param id - the id of the product to retrieve
-//   * @return - the product
-//   */
-//  public Encounter getEncounterById(Long id) {
-//    Encounter encounter;
-//
-//    try {
-//      encounter = encounterRepository.findById(id).orElse(null);
-//    } catch (DataAccessException e) {
-//      logger.error(e.getMessage());
-//      throw new ServiceUnavailable(e.getMessage());
-//    }
-//
-//    if (encounter != null) {
-//      return encounter;
-//    } else {
-//      logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
-//      throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
-//    }
-//  }
+  /**
+   * Retrieves the product with the provided id from the database.
+   *
+   * @param id - the id of the product to retrieve
+   * @return - the product
+   */
+  public Encounter getEncounterById(Long patientId, Long id) {
+    Encounter encounter;
+
+    try {
+      encounter = encounterRepository.findById(id).orElse(null);
+    } catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
+    }
+
+    //TODO: create constants message for this bad request;
+    if(encounter.getPatient().getId() != patientId){
+      throw new BadRequest();
+    }
+
+    if (encounter != null) {
+      return encounter;
+    } else {
+      logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
+      throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
+    }
+  }
 
   /**
    * Adds a movie to the database

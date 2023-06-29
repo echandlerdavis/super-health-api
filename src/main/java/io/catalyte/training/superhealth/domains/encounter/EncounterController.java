@@ -1,6 +1,7 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
 import static io.catalyte.training.superhealth.constants.Paths.ENCOUNTERS_PATH;
+import static io.catalyte.training.superhealth.constants.Paths.PATIENTS_PATH;
 
 import io.catalyte.training.superhealth.constants.LoggingConstants;
 import java.util.List;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The ProductController exposes endpoints for product related actions.
  */
 @RestController
-@RequestMapping(value = ENCOUNTERS_PATH)
+@RequestMapping(value = PATIENTS_PATH)
 public class EncounterController {
 
   Logger logger = LogManager.getLogger(EncounterController.class);
@@ -31,34 +32,34 @@ public class EncounterController {
   @Autowired
   private EncounterService encounterService;
 
-  /**
-   * Handles a GET request to /encounters - returns all encounters in the database.
-   *
-   * @return all movies in the database.
-   */
+//  /**
+//   * Handles a GET request to /encounters - returns all encounters in the database.
+//   *
+//   * @return all movies in the database.
+//   */
 //  @GetMapping
 //  public ResponseEntity<List<Encounter>> getEncounters() {
 //    logger.info(LoggingConstants.GET_ENCOUNTERS);
 //
 //    return new ResponseEntity<>(encounterService.getEncounters(), HttpStatus.OK);
 //  }
-//
-//  /**
-//   * Handles a GET request to /encounters/{id}- returns a single encounter based on an id defined in the
-//   * path variable
-//   *
-//   * @param id- path variable id
-//   * @return a single movie from the movie's id.
-//   */
-//  @GetMapping(value = "/{id}")
-//  @ResponseStatus(value = HttpStatus.OK)
-//  public ResponseEntity<Encounter> getEncounterById(@PathVariable Long id) {
-//    logger.info(LoggingConstants.GET_ENCOUNTER_BY_ID(id));
-//
-//    return new ResponseEntity<>(encounterService.getEncounterById(id), HttpStatus.OK);
-//  }
-//
-//
+
+  /**
+   * Handles a GET request to patients/{patientId}/encounters/{id}- returns a single encounter based on an id defined in the
+   * path variable
+   *
+   * @param id- path variable id
+   * @return a single movie from the movie's id.
+   */
+  @GetMapping(value = "{patientId}/encounters/{id}")
+  @ResponseStatus(value = HttpStatus.OK)
+  public ResponseEntity<Encounter> getEncounterById(@PathVariable Long patientId, @PathVariable Long id) {
+    logger.info(LoggingConstants.GET_ENCOUNTER_BY_ID(id));
+
+    return new ResponseEntity<>(encounterService.getEncounterById(patientId, id), HttpStatus.OK);
+  }
+
+
 //  /**
 //   * Handles a POST request to /encounters. This creates a new movie object that gets saved to the
 //   * database.
