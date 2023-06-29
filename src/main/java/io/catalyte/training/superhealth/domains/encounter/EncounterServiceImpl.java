@@ -88,6 +88,15 @@ public class EncounterServiceImpl implements EncounterService {
 ////    if (!movieErrors.isEmpty()) {
 ////      throw new BadRequest(String.join("\n", movieErrors));
 ////    }
+
+  //    if (validateTotalRentalCost(rental)) {
+//      errors.add(StringConstants.RENTAL_TOTAL_COST_INVALID);
+//    }
+//      if(!validateDateFormat(rental) &&
+//      !emptyFields.contains("rentalDate") &&
+//      !nullFields.contains("rentalDate")){
+//    errors.add(StringConstants.RENTAL_DATE_STRING_INVALID);
+//  }
 //
 //    try {
 //      return patientRepository.save(encounter);
@@ -95,6 +104,38 @@ public class EncounterServiceImpl implements EncounterService {
 //      logger.error(e.getMessage());
 //      throw new ServiceUnavailable(e.getMessage());
 //    }
+//  }
+
+
+  /**
+   * Checks that total rental cost is a double value greater than zero and does not have more than 2 digits after the
+   * decimal
+   * <p>
+   * Because price is stored as a double, regardless of input the product will always have 1 digit
+   * after the decimal even if input as an integer, or with 2 zeros after decimal
+   *
+   * @param patient movie to be validated
+   * @return boolean if dailyRentalCost is valid
+   */
+//  public Boolean validateTotalRentalCost(Patient rental) {
+//    if (rental.getRentalTotalCost() != null) {
+//      //Split price by the decimal
+//      String[] rentalCostString = String.valueOf(rental.getRentalTotalCost()).split("\\.");
+//      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
+//      Boolean priceLessThanZero = rental.getRentalTotalCost() < 0;
+//      return priceLessThanZero || priceMoreThan2Decimals;
+//    }
+//    return false;
+//  }
+
+//  public Boolean validateDateFormat(Patient patient) {
+//    String regex = "^\\d{4}-\\d{2}-\\d{2}$";
+//    Pattern pattern = Pattern.compile(regex);
+//    if (patient.getD() != null) {
+//      Matcher matcher = pattern.matcher(rental.getRentalDate());
+//      return matcher.matches();
+//    }
+//    return false;
 //  }
 
   /**
@@ -179,11 +220,11 @@ public class EncounterServiceImpl implements EncounterService {
 //    Boolean skuFormatIsValid= validateMovieSkuFormat(movie);
 
     if (!nullFields.isEmpty()) {
-      errors.add(StringConstants.MOVIE_FIELDS_NULL(nullFields));
+      errors.add(StringConstants.FIELDS_NULL(nullFields));
     }
 
     if (!emptyFields.isEmpty()) {
-      errors.add(StringConstants.MOVIE_FIELDS_EMPTY(emptyFields));
+      errors.add(StringConstants.FIELDS_EMPTY(emptyFields));
     }
 
     if (dailyRentalCostIsNotValid) {
@@ -235,22 +276,7 @@ public class EncounterServiceImpl implements EncounterService {
 ////    return false;
 //  };
 
-  /**
-   * Checks whether the sku of a movie attempting to be added or updated already exists in the database.
-   * @param newMovie - movie to be saved
-   * @return Boolean if the sku exists already.
-   */
-//  public Boolean movieSkuExists(Encounter newMovie){
-//    List<Encounter> allMovies = movieRepository.findAll();
-//    if(newMovie.getSku() != null){
-//      for(Encounter movie : allMovies){
-//        if (movie.getSku().equals(newMovie.getSku()) && movie.getId() != newMovie.getId()) {
-//        return true;
-//          }
-//      }
-//    }
-//    return false;
-//  }
+
 
   /**
    * Reads a movie fields and checks for fields that are empty or null

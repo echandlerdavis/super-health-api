@@ -3,8 +3,8 @@ package io.catalyte.training.superhealth.domains.encounter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.catalyte.training.superhealth.domains.patient.Patient;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,6 +27,9 @@ public class Encounter {
   @JoinColumn(name = "patientId", referencedColumnName = "id")
   @JsonIgnore
   private Patient patient;
+
+//  @Column(insertable = false, updatable = false)
+//  private Long patientId;
 
   private String notes;
 

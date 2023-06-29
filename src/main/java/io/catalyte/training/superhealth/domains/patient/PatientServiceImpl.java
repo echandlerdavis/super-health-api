@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.superhealth.constants.LoggingConstants;
 import io.catalyte.training.superhealth.constants.StringConstants;
 import io.catalyte.training.superhealth.exceptions.BadRequest;
+import io.catalyte.training.superhealth.exceptions.RequestConflict;
 import io.catalyte.training.superhealth.exceptions.ResourceNotFound;
 import io.catalyte.training.superhealth.exceptions.ServiceUnavailable;
 import java.lang.reflect.Field;
@@ -12,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +79,14 @@ public class PatientServiceImpl implements PatientService {
    * @return the persisted rental object
    */
   public Patient savePatient(Patient newPatient) {
-    List<String> patientErrors = getRentalErrors(newPatient);
+    List<String> patientErrors = getPatientErrors(newPatient);
 
     if(!patientErrors.isEmpty()){
       throw new BadRequest(String.join("\n", patientErrors));
+    }
+
+    if(patientEmailAlreadyExists(newPatient)){
+      throw new RequestConflict(StringConstants.EMAIL_ALREADY_EXISTS);
     }
 
     Patient savedPatient;
@@ -91,41 +98,10 @@ public class PatientServiceImpl implements PatientService {
       throw new ServiceUnavailable(e.getMessage());
     }
 
-    //TODO: find out if I need this
-    newPatient.setId(savedPatient.getId());
-//    newPatient.setRentedMovies(savedRental.getRentedMovies());
-//    handleRentedMovies(newRental);
 
     return savedPatient;
   }
 
-  /**
-   * Persists nested rented movie list to the database from a rental request object.
-   * @param rental rental to be saved or updated
-   */
-//  private void handleRentedMovies(Patient rental){
-//    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
-//    List<RentedMovie> findRentedMovies = rentedMovieRepository.findByRental(rental);
-//
-//    if(findRentedMovies != null){
-//      rentedMovieRepository.deleteAll(findRentedMovies);
-//    }
-//
-//    if(rentedMovieSet != null){
-//      rentedMovieSet.forEach(rentedMovie -> {
-//
-//        rentedMovie.setRental(rental);
-//        rentedMovie.setId(null);
-//
-//        try {
-//          rentedMovieRepository.save(rentedMovie);
-//        } catch (DataAccessException e) {
-//          logger.error(e.getMessage());
-//          throw new ServiceUnavailable(e.getMessage());
-//        }
-//      });
-//    }
-//  }
 
   /**
    * Updates and existing rental in the database
@@ -141,11 +117,13 @@ public class PatientServiceImpl implements PatientService {
       logger.error(e.getMessage());
       throw new ResourceNotFound(LoggingConstants.UPDATE_PATIENT_FAILURE);
     }
-    List<String> patientErrors = getRentalErrors(updatedPatient);
+    List<String> patientErrors = getPatientErrors(updatedPatient);
 
     if(!patientErrors.isEmpty()){
       throw new BadRequest(String.join("\n", patientErrors));
     }
+
+
 
     Patient savedPatient;
     findPatient.setId(id);
@@ -163,14 +141,18 @@ public class PatientServiceImpl implements PatientService {
     return savedPatient;
   }
 
+  //TODO: Fix this with the find patient thing. check if it's null, etc.
   /**
    * Deletes rental in the database.
    * @param id - id of the rental to be deleted
    */
   public void deletePatientById(Long id){
-    patientRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFound(LoggingConstants.DELETE_PATIENT_FAILURE));
-
+    try{
+      Patient findPatient = patientRepository.findById(id).orElse(null);
+    }catch (DataAccessException e){
+      logger.error(e.getMessage());
+      throw new ResourceNotFound(LoggingConstants.UPDATE_PATIENT_FAILURE);
+    }
     try {
       patientRepository.deleteById(id);
     } catch (DataAccessException e){
@@ -182,70 +164,26 @@ public class PatientServiceImpl implements PatientService {
   /**
    * Helper method that reads a rental and validates its properties
    *
-   * @param rental rental to be validated
+   * @param patient patient to be validated
    * @return a list of errors
    */
-  public List<String> getRentalErrors(Patient rental) {
+  public List<String> getPatientErrors(Patient patient) {
     List<String> errors = new ArrayList<>();
-    List<String> emptyFields = getRentalFieldsEmptyOrNull(rental).get("emptyFields");
-    List<String> nullFields = getRentalFieldsEmptyOrNull(rental).get("nullFields");
-//    Set<String> rentedMovieErrors = getRentedMovieErrors(rental);
+    List<String> emptyFields = getPatientFieldsEmptyOrNull(patient).get("emptyFields");
+    List<String> nullFields = getPatientFieldsEmptyOrNull(patient).get("nullFields");
 
     if (!nullFields.isEmpty()) {
-      errors.add(StringConstants.MOVIE_FIELDS_NULL(nullFields));
+      errors.add(StringConstants.FIELDS_NULL(nullFields));
     }
 
     if (!emptyFields.isEmpty()) {
-      errors.add(StringConstants.MOVIE_FIELDS_EMPTY(emptyFields));
+      errors.add(StringConstants.FIELDS_EMPTY(emptyFields));
     }
 
-//    if (validateTotalRentalCost(rental)) {
-//      errors.add(StringConstants.RENTAL_TOTAL_COST_INVALID);
-//    }
-
-    if(!validateDateStringFormat(rental) &&
-        !emptyFields.contains("rentalDate") &&
-        !nullFields.contains("rentalDate")){
-      errors.add(StringConstants.RENTAL_DATE_STRING_INVALID);
-    }
-
-//    if(!rentedMovieErrors.isEmpty()){
-//      errors.addAll(rentedMovieErrors);
-//    }
 
     return errors;
   }
 
-  /**
-   * Checks that total rental cost is a double value greater than zero and does not have more than 2 digits after the
-   * decimal
-   * <p>
-   * Because price is stored as a double, regardless of input the product will always have 1 digit
-   * after the decimal even if input as an integer, or with 2 zeros after decimal
-   *
-   * @param rental movie to be validated
-   * @return boolean if dailyRentalCost is valid
-   */
-//  public Boolean validateTotalRentalCost(Patient rental) {
-//    if (rental.getRentalTotalCost() != null) {
-//      //Split price by the decimal
-//      String[] rentalCostString = String.valueOf(rental.getRentalTotalCost()).split("\\.");
-//      Boolean priceMoreThan2Decimals = rentalCostString[1].length() > 2;
-//      Boolean priceLessThanZero = rental.getRentalTotalCost() < 0;
-//      return priceLessThanZero || priceMoreThan2Decimals;
-//    }
-//    return false;
-//  }
-
-  public Boolean validateDateStringFormat(Patient rental) {
-//    String regex = "^\\d{4}-\\d{2}-\\d{2}$";
-//    Pattern pattern = Pattern.compile(regex);
-//    if (rental.getRentalDate() != null) {
-//      Matcher matcher = pattern.matcher(rental.getRentalDate());
-//      return matcher.matches();
-//    }
-    return false;
-  }
 
   /**
    * Reads rental fields and checks for fields that are empty or null
@@ -253,25 +191,25 @@ public class PatientServiceImpl implements PatientService {
    * @param rental movie to be validated
    * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
    */
-  public HashMap<String, List<String>> getRentalFieldsEmptyOrNull(Patient rental) {
-    List<Field> rentalFields = Arrays.asList(Patient.class.getDeclaredFields());
-    List<String> rentalFieldNames = new ArrayList<>();
+  public HashMap<String, List<String>> getPatientFieldsEmptyOrNull(Patient rental) {
+    List<Field> patientFields = Arrays.asList(Patient.class.getDeclaredFields());
+    List<String> patientFieldNames = new ArrayList<>();
     List<String> emptyFields = new ArrayList<>();
     List<String> nullFields = new ArrayList<>();
     HashMap<String, List<String>> results = new HashMap<>();
     //Get product field names
-    rentalFields.forEach((field -> rentalFieldNames.add(field.getName())));
+    patientFields.forEach((field -> patientFieldNames.add(field.getName())));
     //Remove id as product will not have an id before it is saved
-    rentalFieldNames.remove("id");
+    patientFieldNames.remove("id");
     //Convert rental to a HashMap
     ObjectMapper mapper = new ObjectMapper();
-    Map rentalMap = mapper.convertValue(rental, HashMap.class);
+    Map patientMap = mapper.convertValue(rental, HashMap.class);
     //Loop through each fieldName to retrieve each rental mapping value of the field
-    rentalFieldNames.forEach((field) -> {
+    patientFieldNames.forEach((field) -> {
       //Check if the value for the rental's field is null or empty and place in the corresponding list
-      if (rentalMap.get(field) == null) {
+      if (patientMap.get(field) == null) {
         nullFields.add(field);
-      } else if (rentalMap.get(field).toString().trim() == "") {
+      } else if (patientMap.get(field).toString().trim() == "") {
         emptyFields.add(field);
       }
     });
@@ -344,6 +282,29 @@ public class PatientServiceImpl implements PatientService {
 //      }
 //      return false;
 //    }
+
+  /**
+   * Checks whether the sku of a movie attempting to be added or updated already exists in the database.
+   * @param newPatient - patient to be saved
+   * @return Boolean if the sku exists already.
+   */
+  public Boolean patientEmailAlreadyExists(Patient newPatient){
+    List<Patient> allPatients;
+    try{
+      allPatients = patientRepository.findAll();
+    } catch (DataAccessException e){
+      logger.error(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
+    }
+    if(newPatient.getEmail() != null){
+      for(Patient patient : allPatients){
+        if (patient.getEmail().equals(newPatient.getEmail()) && !patient.getId().equals(newPatient.getId())) {
+        return true;
+          }
+      }
+    }
+    return false;
+  }
 
   }
 
