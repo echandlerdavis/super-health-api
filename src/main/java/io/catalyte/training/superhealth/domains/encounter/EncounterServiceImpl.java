@@ -228,7 +228,7 @@ public class EncounterServiceImpl implements EncounterService {
     }
 
     if (dailyRentalCostIsNotValid) {
-      errors.add(StringConstants.MOVIE_RENTAL_COST_INVALID);
+      errors.add(StringConstants.STATE_INVALID);
     }
 
 //    if (!skuFormatIsValid) {

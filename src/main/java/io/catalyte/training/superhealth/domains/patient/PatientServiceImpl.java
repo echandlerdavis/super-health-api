@@ -3,6 +3,7 @@ package io.catalyte.training.superhealth.domains.patient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.superhealth.constants.LoggingConstants;
 import io.catalyte.training.superhealth.constants.StringConstants;
+import io.catalyte.training.superhealth.domains.encounter.Encounter;
 import io.catalyte.training.superhealth.exceptions.BadRequest;
 import io.catalyte.training.superhealth.exceptions.RequestConflict;
 import io.catalyte.training.superhealth.exceptions.ResourceNotFound;
@@ -88,6 +89,15 @@ public class PatientServiceImpl implements PatientService {
     if(patientEmailAlreadyExists(newPatient)){
       throw new RequestConflict(StringConstants.EMAIL_ALREADY_EXISTS);
     }
+
+    //set gender to be capitalized correctly if it is not.
+    String lowerCaseGender = newPatient.getGender().toLowerCase();
+    String formattedGender = lowerCaseGender.substring(0,1).toUpperCase() + lowerCaseGender.substring(1);
+    newPatient.setGender(formattedGender);
+
+    //set encounters to an empty array list.
+    List<Encounter> encounters = new ArrayList<>();
+    newPatient.setEncounters(encounters);
 
     Patient savedPatient;
 
@@ -202,6 +212,9 @@ public class PatientServiceImpl implements PatientService {
     if(!validateNumber(patient.getWeight())){
       errors.add(StringConstants.NUMBER_INVALID("Weight"));
     }
+    if(!validateGender(patient)){
+      errors.add(StringConstants.GENDER_INVALID);
+    }
 
     return errors;
   }
@@ -221,8 +234,10 @@ public class PatientServiceImpl implements PatientService {
     HashMap<String, List<String>> results = new HashMap<>();
     //Get product field names
     patientFields.forEach((field -> patientFieldNames.add(field.getName())));
-    //Remove id as product will not have an id before it is saved
+    //Remove id as patient will not have an id before it is saved
     patientFieldNames.remove("id");
+    //Remove encounters field as it can and should be null
+    patientFieldNames.remove("encounters");
     //Convert rental to a HashMap
     ObjectMapper mapper = new ObjectMapper();
     Map patientMap = mapper.convertValue(rental, HashMap.class);
@@ -284,8 +299,8 @@ public class PatientServiceImpl implements PatientService {
   };
 
   public Boolean validatePostalCode(Patient newPatient){
-    String regex1 = "^//d{5}$";
-    String regex2 = "^//d{5}-//d{4}$";
+    String regex1 = "^\\d{5}$";
+    String regex2 = "^\\d{5}-\\d{4}$";
     Pattern pattern1 = Pattern.compile(regex1);
     Pattern pattern2 = Pattern.compile(regex2);
     if (newPatient.getPostal() != null) {
@@ -300,7 +315,11 @@ public class PatientServiceImpl implements PatientService {
     return number > 0;
   }
 
-  public Boolean validateGender(Patient patient){
+  public Boolean validateGender(Patient newPatient){
+    String gender = newPatient.getGender().toLowerCase().trim();
+    if(gender.equals("male") || gender.equals("female") || gender.equals("other")){
+      return true;
+    }
     return false;
   };
   /**

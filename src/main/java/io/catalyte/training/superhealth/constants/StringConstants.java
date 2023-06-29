@@ -22,6 +22,7 @@ public class StringConstants {
   public static final String NUMBER_INVALID(String field){
     return field + " must be a number larger than zero.";
   };
+  public static final String GENDER_INVALID = "Gender must be set to 'Male', 'Female', or 'Other'";
   public static final String EMAIL_ALREADY_EXISTS = "Patient email already exists";
 
   // Error Messages - Encounters Validation
