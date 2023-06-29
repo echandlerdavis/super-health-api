@@ -39,11 +39,11 @@ public class Patient {
 
   private String postal;
 
-  private Number age;
+  private int age;
 
-  private Number height;
+  private int height;
 
-  private Number weight;
+  private int weight;
 
   private String insurance;
 
@@ -58,7 +58,7 @@ public class Patient {
 
   public Patient(Long id, String firstName, String lastName, String ssn, String email,
       String street,
-      String city, String state, String postal, Number age, Number height, Number weight,
+      String city, String state, String postal, int age, int height, int weight,
       String insurance, String gender) {
     this.id = id;
     this.firstName = firstName;
@@ -148,27 +148,27 @@ public class Patient {
     this.postal = postal;
   }
 
-  public Number getAge() {
+  public int getAge() {
     return age;
   }
 
-  public void setAge(Number age) {
+  public void setAge(int age) {
     this.age = age;
   }
 
-  public Number getHeight() {
+  public int getHeight() {
     return height;
   }
 
-  public void setHeight(Number height) {
+  public void setHeight(int height) {
     this.height = height;
   }
 
-  public Number getWeight() {
+  public int getWeight() {
     return weight;
   }
 
-  public void setWeight(Number weight) {
+  public void setWeight(int weight) {
     this.weight = weight;
   }
 
@@ -229,8 +229,8 @@ public class Patient {
     Patient patient = (Patient) o;
     return firstName.equals(patient.firstName) && lastName.equals(patient.lastName) && ssn.equals(
         patient.ssn) && email.equals(patient.email) && street.equals(patient.street) && city.equals(
-        patient.city) && state.equals(patient.state) && postal.equals(patient.postal) && age.equals(
-        patient.age) && height.equals(patient.height) && weight.equals(patient.weight)
+        patient.city) && state.equals(patient.state) && postal.equals(patient.postal) && age ==
+        patient.age && height == patient.height && weight == patient.weight
         && insurance.equals(patient.insurance) && gender.equals(patient.gender);
   }
 

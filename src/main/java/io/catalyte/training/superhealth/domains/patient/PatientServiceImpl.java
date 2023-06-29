@@ -175,11 +175,33 @@ public class PatientServiceImpl implements PatientService {
     if (!nullFields.isEmpty()) {
       errors.add(StringConstants.FIELDS_NULL(nullFields));
     }
-
     if (!emptyFields.isEmpty()) {
       errors.add(StringConstants.FIELDS_EMPTY(emptyFields));
     }
-
+    if(!validateNameFormat(patient.getFirstName()) || !validateNameFormat(patient.getLastName())){
+      errors.add(StringConstants.NAME_INVALID);
+    }
+    if(!validateSSN(patient)){
+      errors.add(StringConstants.SSN_INVALID);
+    }
+    if(!validateEmailFormat(patient)){
+      errors.add(StringConstants.EMAIL_INVALID);
+    }
+    if(!validateStateFormat(patient)){
+      errors.add(StringConstants.STATE_INVALID);
+    }
+    if(!validatePostalCode(patient)){
+      errors.add(StringConstants.POSTAL_CODE_INVALID);
+    }
+    if(!validateNumber(patient.getAge())){
+      errors.add(StringConstants.NUMBER_INVALID("Age"));
+    }
+    if(!validateNumber(patient.getHeight())){
+      errors.add(StringConstants.NUMBER_INVALID("Height"));
+    }
+    if(!validateNumber(patient.getWeight())){
+      errors.add(StringConstants.NUMBER_INVALID("Weight"));
+    }
 
     return errors;
   }
@@ -220,69 +242,67 @@ public class PatientServiceImpl implements PatientService {
     return results;
   }
 
-  /**
-   * Reads and validates nested rented movie objects from a rental attempting to be saved to the
-   * database.
-   * @param rental - rental to be saved or updated
-   * @return list of errors pertaining to the nested rented movie list.
-   */
-//  private Set<String> getRentedMovieErrors(Patient rental) {
-//    // Get rentedMovies from each Rental
-//    List<RentedMovie> rentedMovieSet = rental.getRentedMovies();
-//    Set<String> rentedMovieErrors = new HashSet<>();
-//
-//    //Goes through each and adds invalid movie ids to error list.
-//    List<Long> invalidMovieIds = new ArrayList<>();
-//    Set<String> emptyFields = new HashSet<>();
-//    Set<String> nullFields = new HashSet<>();
-//    // If no rentedMovies add to error list
-//    if (rentedMovieSet == null || rentedMovieSet.size() == 0) {
-//      rentedMovieErrors.add(StringConstants.RENTAL_HAS_NO_RENTED_MOVIE);
-//    }else {
-//      rentedMovieSet.forEach(rentedMovie -> {
-//        if (!validateMovieIdExists(rentedMovie) && rentedMovie.getMovieId() != null) {
-//          invalidMovieIds.add(rentedMovie.getMovieId());
-//        }else if (rentedMovie.getMovieId() == null) {
-//          nullFields.add("movieId");
-//        } else if (rentedMovie.getMovieId().toString().trim() == "") {
-//          emptyFields.add("movieId");
-//        }
-//        if (rentedMovie.getDaysRented() <= 0) {
-//          rentedMovieErrors.add(StringConstants.RENTED_MOVIE_DAYS_RENTED_INVALID);
-//        }
-//      });
-//    }
-//
-//    if(!invalidMovieIds.isEmpty()){
-//      rentedMovieErrors.add(StringConstants.RENTED_MOVIEID_INVALID(invalidMovieIds));
-//    }
-//
-//    if(!emptyFields.isEmpty()){
-//      rentedMovieErrors.add(StringConstants.RENTED_MOVIE_FIELDS_EMPTY(emptyFields));
-//    }
-//
-//    if(!nullFields.isEmpty()){
-//      rentedMovieErrors.add(StringConstants.RENTED_MOVIE_FIELDS_NULL(nullFields));
-//    }
-//
-//    return rentedMovieErrors;
-//    }
+  public Boolean validateNameFormat(String nameString){
+    String regex = "^[a-zA-Z\\s'-]+$";
+    Pattern pattern = Pattern.compile(regex);
+    if (nameString != null) {
+      Matcher matcher = pattern.matcher(nameString);
+      return matcher.matches();
+    }
+    return false;
+  };
 
-  /**
-   * Checks the movie repository for a valid movieId from a nested rented movie object.
-   * @param rentedMovie - request object with a movie Id
-   * @return Boolean if the movieId exists
-   */
-//  private Boolean validateMovieIdExists(RentedMovie rentedMovie){
-//      List<Encounter> allMovies = movieRepository.findAll();
-//      for(Encounter movie : allMovies){
-//        if(movie.getId() == rentedMovie.getMovieId()){
-//          return true;
-//        }
-//      }
-//      return false;
-//    }
+  public Boolean validateSSN(Patient newPatient){
+    String regex = "^\\d{3}-\\d{2}-\\d{4}$";
+    Pattern pattern = Pattern.compile(regex);
+    if (newPatient.getSsn() != null) {
+      Matcher matcher = pattern.matcher(newPatient.getSsn());
+      return matcher.matches();
+    }
+    return false;
+  };
 
+  public Boolean validateEmailFormat(Patient newPatient){
+    String regex = "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]+$";
+    Pattern pattern = Pattern.compile(regex);
+    if (newPatient.getEmail() != null) {
+      Matcher matcher = pattern.matcher(newPatient.getEmail());
+      return matcher.matches();
+    }
+    return false;
+
+  };
+
+  public Boolean validateStateFormat(Patient newPatient){
+    String regex = "^[A-Z]{2}$";
+    Pattern pattern = Pattern.compile(regex);
+    if (newPatient.getState() != null) {
+      Matcher matcher = pattern.matcher(newPatient.getState());
+      return matcher.matches();
+    }
+    return false;
+  };
+
+  public Boolean validatePostalCode(Patient newPatient){
+    String regex1 = "^//d{5}$";
+    String regex2 = "^//d{5}-//d{4}$";
+    Pattern pattern1 = Pattern.compile(regex1);
+    Pattern pattern2 = Pattern.compile(regex2);
+    if (newPatient.getPostal() != null) {
+      Matcher matcher1 = pattern1.matcher(newPatient.getPostal());
+      Matcher matcher2 = pattern2.matcher(newPatient.getPostal());
+      return matcher1.matches() || matcher2.matches();
+    }
+    return false;
+  };
+
+  public Boolean validateNumber(int number){
+    return number > 0;
+  }
+
+  public Boolean validateGender(Patient patient){
+    return false;
+  };
   /**
    * Checks whether the sku of a movie attempting to be added or updated already exists in the database.
    * @param newPatient - patient to be saved

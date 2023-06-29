@@ -14,10 +14,16 @@ public class StringConstants {
   public static final String SERVICE_UNAVAILABLE = "503 Service Unavailable";
 
   // Error Messages - Patient Validation
-  public static final String MOVIE_RENTAL_COST_INVALID = "Daily rental cost must be a number greater than 0 with 2 digits after the decimal place";
-  public static final String MOVIE_SKU_INVALID = "Movie SKU must match the format XXXXXX-DDDD where 'X' is a capital letter and 'D' is a single digit";
-
+  public static final String NAME_INVALID = "Name fields must only contain alphabetic characters, an apostrophe, or a hyphen";
+  public static final String SSN_INVALID = "Must be a valid SSN with format DDD-DD-DDDD";
+  public static final String EMAIL_INVALID = "Email must match the format A@L.L where 'A' any number of alphanumeric characters, and 'L' is any number of alphabetic characters.";
+  public static final String STATE_INVALID = "State input must be two capital letters";
+  public static final String POSTAL_CODE_INVALID = "Postal input must match format 'DDDDD' or 'DDDDD-DDDD'";
+  public static final String NUMBER_INVALID(String field){
+    return field + " must be a number larger than zero.";
+  };
   public static final String EMAIL_ALREADY_EXISTS = "Patient email already exists";
+
   // Error Messages - Encounters Validation
   public static final String RENTAL_DATE_STRING_INVALID = "Rental Date must match format 'YYYY-MM-DD'";
   public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Rental must have at least one rentedMovie";
