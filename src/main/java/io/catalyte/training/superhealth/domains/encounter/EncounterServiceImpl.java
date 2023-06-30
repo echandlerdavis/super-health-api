@@ -3,8 +3,10 @@ package io.catalyte.training.superhealth.domains.encounter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.superhealth.constants.LoggingConstants;
 import io.catalyte.training.superhealth.constants.StringConstants;
-import io.catalyte.training.superhealth.domains.patient.PatientRepository;
+import io.catalyte.training.superhealth.domains.patient.Patient;
+import io.catalyte.training.superhealth.domains.patient.PatientService;
 import io.catalyte.training.superhealth.exceptions.BadRequest;
+import io.catalyte.training.superhealth.exceptions.RequestConflict;
 import io.catalyte.training.superhealth.exceptions.ResourceNotFound;
 import io.catalyte.training.superhealth.exceptions.ServiceUnavailable;
 import java.lang.reflect.Field;
@@ -29,23 +31,12 @@ public class EncounterServiceImpl implements EncounterService {
 
   EncounterRepository encounterRepository;
 
-  @Autowired
-  public EncounterServiceImpl(EncounterRepository encounterRepository) {
-    this.encounterRepository = encounterRepository;
-  }
+  PatientService patientService;
 
-  /**
-   * Retrieves all encounters from the database
-   *
-   * @return - all encounters
-   */
-  public List<Encounter> getEncounters() {
-    try {
-      return encounterRepository.findAll();
-    } catch (DataAccessException e) {
-      logger.error(e.getMessage());
-      throw new ServiceUnavailable(e.getMessage());
-    }
+  @Autowired
+  public EncounterServiceImpl(EncounterRepository encounterRepository, PatientService patientService) {
+    this.encounterRepository = encounterRepository;
+    this.patientService = patientService;
   }
 
   /**
@@ -83,13 +74,23 @@ public class EncounterServiceImpl implements EncounterService {
    * @param encounter - product object
    * @return list of movie objects that are added to database
 //   */
-//  public Encounter saveEncounter(Long patientId, Encounter encounter) {
-////    List<String> encounterErrors = getMovieErrors(encounter);
-////    if (!movieErrors.isEmpty()) {
-////      throw new BadRequest(String.join("\n", movieErrors));
-////    }
+  public Encounter saveEncounter(Long patientId, Encounter encounter) {
+    if(encounter.getPatientId() == null){
+      encounter.setPatientId(patientId);
+    }
+    if(patientId != encounter.getPatientId()){
+      throw new RequestConflict(StringConstants.PATIENT_ID_INVALID);
+    }
+    encounter.setPatient(patientService.getPatientById(patientId));
 
-  //    if (validateTotalRentalCost(rental)) {
+    List<String> encounterErrors = getEncounterErrors(encounter);
+    if (!encounterErrors.isEmpty()) {
+      throw new BadRequest(String.join("\n", encounterErrors));
+    }
+
+
+
+//      if (validateTotalRentalCost(rental)) {
 //      errors.add(StringConstants.RENTAL_TOTAL_COST_INVALID);
 //    }
 //      if(!validateDateFormat(rental) &&
@@ -97,14 +98,14 @@ public class EncounterServiceImpl implements EncounterService {
 //      !nullFields.contains("rentalDate")){
 //    errors.add(StringConstants.RENTAL_DATE_STRING_INVALID);
 //  }
-//
-//    try {
-//      return patientRepository.save(encounter);
-//    } catch (DataAccessException e) {
-//      logger.error(e.getMessage());
-//      throw new ServiceUnavailable(e.getMessage());
-//    }
-//  }
+
+    try {
+      return encounterRepository.save(encounter);
+    } catch (DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
+    }
+  }
 
 
   /**
@@ -212,7 +213,7 @@ public class EncounterServiceImpl implements EncounterService {
    * @param movie movie to be validated
    * @return a list of errors
    */
-  public List<String> getMovieErrors(Encounter movie) {
+  public List<String> getEncounterErrors(Encounter movie) {
     List<String> errors = new ArrayList<>();
     Boolean dailyRentalCostIsNotValid = validateDailyRentalCost(movie);
     List<String> emptyFields = getFieldsEmptyOrNull(movie).get("emptyFields");

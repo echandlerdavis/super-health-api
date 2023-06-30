@@ -32,18 +32,6 @@ public class EncounterController {
   @Autowired
   private EncounterService encounterService;
 
-//  /**
-//   * Handles a GET request to /encounters - returns all encounters in the database.
-//   *
-//   * @return all movies in the database.
-//   */
-//  @GetMapping
-//  public ResponseEntity<List<Encounter>> getEncounters() {
-//    logger.info(LoggingConstants.GET_ENCOUNTERS);
-//
-//    return new ResponseEntity<>(encounterService.getEncounters(), HttpStatus.OK);
-//  }
-
   /**
    * Handles a GET request to patients/{patientId}/encounters/{id}- returns a single encounter based on an id defined in the
    * path variable
@@ -60,18 +48,18 @@ public class EncounterController {
   }
 
 
-//  /**
-//   * Handles a POST request to /encounters. This creates a new movie object that gets saved to the
-//   * database.
-//   *
-//   * @param encounter - movie object
-//   * @return encounter added to database
-//   */
-//  @PostMapping
-//  public ResponseEntity<Encounter> postEncounter(@RequestBody Encounter encounter) {
-//    logger.info(LoggingConstants.POST_ENCOUNTER);
-//    return new ResponseEntity<>(encounterService.saveEncounter(encounter), HttpStatus.CREATED);
-//  }
+  /**
+   * Handles a POST request to /encounters. This creates a new movie object that gets saved to the
+   * database.
+   *
+   * @param encounter - movie object
+   * @return encounter added to database
+   */
+  @PostMapping
+  public ResponseEntity<Encounter> postEncounter(@RequestBody Encounter encounter) {
+    logger.info(LoggingConstants.POST_ENCOUNTER);
+    return new ResponseEntity<>(encounterService.saveEncounter(encounter), HttpStatus.CREATED);
+  }
 //
 //  /**
 //   * Handles a PUT request to /encounters/id. This updates an existing encounter object that gets saved to the

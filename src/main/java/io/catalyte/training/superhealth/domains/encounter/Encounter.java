@@ -1,11 +1,10 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.catalyte.training.superhealth.domains.patient.Patient;
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,7 +28,8 @@ public class Encounter {
   @JsonIgnore
   private Patient patient;
 
-  //do a patient id that is set not from the info above. Validate that it's equal to the patient.
+  private Long patientId;
+
   private String notes;
 
   private String visitCode;
@@ -52,16 +52,18 @@ public class Encounter {
 
   private int diastolic;
 
+  @JsonFormat(pattern = "YYYY-MM-DD")
   private LocalDate date;
 
   public Encounter() {
   }
 
-  public Encounter(Long id, Patient patient, String notes, String visitCode, String provider,
+  public Encounter(Long id, Patient patient, Long patientId, String notes, String visitCode, String provider,
       String billingCode, String icd10, double totalCost, double copay, String chiefComplaint,
       int pulse, int systolic, int diastolic, LocalDate date) {
     this.id = id;
     this.patient = patient;
+    this.patientId = patientId;
     this.notes = notes;
     this.visitCode = visitCode;
     this.provider = provider;
@@ -89,6 +91,14 @@ public class Encounter {
 
   public void setPatient(Patient patient) {
     this.patient = patient;
+  }
+
+  public Long getPatientId() {
+    return patientId;
+  }
+
+  public void setPatientId(Long patientId) {
+    this.patientId = patientId;
   }
 
   public String getNotes() {
@@ -199,7 +209,7 @@ public class Encounter {
     return Double.compare(encounter.totalCost, totalCost) == 0
         && Double.compare(encounter.copay, copay) == 0 && pulse == encounter.pulse
         && systolic == encounter.systolic && diastolic == encounter.diastolic && patient.equals(
-        encounter.patient) && notes.equals(encounter.notes) && visitCode.equals(encounter.visitCode)
+        encounter.patient) && (patientId == encounter.patientId) && notes.equals(encounter.notes) && visitCode.equals(encounter.visitCode)
         && provider.equals(encounter.provider) && billingCode.equals(encounter.billingCode)
         && icd10.equals(encounter.icd10) && chiefComplaint.equals(encounter.chiefComplaint)
         && date.equals(encounter.date);
@@ -207,7 +217,7 @@ public class Encounter {
 
   @Override
   public int hashCode() {
-    return Objects.hash(patient, notes, visitCode, provider, billingCode, icd10, totalCost, copay,
+    return Objects.hash(patient, patientId, notes, visitCode, provider, billingCode, icd10, totalCost, copay,
         chiefComplaint, pulse, systolic, diastolic, date);
   }
 

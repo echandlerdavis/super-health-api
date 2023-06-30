@@ -26,6 +26,7 @@ public class StringConstants {
   public static final String EMAIL_ALREADY_EXISTS = "Patient email already exists";
 
   // Error Messages - Encounters Validation
+  public static final String PATIENT_ID_INVALID = "The patientId you entered does not match your request.";
   public static final String RENTAL_DATE_STRING_INVALID = "Rental Date must match format 'YYYY-MM-DD'";
   public static final String RENTAL_HAS_NO_RENTED_MOVIE = "Rental must have at least one rentedMovie";
   public static final String RENTED_MOVIE_DAYS_RENTED_INVALID = "The number of days rented must be greater than 0";

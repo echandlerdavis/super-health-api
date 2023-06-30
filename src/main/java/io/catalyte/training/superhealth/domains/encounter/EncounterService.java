@@ -7,11 +7,9 @@ import java.util.List;
  */
 public interface EncounterService {
 
-  List<Encounter> getEncounters();
-
   Encounter getEncounterById(Long patientId, Long id);
 
-//  Encounter saveEncounter(Encounter encounter);
+  Encounter saveEncounter(Encounter encounter);
 //
 //  Encounter updateEncounter(Long id, Encounter encounter);
 //
