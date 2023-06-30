@@ -1,6 +1,7 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.catalyte.training.superhealth.domains.patient.Patient;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -28,9 +29,7 @@ public class Encounter {
   @JsonIgnore
   private Patient patient;
 
-//  @Column(insertable = false, updatable = false)
-//  private Long patientId;
-
+  //do a patient id that is set not from the info above. Validate that it's equal to the patient.
   private String notes;
 
   private String visitCode;
