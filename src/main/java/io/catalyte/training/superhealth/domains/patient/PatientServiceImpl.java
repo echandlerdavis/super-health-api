@@ -132,16 +132,31 @@ public class PatientServiceImpl implements PatientService {
     if(!patientErrors.isEmpty()){
       throw new BadRequest(String.join("\n", patientErrors));
     }
+    if(patientEmailAlreadyExists(updatedPatient)){
+      throw new RequestConflict(StringConstants.EMAIL_ALREADY_EXISTS);
+    }
 
-
+    //set gender to be capitalized correctly if it is not.
+    String lowerCaseGender = updatedPatient.getGender().toLowerCase();
+    String formattedGender = lowerCaseGender.substring(0,1).toUpperCase() + lowerCaseGender.substring(1);
+    updatedPatient.setGender(formattedGender);
 
     Patient savedPatient;
     findPatient.setId(id);
-//    findRental.setRentalDate(updatedRental.getRentalDate());
-//    findRental.setRentedMovies(null);
-//    findRental.setRentedMovies(updatedRental.getRentedMovies());
-//    handleRentedMovies(findRental);
-//    findRental.setRentalTotalCost(updatedRental.getRentalTotalCost());
+    findPatient.setFirstName(updatedPatient.getFirstName());
+    findPatient.setLastName(updatedPatient.getLastName());
+    findPatient.setSsn(updatedPatient.getSsn());
+    findPatient.setEmail(updatedPatient.getEmail());
+    findPatient.setStreet(updatedPatient.getStreet());
+    findPatient.setCity(updatedPatient.getCity());
+    findPatient.setState(updatedPatient.getState());
+    findPatient.setPostal(updatedPatient.getPostal());
+    findPatient.setAge(updatedPatient.getAge());
+    findPatient.setHeight(updatedPatient.getHeight());
+    findPatient.setWeight(updatedPatient.getWeight());
+    findPatient.setInsurance(updatedPatient.getInsurance());
+    findPatient.setGender(updatedPatient.getGender());
+
     try {
       savedPatient = patientRepository.save(findPatient);
     }catch (DataAccessException e){
