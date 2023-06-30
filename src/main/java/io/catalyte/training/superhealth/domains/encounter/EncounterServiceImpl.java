@@ -3,9 +3,7 @@ package io.catalyte.training.superhealth.domains.encounter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.catalyte.training.superhealth.constants.LoggingConstants;
 import io.catalyte.training.superhealth.constants.StringConstants;
-import io.catalyte.training.superhealth.domains.patient.Patient;
 import io.catalyte.training.superhealth.domains.patient.PatientService;
-import io.catalyte.training.superhealth.domains.patient.PatientServiceImpl;
 import io.catalyte.training.superhealth.exceptions.BadRequest;
 import io.catalyte.training.superhealth.exceptions.RequestConflict;
 import io.catalyte.training.superhealth.exceptions.ResourceNotFound;
@@ -18,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.persistence.criteria.CriteriaBuilder.In;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +69,7 @@ public class EncounterServiceImpl implements EncounterService {
     }
   }
 
+  //TODO: Test Validation.
   /**
    * Adds a movie to the database
    *
@@ -110,11 +108,7 @@ public class EncounterServiceImpl implements EncounterService {
       throw new ServiceUnavailable(e.getMessage());
     }
   }
-
-
-
-
-
+  
 
   /**
    * Updates movie in the database.
