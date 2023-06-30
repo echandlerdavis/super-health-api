@@ -52,13 +52,13 @@ public class EncounterController {
    * Handles a POST request to /encounters. This creates a new movie object that gets saved to the
    * database.
    *
-   * @param encounter - movie object
+   * @param encounterDTO - movie object
    * @return encounter added to database
    */
-  @PostMapping
-  public ResponseEntity<Encounter> postEncounter(@RequestBody Encounter encounter) {
+  @PostMapping(value = "{patientId}/encounters")
+  public ResponseEntity<Encounter> postEncounter(@PathVariable Long patientId, @RequestBody EncounterDTO encounterDTO) {
     logger.info(LoggingConstants.POST_ENCOUNTER);
-    return new ResponseEntity<>(encounterService.saveEncounter(encounter), HttpStatus.CREATED);
+    return new ResponseEntity<>(encounterService.saveEncounter(patientId, encounterDTO), HttpStatus.CREATED);
   }
 //
 //  /**

@@ -9,7 +9,7 @@ public interface EncounterService {
 
   Encounter getEncounterById(Long patientId, Long id);
 
-  Encounter saveEncounter(Encounter encounter);
+  Encounter saveEncounter(Long patientId, EncounterDTO encounterDTO);
 //
 //  Encounter updateEncounter(Long id, Encounter encounter);
 //

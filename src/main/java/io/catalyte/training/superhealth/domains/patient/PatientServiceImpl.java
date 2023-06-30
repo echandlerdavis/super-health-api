@@ -28,7 +28,6 @@ public class PatientServiceImpl implements PatientService {
   private final Logger logger = LogManager.getLogger(PatientServiceImpl.class);
 
   PatientRepository patientRepository;
-//  EncounterRepository encounterRepository;
 
   @Autowired
   public PatientServiceImpl(PatientRepository patientRepository) {

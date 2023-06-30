@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.criteria.CriteriaBuilder.In;
 
 /**
  * This class is a representation of a patient encounter.
@@ -28,8 +29,6 @@ public class Encounter {
   @JsonIgnore
   private Patient patient;
 
-  private Long patientId;
-
   private String notes;
 
   private String visitCode;
@@ -40,30 +39,28 @@ public class Encounter {
 
   private String icd10;
 
-  private double totalCost;
+  private Double totalCost;
 
-  private double copay;
+  private Double copay;
 
   private String chiefComplaint;
 
-  private int pulse;
+  private Integer pulse;
 
-  private int systolic;
+  private Integer systolic;
 
-  private int diastolic;
+  private Integer diastolic;
 
-  @JsonFormat(pattern = "YYYY-MM-DD")
   private LocalDate date;
 
   public Encounter() {
   }
 
-  public Encounter(Long id, Patient patient, Long patientId, String notes, String visitCode, String provider,
-      String billingCode, String icd10, double totalCost, double copay, String chiefComplaint,
-      int pulse, int systolic, int diastolic, LocalDate date) {
+  public Encounter(Long id, Patient patient, String notes, String visitCode, String provider,
+      String billingCode, String icd10, Double totalCost, Double copay, String chiefComplaint,
+      Integer pulse, Integer systolic, Integer diastolic, LocalDate date) {
     this.id = id;
     this.patient = patient;
-    this.patientId = patientId;
     this.notes = notes;
     this.visitCode = visitCode;
     this.provider = provider;
@@ -91,14 +88,6 @@ public class Encounter {
 
   public void setPatient(Patient patient) {
     this.patient = patient;
-  }
-
-  public Long getPatientId() {
-    return patientId;
-  }
-
-  public void setPatientId(Long patientId) {
-    this.patientId = patientId;
   }
 
   public String getNotes() {
@@ -141,11 +130,11 @@ public class Encounter {
     this.icd10 = icd10;
   }
 
-  public double getTotalCost() {
+  public Double getTotalCost() {
     return totalCost;
   }
 
-  public void setTotalCost(double totalCost) {
+  public void setTotalCost(Double totalCost) {
     this.totalCost = totalCost;
   }
 
@@ -153,7 +142,7 @@ public class Encounter {
     return copay;
   }
 
-  public void setCopay(double copay) {
+  public void setCopay(Double copay) {
     this.copay = copay;
   }
 
@@ -165,27 +154,27 @@ public class Encounter {
     this.chiefComplaint = chiefComplaint;
   }
 
-  public int getPulse() {
+  public Integer getPulse() {
     return pulse;
   }
 
-  public void setPulse(int pulse) {
+  public void setPulse(Integer pulse) {
     this.pulse = pulse;
   }
 
-  public int getSystolic() {
+  public Integer getSystolic() {
     return systolic;
   }
 
-  public void setSystolic(int systolic) {
+  public void setSystolic(Integer systolic) {
     this.systolic = systolic;
   }
 
-  public int getDiastolic() {
+  public Integer getDiastolic() {
     return diastolic;
   }
 
-  public void setDiastolic(int diastolic) {
+  public void setDiastolic(Integer diastolic) {
     this.diastolic = diastolic;
   }
 
@@ -209,7 +198,7 @@ public class Encounter {
     return Double.compare(encounter.totalCost, totalCost) == 0
         && Double.compare(encounter.copay, copay) == 0 && pulse == encounter.pulse
         && systolic == encounter.systolic && diastolic == encounter.diastolic && patient.equals(
-        encounter.patient) && (patientId == encounter.patientId) && notes.equals(encounter.notes) && visitCode.equals(encounter.visitCode)
+        encounter.patient) && notes.equals(encounter.notes) && visitCode.equals(encounter.visitCode)
         && provider.equals(encounter.provider) && billingCode.equals(encounter.billingCode)
         && icd10.equals(encounter.icd10) && chiefComplaint.equals(encounter.chiefComplaint)
         && date.equals(encounter.date);
@@ -217,7 +206,7 @@ public class Encounter {
 
   @Override
   public int hashCode() {
-    return Objects.hash(patient, patientId, notes, visitCode, provider, billingCode, icd10, totalCost, copay,
+    return Objects.hash(patient, notes, visitCode, provider, billingCode, icd10, totalCost, copay,
         chiefComplaint, pulse, systolic, diastolic, date);
   }
 
