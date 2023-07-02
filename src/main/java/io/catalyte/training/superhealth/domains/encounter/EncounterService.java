@@ -10,8 +10,8 @@ public interface EncounterService {
   Encounter getEncounterById(Long patientId, Long id);
 
   Encounter saveEncounter(Long patientId, EncounterDTO encounterDTO);
-//
-//  Encounter updateEncounter(Long id, Encounter encounter);
+
+  Encounter updateEncounter(Long patientId, Long id, EncounterDTO encounterDTO);
 //
 //  void deleteEncounter(Long id);
 

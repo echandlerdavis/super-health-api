@@ -108,7 +108,7 @@ public class EncounterServiceImpl implements EncounterService {
       throw new ServiceUnavailable(e.getMessage());
     }
   }
-  
+
 
   /**
    * Updates movie in the database.
@@ -118,37 +118,48 @@ public class EncounterServiceImpl implements EncounterService {
    */
 
 //  //TODO: Update Logging constants for Resource not found, etc.
-//  public Encounter updateEncounter(Long id, Encounter encounter){
-//    Encounter findEncounter;
-//
-//    try {
-//     findEncounter  = encounterRepository.findById(id).orElse(null);
-//    }catch(DataAccessException e) {
-//      logger.error(e.getMessage());
-//      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
-//    }
-//
-//  if(findEncounter != null) {
-////    findMovie.setSku(movie.getSku());
-////    findMovie.setGenre(movie.getGenre());
-////    findMovie.setDirector(movie.getDirector());
-////    findMovie.setTitle(movie.getTitle());
-////    findMovie.setDailyRentalCost(movie.getDailyRentalCost());
-////    findMovie.setId(id);
-//  }
-//    List<String> movieErrors = getMovieErrors(encounter);
-//
-//    if (!movieErrors.isEmpty()) {
-//      throw new BadRequest(String.join("\n", movieErrors));
-//    }
-//
-//    try{
-//      return encounterRepository.save(findEncounter);
-//    }catch (DataAccessException e){
-//      logger.error(e.getMessage());
-//      throw new ServiceUnavailable(e.getMessage());
-//    }
-//  }
+  public Encounter updateEncounter(Long patientId, Long id, EncounterDTO encounter){
+    Encounter findEncounter;
+
+    if(patientId != encounter.getPatientId()){
+      throw new RequestConflict(StringConstants.PATIENT_ID_INVALID);
+    }
+
+    try {
+     findEncounter  = encounterRepository.findById(id).orElse(null);
+    }catch(DataAccessException e) {
+      logger.error(e.getMessage());
+      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
+    }
+
+  if(findEncounter != null) {
+    findEncounter.setPatient(patientService.getPatientById(encounter.getPatientId()));
+    findEncounter.setNotes(encounter.getNotes());
+    findEncounter.setVisitCode(encounter.getVisitCode());
+    findEncounter.setProvider(encounter.getProvider());
+    findEncounter.setBillingCode(encounter.getBillingCode());
+    findEncounter.setIcd10(encounter.getIcd10());
+    findEncounter.setTotalCost(encounter.getTotalCost());
+    findEncounter.setCopay(encounter.getCopay());
+    findEncounter.setChiefComplaint(encounter.getChiefComplaint());
+    findEncounter.setPulse(encounter.getPulse());
+    findEncounter.setSystolic(encounter.getSystolic());
+    findEncounter.setDiastolic(encounter.getDiastolic());
+    findEncounter.setDate(encounter.getDate());
+  }
+    List<String> encounterErrors = getEncounterErrors(encounter);
+
+    if (!encounterErrors.isEmpty()) {
+      throw new BadRequest(String.join("\n", encounterErrors));
+    }
+
+    try{
+      return encounterRepository.save(findEncounter);
+    }catch (DataAccessException e){
+      logger.error(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
+    }
+  }
 //
 //  /**
 //   * Deletes movie in the database.
@@ -351,7 +362,7 @@ public class EncounterServiceImpl implements EncounterService {
   }
 
   public Boolean validateDateFormat(EncounterDTO encounter) {
-    String regex = "^\\d{4}-\\d{2}-\\d{2}$";
+    String regex = "^\\d{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])$";
     Pattern pattern = Pattern.compile(regex);
     if (encounter.getDate() != null) {
       Matcher matcher = pattern.matcher(String.valueOf(encounter.getDate()));

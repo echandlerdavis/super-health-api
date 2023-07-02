@@ -60,21 +60,21 @@ public class EncounterController {
     logger.info(LoggingConstants.POST_ENCOUNTER);
     return new ResponseEntity<>(encounterService.saveEncounter(patientId, encounterDTO), HttpStatus.CREATED);
   }
-//
-//  /**
-//   * Handles a PUT request to /encounters/id. This updates an existing encounter object that gets saved to the
-//   * database.
-//   *
-//   * @param encounter - encounter object
-//   * @param id - id of encounter to be updated
-//   * @return encouter updated to database
-//   */
-//  @PutMapping(value = "/{id}")
-//  public ResponseEntity<Encounter> updateEncounter(@PathVariable Long id,
-//      @RequestBody Encounter encounter){
-//    logger.info(LoggingConstants.UPDATE_ENCOUNTER(id));
-//    return new ResponseEntity<>(encounterService.updateEncounter(id, encounter), HttpStatus.OK);
-//  }
+
+  /**
+   * Handles a PUT request to /encounters/id. This updates an existing encounter object that gets saved to the
+   * database.
+   *
+   * @param encounter - encounter object
+   * @param id - id of encounter to be updated
+   * @return encouter updated to database
+   */
+  @PutMapping(value = "/{patientId}/encounters/{id}")
+  public ResponseEntity<Encounter> updateEncounter(@PathVariable Long patientId, @PathVariable Long id,
+      @RequestBody EncounterDTO encounter){
+    logger.info(LoggingConstants.UPDATE_ENCOUNTER(id));
+    return new ResponseEntity<>(encounterService.updateEncounter(patientId, id, encounter), HttpStatus.OK);
+  }
 //
 //  /**
 //   * Handles a DELETE request to /encounters/id. This deletes an existing encounter object.
