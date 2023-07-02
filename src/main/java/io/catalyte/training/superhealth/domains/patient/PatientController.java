@@ -3,6 +3,7 @@ package io.catalyte.training.superhealth.domains.patient;
 import static io.catalyte.training.superhealth.constants.Paths.PATIENTS_PATH;
 
 import io.catalyte.training.superhealth.constants.LoggingConstants;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +36,7 @@ public class PatientController {
   }
 
   /**
-   * Handles a GET request directed at /rentals.
+   * Handles a GET request directed at /patients.
    *
    * @return all rentals in database.
    */
@@ -43,6 +44,17 @@ public class PatientController {
   public ResponseEntity<List<Patient>> getPatients() {
     logger.info(LoggingConstants.GET_PATIENTS);
     return new ResponseEntity<>(patientService.getPatients(), HttpStatus.OK);
+  }
+
+  /**
+   * Handles a GET request directed at /patients/emails.
+   *
+   * @return all rentals in database.
+   */
+  @GetMapping(value = "/emails")
+  public ResponseEntity<HashMap<Long, String>> getPatientEmails() {
+    logger.info(LoggingConstants.GET_PATIENT_EMAILS);
+    return new ResponseEntity<>(patientService.getPatientEmails(), HttpStatus.OK);
   }
 
   /**

@@ -5,7 +5,6 @@ package io.catalyte.training.superhealth.constants;
  */
 public class LoggingConstants {
   //Movie endpoints logging constants
-  public static final String GET_ENCOUNTERS = "Received request to get all encounters";
   public static final String GET_ENCOUNTER_BY_ID(Long id){
     return "Received request to get encounter by id: " + id;
   }
@@ -19,6 +18,8 @@ public class LoggingConstants {
   }
   //Rental Logging Constants
   public static final String GET_PATIENTS = "Received request to get all patients";
+
+  public static final String GET_PATIENT_EMAILS = "Received request to get all patient emails.";
   public static final String GET_PATIENT_BY_ID(Long id){
     return "Received request to get patient by id: " + id;
   }
