@@ -48,14 +48,14 @@ public class EncounterApiTest {
   @Before
   public void setUp() {
     mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    setTestRentals();
+    setTestEncounters();
   }
 
   /**
    * Helper method initializes a test purchase with billing address, delivery address, credit card
    * info, and product with id of 1 to be sent in POST method
    */
-  private void setTestRentals() {
+  private void setTestEncounters() {
     testPatient1 = patientFactory.createRandomPatient();
 
     patientRepository.save(testPatient1);
@@ -276,43 +276,42 @@ public class EncounterApiTest {
 //        .equals(StringConstants
 //            .RENTED_MOVIEID_INVALID(Arrays.asList(newRental.getRentedMovies().get(0).getMovieId()))));
 //  }
-//
+
+  @Test
+  public void updateEncounterReturns200WithMovieObject() throws Exception {
+    EncounterDTO updatedEncounter = new EncounterDTO(
+        testPatient1.getId(),
+        "updated encounter",
+        "U7I 3C3",
+        "Updated Hospital",
+        "123.456.789-00",
+        "Z99",
+        0.11,
+        0.11,
+        "new complaint",
+        78,
+        120,
+        80,
+        "2020-08-04"
+    );
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(updatedEncounter)))
+        .andExpect(status().isOk())
+        .andReturn().getResponse();
+
+    Encounter returnedEncounter = mapper.readValue(response.getContentAsString(), Encounter.class);
+
+    assertNotNull(returnedEncounter.getId());
+  }
+
+
 //  @Test
-//  public void updateEncounterReturns200WithMovieObject() throws Exception {
-//    EncounterDTO updatedEncounter = new EncounterDTO(
-//        testPatient1.getId(),
-//        "updated encounter",
-//        "U7I 3C3",
-//        "Updated Hospital",
-//        "123.456.789-00",
-//        "Z99",
-//        0.11,
-//        0.11,
-//        "new complaint",
-//        78,
-//        120,
-//        80,
-//        "2020-08-04"
-//    );
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(put(RENTALS_PATH + "/" + testRental1.getId())
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(updatedRental)))
-//        .andExpect(status().isOk())
-//        .andReturn().getResponse();
-//
-//    Patient returnedRental = mapper.readValue(response.getContentAsString(), Patient.class);
-//
-//    assertNotNull(returnedRental.getId());
-//  }
-//
-//
-//  @DirtiesContext
-//  @Test
-//  public void DeleteRentalReturns204() throws Exception {
-//    mockMvc.perform(delete(RENTALS_PATH + "/" + testRental1.getId().toString()))
+//  public void DeleteEncounterReturns204() throws Exception {
+//    mockMvc.perform(delete(ENCOUNTERS_PATH(te) + "/" + testRental1.getId().toString()))
 //        .andExpect(status().isNoContent());
 //  }
-//
-//
+
+
 }

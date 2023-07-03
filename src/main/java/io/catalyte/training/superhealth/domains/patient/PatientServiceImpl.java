@@ -139,6 +139,11 @@ public class PatientServiceImpl implements PatientService {
       findPatient = patientRepository.findById(id).orElse(null);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
+    }
+
+    if(findPatient == null){
+      logger.error(LoggingConstants.UPDATE_PATIENT_FAILURE);
       throw new ResourceNotFound(LoggingConstants.UPDATE_PATIENT_FAILURE);
     }
     List<String> patientErrors = getPatientErrors(updatedPatient);
@@ -187,19 +192,23 @@ public class PatientServiceImpl implements PatientService {
   public void deletePatientById(Long id){
     Patient findPatient;
     try{
-      findPatient = patientRepository.findById(id).orElse(null);
+       findPatient = patientRepository.findById(id).orElse(null);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
-      throw new ResourceNotFound(LoggingConstants.UPDATE_PATIENT_FAILURE);
+      throw new ServiceUnavailable(e.getMessage());
     }
-    if(findPatient != null) {
+
+    if(findPatient == null){
+      logger.error(LoggingConstants.DELETE_PATIENT_FAILURE);
+      throw new ResourceNotFound(LoggingConstants.DELETE_PATIENT_FAILURE);
+    }
+
       try {
         patientRepository.deleteById(id);
       } catch (DataAccessException e) {
         logger.error(e.getMessage());
         throw new ServiceUnavailable(e.getMessage());
       }
-    }
   }
 
   /**

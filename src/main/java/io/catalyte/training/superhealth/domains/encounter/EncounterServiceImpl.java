@@ -56,17 +56,18 @@ public class EncounterServiceImpl implements EncounterService {
       throw new ServiceUnavailable(e.getMessage());
     }
 
-    //TODO: create constants message for this bad request;
-    if(encounter.getPatient().getId() != patientId){
-      throw new BadRequest();
-    }
-
     if (encounter != null) {
+      if(encounter.getPatient().getId() != patientId){
+        throw new BadRequest();
+      }
       return encounter;
     } else {
       logger.info(LoggingConstants.GET_BY_ID_FAILURE(id));
       throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
     }
+
+    //TODO: create constants message for this bad request;
+
   }
 
   //TODO: Test Validation.
