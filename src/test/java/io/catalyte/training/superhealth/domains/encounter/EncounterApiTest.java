@@ -1,140 +1,119 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
-//import static io.catalyte.training.movierentals.constants.Paths.RENTALS_PATH;
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertFalse;
-//import static org.junit.Assert.assertNotNull;
-//import static org.junit.Assert.assertTrue;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import io.catalyte.training.movierentals.constants.StringConstants;
-//import io.catalyte.training.movierentals.data.PatientFactory;
-//import io.catalyte.training.movierentals.data.EncounterFactory;
-//import io.catalyte.training.movierentals.domains.encounter.Encounter;
-//import io.catalyte.training.movierentals.domains.encounter.EncounterRepository;
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.HashMap;
-//import java.util.HashSet;
-//import java.util.List;
-//import org.junit.After;
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.mock.web.MockHttpServletResponse;
-//import org.springframework.test.annotation.DirtiesContext;
-//import org.springframework.test.context.junit4.SpringRunner;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-//import org.springframework.web.context.WebApplicationContext;
-//
-//@RunWith(SpringRunner.class)
-//@SpringBootTest
-//public class RentalApiTest {
-//
-//  private final EncounterFactory encounterFactory = new EncounterFactory();
-//  private final RentedMovieFactory rentedMovieFactory = new RentedMovieFactory();
-//  private final PatientFactory patientFactory = new PatientFactory();
-//  Patient testRental1;
-//  Patient testRental2;
-//
-//  List<Encounter> randomMovieList;
-//  @Autowired
-//  public PatientRepository patientRepository;
-//  @Autowired
-//  public RentedMovieRepository rentedMovieRepository;
-//  @Autowired
-//  public EncounterRepository movieRepository;
-//  @Autowired
-//  private WebApplicationContext wac;
-//  private MockMvc mockMvc;
-//
-//  @Before
-//  public void setUp() {
-//    mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-//    setTestRentals();
-//  }
-//
-//  /**
-//   * Helper method initializes a test purchase with billing address, delivery address, credit card
-//   * info, and product with id of 1 to be sent in POST method
-//   */
-//  private void setTestRentals() {
-//    randomMovieList = patientFactory.generateRandomMovieList(20);
-//    testRental1 = encounterFactory.createRandomRental();
-//    testRental2 = encounterFactory.createRandomRental();
-//    List<Patient> testRentals = new ArrayList<>();
-//    testRentals.add(testRental1);
-//    testRentals.add(testRental2);
-//
-//    movieRepository.saveAll(randomMovieList);
-//    patientRepository.saveAll(testRentals);
-//
-//    for (Patient rental : testRentals){
-//      List<RentedMovie> rentedMovieSet = rentedMovieFactory.generateRandomRentedMovies(rental);
-//      rental.setRentedMovies(rentedMovieSet);
-//      rentedMovieRepository.saveAll(rentedMovieSet);
-//    }
-//
-//
-//  }
-//
-//  /**
-//   * Remove rentals that were added in setup.
-//   */
-//  @After
-//  public void tearDown() {
-//    //delete rentals
-//    patientRepository.delete(testRental1);
-//    patientRepository.delete(testRental2);
-//
-//    //delete rented movies
-//    rentedMovieRepository.deleteAll();
-//
-//
-//    //delete movies
-//    movieRepository.deleteAll(randomMovieList);
-//  }
-//
-//  @Test
-//  public void getRentalsReturns200() throws Exception {
-//    mockMvc.perform(get(RENTALS_PATH))
-//        .andExpect(status().isOk());
-//  }
-//
-//  @DirtiesContext
-//  @Test
-//  public void getRentalByIdReturnsRentalWith200() throws Exception {
-//    mockMvc.perform(get(RENTALS_PATH + "/" + testRental1.getId().toString()))
-//        .andExpect(status().isOk());
-//  }
-//
-//  @DirtiesContext
-//  @Test
-////  @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-//  public void saveRentalReturns201WithRentalObject() throws Exception {
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRental.setRentedMovies(newRentedMovies);
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//          .contentType("application/json")
-//          .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isCreated())
-//        .andReturn().getResponse();
-//
-//    Patient returnedRental = mapper.readValue(response.getContentAsString(), Patient.class);
-//
-//    assert (returnedRental.equals(newRental));
-//    assertNotNull(returnedRental.getId());
-//  }
+import static io.catalyte.training.superhealth.constants.Paths.ENCOUNTERS_PATH;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.superhealth.data.EncounterFactory;
+import io.catalyte.training.superhealth.data.PatientFactory;
+import io.catalyte.training.superhealth.domains.patient.Patient;
+import io.catalyte.training.superhealth.domains.patient.PatientRepository;
+import java.util.List;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class EncounterApiTest {
+
+  private final EncounterFactory encounterFactory = new EncounterFactory();
+  private final PatientFactory patientFactory = new PatientFactory();
+  Patient testPatient1;
+  List<Encounter> randomEncounterList;
+  @Autowired
+  public PatientRepository patientRepository;
+  @Autowired
+  public EncounterRepository encounterRepository;
+  @Autowired
+  private WebApplicationContext wac;
+  private MockMvc mockMvc;
+
+  @Before
+  public void setUp() {
+    mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+    setTestRentals();
+  }
+
+  /**
+   * Helper method initializes a test purchase with billing address, delivery address, credit card
+   * info, and product with id of 1 to be sent in POST method
+   */
+  private void setTestRentals() {
+    testPatient1 = patientFactory.createRandomPatient();
+
+    patientRepository.save(testPatient1);
+
+    randomEncounterList = encounterFactory.generateRandomEncounterList(testPatient1);
+    testPatient1.setEncounters(randomEncounterList);
+    encounterRepository.saveAll(randomEncounterList);
+
+
+  }
+
+  /**
+   * Remove rentals that were added in setup.
+   */
+  @After
+  public void tearDown() {
+    //delete encounters
+    encounterRepository.deleteAll();
+
+    //delete patients
+    patientRepository.deleteAll();
+
+  }
+
+  @Test
+  public void getEncounterByIdReturns200() throws Exception {
+    mockMvc.perform(get(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId()))
+        .andExpect(status().isOk());
+  }
+
+
+  @Test
+  public void saveEncounterReturns201WithEncounterObject() throws Exception {
+    EncounterDTO newEncounter = new EncounterDTO(
+        testPatient1.getId(),
+        "new encounter",
+        "N3W 3C3",
+        "New Hospital",
+        "123.456.789-00",
+        "Z99",
+        0.11,
+        0.11,
+        "new complaint",
+        78,
+        120,
+        80,
+        "2020-08-04"
+    );
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+          .contentType("application/json")
+          .content(mapper.writeValueAsString(newEncounter)))
+        .andExpect(status().isCreated())
+        .andReturn().getResponse();
+
+    Encounter returnedEncounter = mapper.readValue(response.getContentAsString(), Encounter.class);
+    assertNotNull(returnedEncounter.getId());
+  }
 //
 //  @Test
 //  public void saveRentalReturns400WhenTotalRentalCostIsNegativeNumber() throws Exception{
@@ -298,12 +277,23 @@ package io.catalyte.training.superhealth.domains.encounter;
 //            .RENTED_MOVIEID_INVALID(Arrays.asList(newRental.getRentedMovies().get(0).getMovieId()))));
 //  }
 //
-//  @DirtiesContext
 //  @Test
-//  public void updateRentalReturns200WithMovieObject() throws Exception {
-//    Patient updatedRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> updatedRentedMovies = rentedMovieFactory.generateRandomRentedMovies(updatedRental);
-//    updatedRental.setRentedMovies(updatedRentedMovies);
+//  public void updateEncounterReturns200WithMovieObject() throws Exception {
+//    EncounterDTO updatedEncounter = new EncounterDTO(
+//        testPatient1.getId(),
+//        "updated encounter",
+//        "U7I 3C3",
+//        "Updated Hospital",
+//        "123.456.789-00",
+//        "Z99",
+//        0.11,
+//        0.11,
+//        "new complaint",
+//        78,
+//        120,
+//        80,
+//        "2020-08-04"
+//    );
 //    ObjectMapper mapper = new ObjectMapper();
 //    MockHttpServletResponse response = mockMvc.perform(put(RENTALS_PATH + "/" + testRental1.getId())
 //            .contentType("application/json")
@@ -313,7 +303,6 @@ package io.catalyte.training.superhealth.domains.encounter;
 //
 //    Patient returnedRental = mapper.readValue(response.getContentAsString(), Patient.class);
 //
-//    assert (returnedRental.equals(updatedRental));
 //    assertNotNull(returnedRental.getId());
 //  }
 //
@@ -326,4 +315,4 @@ package io.catalyte.training.superhealth.domains.encounter;
 //  }
 //
 //
-//}
+}

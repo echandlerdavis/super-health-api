@@ -126,7 +126,7 @@ public class EncounterFactory {
   }
   public List<Encounter> generateRandomEncounterList(Patient patient){
     List<Encounter> encounterList = new ArrayList<>();
-    int numberOfEncounters = randomGenerator.nextInt(5);
+    int numberOfEncounters = randomGenerator.nextInt(5) + 1;
     for(int i = 0; i < numberOfEncounters; i++){
       encounterList.add(createRandomEncounter(patient));
     }
