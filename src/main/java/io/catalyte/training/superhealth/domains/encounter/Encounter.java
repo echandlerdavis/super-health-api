@@ -49,14 +49,14 @@ public class Encounter {
 
   private Integer diastolic;
 
-  private LocalDate date;
+  private String date;
 
   public Encounter() {
   }
 
   public Encounter(Long id, Patient patient, String notes, String visitCode, String provider,
       String billingCode, String icd10, Double totalCost, Double copay, String chiefComplaint,
-      Integer pulse, Integer systolic, Integer diastolic, LocalDate date) {
+      Integer pulse, Integer systolic, Integer diastolic, String date) {
     this.id = id;
     this.patient = patient;
     this.notes = notes;
@@ -176,11 +176,11 @@ public class Encounter {
     this.diastolic = diastolic;
   }
 
-  public LocalDate getDate() {
+  public String getDate() {
     return date;
   }
 
-  public void setDate(LocalDate date) {
+  public void setDate(String date) {
     this.date = date;
   }
 

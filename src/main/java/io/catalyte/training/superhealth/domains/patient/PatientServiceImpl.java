@@ -180,23 +180,25 @@ public class PatientServiceImpl implements PatientService {
     return savedPatient;
   }
 
-  //TODO: Fix this with the find patient thing. check if it's null, etc.
   /**
    * Deletes rental in the database.
    * @param id - id of the rental to be deleted
    */
   public void deletePatientById(Long id){
+    Patient findPatient;
     try{
-      Patient findPatient = patientRepository.findById(id).orElse(null);
+      findPatient = patientRepository.findById(id).orElse(null);
     }catch (DataAccessException e){
       logger.error(e.getMessage());
       throw new ResourceNotFound(LoggingConstants.UPDATE_PATIENT_FAILURE);
     }
-    try {
-      patientRepository.deleteById(id);
-    } catch (DataAccessException e){
-      logger.error(e.getMessage());
-      throw new ServiceUnavailable(e.getMessage());
+    if(findPatient != null) {
+      try {
+        patientRepository.deleteById(id);
+      } catch (DataAccessException e) {
+        logger.error(e.getMessage());
+        throw new ServiceUnavailable(e.getMessage());
+      }
     }
   }
 

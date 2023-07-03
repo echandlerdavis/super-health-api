@@ -365,7 +365,7 @@ public class EncounterServiceImpl implements EncounterService {
     String regex = "^\\d{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])$";
     Pattern pattern = Pattern.compile(regex);
     if (encounter.getDate() != null) {
-      Matcher matcher = pattern.matcher(String.valueOf(encounter.getDate()));
+      Matcher matcher = pattern.matcher(encounter.getDate());
       return matcher.matches();
     }
     return false;

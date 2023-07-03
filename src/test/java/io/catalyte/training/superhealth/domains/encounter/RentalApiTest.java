@@ -1,4 +1,4 @@
-package io.catalyte.training.superhealth.domains.patient;
+package io.catalyte.training.superhealth.domains.encounter;
 
 //import static io.catalyte.training.movierentals.constants.Paths.RENTALS_PATH;
 //import static org.junit.Assert.assertEquals;

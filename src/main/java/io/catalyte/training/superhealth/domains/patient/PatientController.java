@@ -99,7 +99,7 @@ public class PatientController {
   }
 
   /**
-   * Handles a DELETE request to /rentals/id. This deletes an existing rental object.
+   * Handles a DELETE request to /patients/id. This deletes an existing rental object.
    *
    * @param id - id of rental to be deleted
    * @return no content response entity

@@ -119,7 +119,7 @@ public class EncounterFactory {
       encounter.setPulse(randomGenerator.nextInt(100) + 50);
       encounter.setSystolic(randomGenerator.nextInt(100) + 50);
       encounter.setDiastolic(randomGenerator.nextInt(50) + 50);
-      encounter.setDate(between(LocalDate.parse("2000-01-01"), LocalDate.now()));
+      encounter.setDate(String.valueOf(between(LocalDate.parse("2000-01-01"), LocalDate.now())));
 
     return encounter;
 

@@ -54,11 +54,12 @@ public class DemoData implements CommandLineRunner {
     // Generate patients
     List<Patient> patientList = patientFactory.generateRandomPatientList(numberOfPatients);
 
-    // Persist them to the database and save list to purchaseFactory
+    // Persist them to the database
     logger.info("Loading " + numberOfPatients + " patients...");
     patientRepository.saveAll(patientList);
     logger.info("Loading random number of encounters...");
 
+    // Generate random number of encounters for each patient and persist them to the database
     for (Patient patient : patientList){
       List<Encounter> encounterList = encounterFactory.generateRandomEncounterList(patient);
       patient.setEncounters(encounterList);
