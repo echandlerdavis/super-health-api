@@ -130,6 +130,11 @@ public class EncounterServiceImpl implements EncounterService {
      findEncounter  = encounterRepository.findById(id).orElse(null);
     }catch(DataAccessException e) {
       logger.error(e.getMessage());
+      throw new ServiceUnavailable(e.getMessage());
+    }
+
+    if(findEncounter == null){
+      logger.error(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
       throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
     }
 
@@ -161,33 +166,6 @@ public class EncounterServiceImpl implements EncounterService {
       throw new ServiceUnavailable(e.getMessage());
     }
   }
-//
-//  /**
-//   * Deletes movie in the database.
-//   * @param id - id of the movie to be deleted
-//   */
-//  public void deleteEncounter(Long id){
-//    Encounter findEncounter;
-//
-//    try {
-//      findEncounter  = encounterRepository.findById(id).orElse(null);
-//    }catch(DataAccessException e) {
-//      logger.error(e.getMessage());
-//      throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
-//    }
-//
-//    //validation for if there are encounters already?
-//
-//    if(findEncounter != null){
-//      try {
-//        encounterRepository.deleteById(id);
-//      } catch (DataAccessException e){
-//        logger.error(e.getMessage());
-//        throw new ServiceUnavailable(e.getMessage());
-//      }
-//    }
-//
-//  }
 
 
   /**

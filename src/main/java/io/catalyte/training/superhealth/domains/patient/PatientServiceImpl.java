@@ -203,6 +203,11 @@ public class PatientServiceImpl implements PatientService {
       throw new ResourceNotFound(LoggingConstants.DELETE_PATIENT_FAILURE);
     }
 
+    if(findPatient.getEncounters() != null && !findPatient.getEncounters().isEmpty()){
+      logger.error(LoggingConstants.DELETE_PATIENT_CONFLICT);
+      throw new RequestConflict(LoggingConstants.DELETE_PATIENT_CONFLICT);
+    }
+
       try {
         patientRepository.deleteById(id);
       } catch (DataAccessException e) {

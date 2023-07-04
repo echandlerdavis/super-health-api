@@ -145,69 +145,7 @@ public class PatientServiceImplTest {
     }).when(patientRepository).save(any());
     assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.savePatient(testPatient));
   }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentalDateNull(){
-//    testRental.setRentalDate(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentalDateEmpty(){
-//    testRental.setRentalDate("");
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentalDateIsInvalidFormat(){
-//    testRental.setRentalDate("Invalid Format");
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentalTotalCostIsNegative(){
-//    testRental.setRentalTotalCost(-1.00);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentalTotalCostMoreThanTwoDecimals(){
-//    testRental.setRentalTotalCost(1.123);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentedMoviesAreNull(){
-//    testRental.setRentedMovies(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentedMoviesAreEmpty(){
-//    List<RentedMovie> emptyList = new ArrayList<>();
-//    testRental.setRentedMovies(emptyList);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentalTotalCostIsNull(){
-//    testRental.setRentalTotalCost(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentedMovieMovieIdIsNull(){
-//    rentedMovie.setMovieId(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
-//  @Test
-//  public void saveRentalThrowsBadRequestWhenRentedMovieMovieIdDoesNotExist(){
-//    List<Encounter> emptyList = new ArrayList<>();
-//    when(movieRepository.findAll()).thenAnswer((l) -> {
-//      return emptyList;
-//    });
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
-//
+
   @Test
   public void updateValidPatientReturnsRental(){
     assertEquals(testPatient, patientServiceImpl.updatePatient(1L, testPatient));
@@ -232,69 +170,6 @@ public class PatientServiceImplTest {
     when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThrows(ResourceNotFound.class, () -> patientServiceImpl.updatePatient(123L, testPatient));
   }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentalDateNull(){
-//    testRental.setRentalDate(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentalDateEmpty(){
-//    testRental.setRentalDate("");
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentalDateIsInvalidFormat(){
-//    testRental.setRentalDate("Invalid Format");
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentalTotalCostIsNegative(){
-//    testRental.setRentalTotalCost(-1.00);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentalTotalCostMoreThanTwoDecimals(){
-//    testRental.setRentalTotalCost(1.123);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentedMoviesAreNull(){
-//    testRental.setRentedMovies(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentedMoviesAreEmpty(){
-//    List<RentedMovie> emptyList = new ArrayList<>();
-//    testRental.setRentedMovies(emptyList);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentalTotalCostIsNull(){
-//    testRental.setRentalTotalCost(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentedMovieMovieIdIsNull(){
-//    rentedMovie.setMovieId(null);
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
-//  @Test
-//  public void updateRentalThrowsBadRequestWhenRentedMovieMovieIdDoesNotExist(){
-//    List<Encounter> emptyList = new ArrayList<>();
-//    when(movieRepository.findAll()).thenAnswer((l) -> {
-//      return emptyList;
-//    });
-//    assertThrows(BadRequest.class, () -> patientServiceImpl.updateRental(1L, testRental));
-//  }
-//
   @Test
   public void deletePatientReturnsVoid(){
     patientServiceImpl.deletePatientById(123L);

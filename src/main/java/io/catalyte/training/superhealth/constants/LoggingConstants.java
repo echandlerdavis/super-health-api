@@ -36,8 +36,7 @@ public class LoggingConstants {
     return "Get by id failed, it does not exist in the database: " + id;
   }
   public static final String UPDATE_ENCOUNTER_FAILURE = "You cannot update an encounter that does not exist.";
-  public static final String DELETE_ENCOUNTER_FAILURE = "You cannot delete an encounter that does not exist.";
   public static final String UPDATE_PATIENT_FAILURE = "You cannot update a patient that does not exist.";
   public static final String DELETE_PATIENT_FAILURE = "You cannot delete a patient that does not exist.";
-
+  public static final String DELETE_PATIENT_CONFLICT = "You cannot delete a patient that has associated encounters.";
 }
