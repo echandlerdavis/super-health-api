@@ -12,6 +12,7 @@ import io.catalyte.training.superhealth.data.PatientFactory;
 import io.catalyte.training.superhealth.exceptions.ResourceNotFound;
 import io.catalyte.training.superhealth.exceptions.ServiceUnavailable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -33,6 +34,8 @@ public class PatientServiceImplTest {
   public ExpectedException thrown = ExpectedException.none();
   Patient testPatient;
   List<Patient> testPatients = new ArrayList<>();
+
+  HashMap<Long, String> patientEmails = new HashMap<>();
   PatientFactory patientFactory;
   @InjectMocks
   private PatientServiceImpl patientServiceImpl;
@@ -51,6 +54,8 @@ public class PatientServiceImplTest {
     // Initialize a test purchase instance and list of purchases
     setTestPatient();
     testPatients.add(testPatient);
+    testPatients.forEach(patient -> patientEmails.put(patient.getId(), patient.getEmail()));
+
 
     when(patientRepository.findAll()).thenReturn(testPatients);
     when(patientRepository.findById(anyLong())).thenReturn(Optional.of(testPatient));
@@ -114,20 +119,32 @@ public class PatientServiceImplTest {
     assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.getPatientById(123L));
   }
 
+  @Test
+  public void getPatientEmailsReturnsHashmap(){
+    HashMap<Long, String> actual = patientServiceImpl.getPatientEmails();
+    assertEquals(patientEmails, actual);
+  }
+
+  @Test
+  public void getPatientEmailsThrowsServiceUnavailable() {
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(patientRepository).findAll();
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.getPatientEmails());
+  }
+
 
   @Test
   public void saveValidPatientReturnsRental() {
     testPatient.setEmail("newTest@test.com");
     assertEquals(testPatient, patientServiceImpl.savePatient(testPatient));
   }
-//
-//  @Test
-//  public void saveRentalThrowsServiceUnavailable() {
-//    //This test fails when run with coverage
-//    doThrow(new DataAccessException("TEST EXCEPTION") {
-//    }).when(patientRepository).save(any());
-//    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.saveRental(testRental));
-//  }
+
+  @Test
+  public void savePatientThrowsServiceUnavailable() {
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(patientRepository).save(any());
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.savePatient(testPatient));
+  }
 //
 //  @Test
 //  public void saveRentalThrowsBadRequestWhenRentalDateNull(){

@@ -37,6 +37,8 @@ public class EncounterApiTest {
   private final PatientFactory patientFactory = new PatientFactory();
   Patient testPatient1;
   List<Encounter> randomEncounterList;
+
+  EncounterDTO encounterDTO;
   @Autowired
   public PatientRepository patientRepository;
   @Autowired
@@ -64,6 +66,22 @@ public class EncounterApiTest {
     testPatient1.setEncounters(randomEncounterList);
     encounterRepository.saveAll(randomEncounterList);
 
+    encounterDTO = new EncounterDTO(
+        testPatient1.getId(),
+        "new encounter",
+        "N3W 3C3",
+        "New Hospital",
+        "123.456.789-00",
+        "Z99",
+        0.11,
+        0.11,
+        "new complaint",
+        78,
+        120,
+        80,
+        "2020-08-04"
+    );
+
 
   }
 
@@ -89,25 +107,10 @@ public class EncounterApiTest {
 
   @Test
   public void saveEncounterReturns201WithEncounterObject() throws Exception {
-    EncounterDTO newEncounter = new EncounterDTO(
-        testPatient1.getId(),
-        "new encounter",
-        "N3W 3C3",
-        "New Hospital",
-        "123.456.789-00",
-        "Z99",
-        0.11,
-        0.11,
-        "new complaint",
-        78,
-        120,
-        80,
-        "2020-08-04"
-    );
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
           .contentType("application/json")
-          .content(mapper.writeValueAsString(newEncounter)))
+          .content(mapper.writeValueAsString(encounterDTO)))
         .andExpect(status().isCreated())
         .andReturn().getResponse();
 
@@ -279,25 +282,10 @@ public class EncounterApiTest {
 
   @Test
   public void updateEncounterReturns200WithMovieObject() throws Exception {
-    EncounterDTO updatedEncounter = new EncounterDTO(
-        testPatient1.getId(),
-        "updated encounter",
-        "U7I 3C3",
-        "Updated Hospital",
-        "123.456.789-00",
-        "Z99",
-        0.11,
-        0.11,
-        "new complaint",
-        78,
-        120,
-        80,
-        "2020-08-04"
-    );
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
             .contentType("application/json")
-            .content(mapper.writeValueAsString(updatedEncounter)))
+            .content(mapper.writeValueAsString(encounterDTO)))
         .andExpect(status().isOk())
         .andReturn().getResponse();
 
@@ -305,13 +293,6 @@ public class EncounterApiTest {
 
     assertNotNull(returnedEncounter.getId());
   }
-
-
-//  @Test
-//  public void DeleteEncounterReturns204() throws Exception {
-//    mockMvc.perform(delete(ENCOUNTERS_PATH(te) + "/" + testRental1.getId().toString()))
-//        .andExpect(status().isNoContent());
-//  }
 
 
 }

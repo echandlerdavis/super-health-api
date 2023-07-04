@@ -300,42 +300,42 @@ public class PatientServiceImpl implements PatientService {
   public Boolean validateNameFormat(String nameString){
     String regex = "^[a-zA-Z\\s'-]+$";
     Pattern pattern = Pattern.compile(regex);
-    if (nameString != null) {
+    if (nameString != null && !nameString.isEmpty()) {
       Matcher matcher = pattern.matcher(nameString);
       return matcher.matches();
     }
-    return false;
+    return true;
   };
 
   public Boolean validateSSN(Patient newPatient){
     String regex = "^\\d{3}-\\d{2}-\\d{4}$";
     Pattern pattern = Pattern.compile(regex);
-    if (newPatient.getSsn() != null) {
+    if (newPatient.getSsn() != null && !newPatient.getSsn().isEmpty()) {
       Matcher matcher = pattern.matcher(newPatient.getSsn());
       return matcher.matches();
     }
-    return false;
+    return true;
   };
 
   public Boolean validateEmailFormat(Patient newPatient){
     String regex = "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]+$";
     Pattern pattern = Pattern.compile(regex);
-    if (newPatient.getEmail() != null) {
+    if (newPatient.getEmail() != null && !newPatient.getEmail().isEmpty()) {
       Matcher matcher = pattern.matcher(newPatient.getEmail());
       return matcher.matches();
     }
-    return false;
+    return true;
 
   };
 
   public Boolean validateStateFormat(Patient newPatient){
     String regex = "^[A-Z]{2}$";
     Pattern pattern = Pattern.compile(regex);
-    if (newPatient.getState() != null) {
+    if (newPatient.getState() != null && !newPatient.getState().isEmpty()) {
       Matcher matcher = pattern.matcher(newPatient.getState());
       return matcher.matches();
     }
-    return false;
+    return true;
   };
 
   public Boolean validatePostalCode(Patient newPatient){
@@ -343,12 +343,12 @@ public class PatientServiceImpl implements PatientService {
     String regex2 = "^\\d{5}-\\d{4}$";
     Pattern pattern1 = Pattern.compile(regex1);
     Pattern pattern2 = Pattern.compile(regex2);
-    if (newPatient.getPostal() != null) {
+    if (newPatient.getPostal() != null && !newPatient.getPostal().isEmpty()) {
       Matcher matcher1 = pattern1.matcher(newPatient.getPostal());
       Matcher matcher2 = pattern2.matcher(newPatient.getPostal());
       return matcher1.matches() || matcher2.matches();
     }
-    return false;
+    return true;
   };
 
   public Boolean validateNumber(int number){
@@ -356,11 +356,14 @@ public class PatientServiceImpl implements PatientService {
   }
 
   public Boolean validateGender(Patient newPatient){
-    String gender = newPatient.getGender().toLowerCase().trim();
-    if(gender.equals("male") || gender.equals("female") || gender.equals("other")){
-      return true;
+    if(newPatient.getGender() != null && !newPatient.getGender().isEmpty()) {
+      String gender = newPatient.getGender().toLowerCase().trim();
+      if (gender.equals("male") || gender.equals("female") || gender.equals("other")) {
+        return true;
+      }
+      return false;
     }
-    return false;
+    return true;
   };
   /**
    * Checks whether the sku of a movie attempting to be added or updated already exists in the database.
