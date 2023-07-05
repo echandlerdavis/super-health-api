@@ -9,13 +9,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.catalyte.training.superhealth.constants.LoggingConstants;
 import io.catalyte.training.superhealth.constants.Paths;
 import io.catalyte.training.superhealth.constants.StringConstants;
-import io.catalyte.training.superhealth.data.EncounterFactory;
 import io.catalyte.training.superhealth.data.PatientFactory;
-import io.catalyte.training.superhealth.domains.encounter.Encounter;
-import io.catalyte.training.superhealth.domains.encounter.EncounterRepository;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
