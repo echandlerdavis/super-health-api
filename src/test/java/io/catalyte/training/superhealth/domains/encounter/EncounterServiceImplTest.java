@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -13,7 +12,6 @@ import io.catalyte.training.superhealth.data.PatientFactory;
 import io.catalyte.training.superhealth.domains.patient.Patient;
 import io.catalyte.training.superhealth.domains.patient.PatientRepository;
 import io.catalyte.training.superhealth.domains.patient.PatientService;
-import io.catalyte.training.superhealth.domains.patient.PatientServiceImpl;
 import io.catalyte.training.superhealth.exceptions.ResourceNotFound;
 import io.catalyte.training.superhealth.exceptions.ServiceUnavailable;
 import java.util.ArrayList;
@@ -148,7 +146,7 @@ public class EncounterServiceImplTest {
   }
 
   @Test
-  public void updateMovieByIdThrowsErrorWhenNotFound() {
+  public void updateEncounterByIdThrowsErrorWhenNotFound() {
     when(encounterRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThrows(ResourceNotFound.class, () -> encounterServiceImpl.updateEncounter(testEncounter1.getPatient().getId(),123L, testEncounterDTO));
   }

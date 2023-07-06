@@ -134,7 +134,7 @@ public class PatientServiceImplTest {
 
 
   @Test
-  public void saveValidPatientReturnsRental() {
+  public void saveValidPatientReturnsPatient() {
     testPatient.setEmail("newTest@test.com");
     assertEquals(testPatient, patientServiceImpl.savePatient(testPatient));
   }
@@ -166,14 +166,14 @@ public class PatientServiceImplTest {
   }
 
   @Test
-  public void updateRentalThrowsServiceUnavailableWhenFindingPatient() {
+  public void updatePatientThrowsServiceUnavailableWhenFindingPatient() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
     }).when(patientRepository).findById(any());
     assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.updatePatient(1L, testPatient));
   }
 
   @Test
-  public void updateRentalRentalThrowsResourceNotFound(){
+  public void updatePatientThrowsResourceNotFound(){
     when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThrows(ResourceNotFound.class, () -> patientServiceImpl.updatePatient(123L, testPatient));
   }
@@ -201,5 +201,76 @@ public class PatientServiceImplTest {
   public void deletePatientThrowsResourceNotFound(){
     when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThrows(ResourceNotFound.class, () -> patientServiceImpl.deletePatientById(123L));
+  }
+
+  @Test
+  public void validateNameFormatReturnsFalseForInvalidFormat(){
+    testPatient.setFirstName("1nv@l1d N@m3");
+    assertEquals(false, patientServiceImpl.validateNameFormat(testPatient.getFirstName()));
+  }
+
+  @Test
+  public void validateNameFormatReturnsTrueForValidFormat(){
+    testPatient.setLastName("Valid");
+    assertEquals(true, patientServiceImpl.validateNameFormat(testPatient.getLastName()));
+  }
+
+  @Test
+  public void validateNameFormatReturnsTrueForNullValue(){
+    testPatient.setFirstName(null);
+    assertEquals(true, patientServiceImpl.validateNameFormat(testPatient.getFirstName()));
+  }
+
+  @Test
+  public void validateSSNReturnsFalseForInvalidFormat(){
+    testPatient.setSsn("N0+ V@l1d");
+    assertEquals(false, patientServiceImpl.validateSSN(testPatient));
+  }
+
+  @Test
+  public void validateSSNReturnsTrueForValidFormat(){
+    testPatient.setSsn("123-45-6789");
+    assertEquals(true, patientServiceImpl.validateSSN(testPatient));
+  }
+
+  @Test
+  public void validateSSNReturnsTrueForNullValue(){
+    testPatient.setSsn(null);
+    assertEquals(true, patientServiceImpl.validateSSN(testPatient));
+  }
+
+  @Test
+  public void validateEmailFormatReturnsFalseForInvalidFormat(){
+    testPatient.setEmail("1nv@l1d 3m@1L");
+    assertEquals(false, patientServiceImpl.validateEmailFormat(testPatient));
+  }
+
+  @Test
+  public void validateEmailFormatReturnsTrueForValidFormat(){
+    testPatient.setEmail("valid@valid.com");
+    assertEquals(true, patientServiceImpl.validateEmailFormat(testPatient));
+  }
+
+  @Test
+  public void validateEmailFormatReturnsTrueForNullValue(){
+    testPatient.setEmail(null);
+    assertEquals(true, patientServiceImpl.validateEmailFormat(testPatient));
+  }
+
+  @Test
+  public void validateStateFormatReturnsFalseForInvalidState(){
+    testPatient.setState("not valid");
+    assertEquals(false, patientServiceImpl.validateStateFormat(testPatient));
+  }
+
+  @Test
+  public void validateStateFormatReturnsTrueForValidState(){
+    testPatient.setState("LA");
+    assertEquals(true, patientServiceImpl.validateStateFormat(testPatient));
+  }
+  @Test
+  public void validateStateFormatReturnsTrueForNullValue(){
+    testPatient.setState(null);
+    assertEquals(true, patientServiceImpl.validateStateFormat(testPatient));
   }
 }
