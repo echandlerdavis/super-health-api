@@ -33,6 +33,8 @@ public class PatientServiceImplTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
   Patient testPatient;
+
+  Patient testPatient2;
   List<Patient> testPatients = new ArrayList<>();
 
   HashMap<Long, String> patientEmails = new HashMap<>();
@@ -54,6 +56,7 @@ public class PatientServiceImplTest {
     // Initialize a test purchase instance and list of purchases
     setTestPatient();
     testPatients.add(testPatient);
+    testPatients.add(testPatient2);
     testPatients.forEach(patient -> patientEmails.put(patient.getId(), patient.getEmail()));
 
 
@@ -84,6 +87,23 @@ public class PatientServiceImplTest {
          147,
         "Self-Insured",
         "Other"
+    );
+
+    testPatient2 = new Patient(
+        2L,
+        "Other",
+        "Patient",
+        "234-56-7891",
+        "test2@test.com",
+        "8430 Other Street",
+        "Other City",
+        "OK",
+        "12345",
+        15,
+        100,
+        100,
+        "Molina",
+        "Female"
     );
   }
 
@@ -273,4 +293,71 @@ public class PatientServiceImplTest {
     testPatient.setState(null);
     assertEquals(true, patientServiceImpl.validateStateFormat(testPatient));
   }
+
+  @Test
+  public void validatePostalCodeReturnsFalseForInvalidCode(){
+    testPatient.setPostal("invalid");
+    assertEquals(false, patientServiceImpl.validatePostalCode(testPatient));
+  }
+  @Test
+  public void validatePostalCodeReturnsTrueForValidCode(){
+    testPatient.setPostal("12345-1234");
+    assertEquals(true, patientServiceImpl.validatePostalCode(testPatient));
+  }
+  @Test
+  public void validatePostalCodeReturnsTrueForNullValue(){
+    testPatient.setPostal(null);
+    assertEquals(true, patientServiceImpl.validatePostalCode(testPatient));
+  }
+
+  @Test
+  public void validateNumberReturnsFalseForInvalidNumber(){
+    testPatient.setAge(-200);
+    assertEquals(false, patientServiceImpl.validateNumber(testPatient.getAge()));
+  }
+  @Test
+  public void validateNumberReturnsTrueForValidNumber(){
+    testPatient.setHeight(200);
+    assertEquals(true, patientServiceImpl.validateNumber(testPatient.getHeight()));
+  }
+  @Test
+  public void validateNumberReturnsTrueForNullValue(){
+    testPatient.setWeight(null);
+    assertEquals(true, patientServiceImpl.validateNumber(testPatient.getWeight()));
+  }
+
+  @Test
+  public void validateGenderReturnsFalseForInvalidGender(){
+    testPatient.setGender("Invalid");
+    assertEquals(false, patientServiceImpl.validateGender(testPatient));
+  }
+  @Test
+  public void validateGenderReturnsTrueForValidGender(){
+    testPatient.setGender("Other");
+    assertEquals(true, patientServiceImpl.validateGender(testPatient));
+  }
+  @Test
+  public void validateGenderReturnsTrueForNullValue(){
+    testPatient.setGender(null);
+    assertEquals(true, patientServiceImpl.validateGender(testPatient));
+  }
+
+  @Test
+  public void patientEmailAlreadyExistsReturnsTrueIfTrue(){
+    testPatient.setEmail(testPatient2.getEmail());
+    assertEquals(true, patientServiceImpl.patientEmailAlreadyExists(testPatient));
+  }
+
+  @Test
+  public void patientEmailAlreadyExistsReturnsFalseIfFalse(){
+    testPatient.setEmail("newTest@test.com");
+    assertEquals(false, patientServiceImpl.patientEmailAlreadyExists(testPatient));
+  }
+
+  @Test
+  public void patientEmailAlreadyExistsReturnsFalseIfEmailNull(){
+    testPatient.setEmail(null);
+    assertEquals(false, patientServiceImpl.patientEmailAlreadyExists(testPatient));
+  }
+
 }

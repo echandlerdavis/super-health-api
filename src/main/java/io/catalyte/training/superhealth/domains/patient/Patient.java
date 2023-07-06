@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -39,11 +40,11 @@ public class Patient {
 
   private String postal;
 
-  private int age;
+  private Integer age;
 
-  private int height;
+  private Integer height;
 
-  private int weight;
+  private Integer weight;
 
   private String insurance;
 
@@ -58,7 +59,7 @@ public class Patient {
 
   public Patient(Long id, String firstName, String lastName, String ssn, String email,
       String street,
-      String city, String state, String postal, int age, int height, int weight,
+      String city, String state, String postal, Integer age, Integer height, Integer weight,
       String insurance, String gender) {
     this.id = id;
     this.firstName = firstName;
@@ -148,27 +149,27 @@ public class Patient {
     this.postal = postal;
   }
 
-  public int getAge() {
+  public Integer getAge() {
     return age;
   }
 
-  public void setAge(int age) {
+  public void setAge(Integer age) {
     this.age = age;
   }
 
-  public int getHeight() {
+  public Integer getHeight() {
     return height;
   }
 
-  public void setHeight(int height) {
+  public void setHeight(Integer height) {
     this.height = height;
   }
 
-  public int getWeight() {
+  public Integer getWeight() {
     return weight;
   }
 
-  public void setWeight(int weight) {
+  public void setWeight(Integer weight) {
     this.weight = weight;
   }
 
