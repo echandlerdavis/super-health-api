@@ -121,9 +121,8 @@ public class EncounterServiceImplTest {
     assertThrows(ServiceUnavailable.class, () -> encounterServiceImpl.getEncounterById(123L,123L));
   }
 
-
   @Test
-  public void saveValidMovieReturnsMovie() {
+  public void saveValidEncounterReturnsEncounter() {
     assertEquals(testEncounter1, encounterServiceImpl.saveEncounter(testEncounter1.getPatient().getId(), testEncounterDTO));
   }
   @Test
@@ -150,6 +149,111 @@ public class EncounterServiceImplTest {
     when(encounterRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThrows(ResourceNotFound.class, () -> encounterServiceImpl.updateEncounter(testEncounter1.getPatient().getId(),123L, testEncounterDTO));
   }
+
+  @Test
+  public void validateVisitCodeFormatReturnsFalseIfInvalid(){
+    testEncounterDTO.setVisitCode("n0+ v@l1d");
+    assertEquals(false, encounterServiceImpl.validateVisitCodeFormat(testEncounterDTO));
+  }
+
+  @Test
+  public void validateVisitCodeFormatReturnsTrueIfValid(){
+    testEncounterDTO.setVisitCode("N3W 5C5");
+    assertEquals(true, encounterServiceImpl.validateVisitCodeFormat(testEncounterDTO));
+  }
+
+  @Test
+  public void validateVisitCodeFormatReturnsTrueIfNull(){
+    testEncounterDTO.setVisitCode(null);
+    assertEquals(true, encounterServiceImpl.validateVisitCodeFormat(testEncounterDTO));
+  }
+
+  @Test
+  public void validateBillingCodeFormatReturnsFalseIfInvalid(){
+    testEncounterDTO.setBillingCode("1nv@l1d");
+    assertEquals(false, encounterServiceImpl.validateBillingCode(testEncounterDTO));
+  }
+
+  @Test
+  public void validateBillingCodeFormatReturnsTrueIfValid(){
+    testEncounterDTO.setBillingCode("123.456.789-11");
+    assertEquals(true, encounterServiceImpl.validateBillingCode(testEncounterDTO));
+  }
+  @Test
+  public void validateBillingCodeFormatReturnsTrueIfNull(){
+    testEncounterDTO.setBillingCode(null);
+    assertEquals(true, encounterServiceImpl.validateBillingCode(testEncounterDTO));
+  }
+
+  @Test
+  public void validateIcd10ReturnsFalseIfInvalid(){
+    testEncounterDTO.setIcd10("invalid");
+    assertEquals(false, encounterServiceImpl.validateIcd10(testEncounterDTO));
+  }
+  @Test
+  public void validateIcd10ReturnsTrueIfValid(){
+    testEncounterDTO.setIcd10("D11");
+    assertEquals(true, encounterServiceImpl.validateIcd10(testEncounterDTO));
+  }
+  @Test
+  public void validateIcd10ReturnsTrueIfNull(){
+    testEncounterDTO.setIcd10(null);
+    assertEquals(true, encounterServiceImpl.validateIcd10(testEncounterDTO));
+  }
+
+  @Test
+  public void validateCostReturnsFalseIfMoreThanTwoDecimals(){
+    testEncounterDTO.setTotalCost(2.1234);
+    assertEquals(false, encounterServiceImpl.validateCost(testEncounterDTO.getTotalCost()));
+  }
+  @Test
+  public void validateCostReturnsFalseIfNegative(){
+    testEncounterDTO.setCopay(-2.11);
+    assertEquals(false, encounterServiceImpl.validateCost(testEncounterDTO.getCopay()));
+  }
+  @Test
+  public void validateCostReturnsTrueIfValid(){
+    testEncounterDTO.setCopay(2.11);
+    assertEquals(true, encounterServiceImpl.validateCost(testEncounterDTO.getCopay()));
+  }
+  @Test
+  public void validateCostReturnsTrueIfNull(){
+    testEncounterDTO.setTotalCost(null);
+    assertEquals(true, encounterServiceImpl.validateCost(testEncounterDTO.getTotalCost()));
+  }
+
+  @Test
+  public void validateDateFormatReturnsFalseIfInvalid(){
+    testEncounterDTO.setDate("1nV@l1d");
+    assertEquals(false, encounterServiceImpl.validateDateFormat(testEncounterDTO));
+  }
+  @Test
+  public void validateDateFormatReturnsTrueIfValid(){
+    testEncounterDTO.setDate("1234-12-12");
+    assertEquals(true, encounterServiceImpl.validateDateFormat(testEncounterDTO));
+  }
+  @Test
+  public void validateDateFormatReturnsTrueIfNull(){
+    testEncounterDTO.setDate(null);
+    assertEquals(true, encounterServiceImpl.validateDateFormat(testEncounterDTO));
+  }
+
+  @Test
+  public void validateNumberReturnsFalseForInvalidNumber(){
+    testEncounterDTO.setPulse(-100);
+    assertEquals(false, encounterServiceImpl.validateNumber(testEncounterDTO.getPulse()));
+  }
+  @Test
+  public void validateNumberReturnsTrueForValidNumber(){
+    testEncounterDTO.setDiastolic(200);
+    assertEquals(true, encounterServiceImpl.validateNumber(testEncounterDTO.getDiastolic()));
+  }
+  @Test
+  public void validateNumberReturnsTrueForNullValue(){
+    testEncounterDTO.setSystolic(null);
+    assertEquals(true, encounterServiceImpl.validateNumber(testEncounterDTO.getDiastolic()));
+  }
+
 
 }
 
