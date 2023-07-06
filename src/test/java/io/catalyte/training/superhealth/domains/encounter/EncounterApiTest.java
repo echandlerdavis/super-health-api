@@ -12,10 +12,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.catalyte.training.superhealth.constants.Paths;
+import io.catalyte.training.superhealth.constants.StringConstants;
 import io.catalyte.training.superhealth.data.EncounterFactory;
 import io.catalyte.training.superhealth.data.PatientFactory;
 import io.catalyte.training.superhealth.domains.patient.Patient;
 import io.catalyte.training.superhealth.domains.patient.PatientRepository;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -118,168 +122,189 @@ public class EncounterApiTest {
     Encounter returnedEncounter = mapper.readValue(response.getContentAsString(), Encounter.class);
     assertNotNull(returnedEncounter.getId());
   }
-//
-//  @Test
-//  public void saveRentalReturns400WhenTotalRentalCostIsNegativeNumber() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRental.setRentedMovies(newRentedMovies);
-//    newRental.setRentalTotalCost(-1.00);
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage").equals(StringConstants.RENTAL_TOTAL_COST_INVALID));
-//  }
-//
-//  @DirtiesContext
-//  @Test
-//  public void saveRentalReturns400WhenTotalRentalDateIsInvalid() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRental.setRentedMovies(newRentedMovies);
-//    newRental.setRentalDate("Invalid");
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage").equals(StringConstants.RENTAL_DATE_STRING_INVALID));
-//  }
-//
-//  @Test
-//  public void saveRentalReturns400WhenRentedMoviesAreNull() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    newRental.setRentedMovies(null);
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    String[] responseErrors = responseMap.get("errorMessage").toString().split("\n");
-//    List<String> errorsList = Arrays.asList(responseErrors);
-//    assertTrue(errorsList.containsAll(Arrays.asList(
-//        StringConstants.RENTAL_HAS_NO_RENTED_MOVIE,
-//        StringConstants.MOVIE_FIELDS_NULL(Arrays.asList("rentedMovies"))
-//    )));
-//  }
-//
-//  @Test
-//  public void saveRentalReturns400WhenRentedMoviesAreEmpty() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    newRental.setRentedMovies(new ArrayList<>());
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage").equals(StringConstants.RENTAL_HAS_NO_RENTED_MOVIE));
-//  }
-//
-//  @Test
-//  public void saveRentalReturns400WhenFieldsEmpty() throws Exception {
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRental.setRentedMovies(newRentedMovies);
-//    newRental.setRentalDate("");
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage")
-//        .equals(StringConstants.MOVIE_FIELDS_EMPTY(Arrays.asList("rentalDate"))));
-//  }
-//
-//  @DirtiesContext
-//  @Test
-//  public void saveRentalReturns400WhenFieldsNull() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRental.setRentedMovies(newRentedMovies);
-//    newRental.setRentalDate(null);
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage")
-//        .equals(StringConstants.MOVIE_FIELDS_NULL(Arrays.asList("rentalDate"))));
-//  }
-//  @DirtiesContext
-//  @Test
-//  public void saveRentalReturns400WhenRentedMovieDaysRentedInvalid() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRentedMovies.get(0).setDaysRented(-1);
-//    newRental.setRentedMovies(newRentedMovies);
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage").equals(StringConstants.RENTED_MOVIE_DAYS_RENTED_INVALID));
-//  }
-//
-//  @DirtiesContext
-//  @Test
-//  public void saveRentalReturns400WhenRentedMovieFieldsNull() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRentedMovies.get(0).setMovieId(null);
-//    newRental.setRentedMovies(newRentedMovies);
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage")
-//        .equals(StringConstants.RENTED_MOVIE_FIELDS_NULL(new HashSet<>(Arrays.asList("movieId")))));
-//  }
-//
-//  @Test
-//  public void saveRentalReturns400WhenRentedMovieMovieIdInvalid() throws Exception{
-//    Patient newRental = encounterFactory.createRandomRental();
-//    List<RentedMovie> newRentedMovies = rentedMovieFactory.generateRandomRentedMovies(newRental);
-//    newRentedMovies.get(0).setMovieId(50L);
-//    newRental.setRentedMovies(newRentedMovies);
-//    ObjectMapper mapper = new ObjectMapper();
-//    MockHttpServletResponse response = mockMvc.perform(post(RENTALS_PATH)
-//            .contentType("application/json")
-//            .content(mapper.writeValueAsString(newRental)))
-//        .andExpect(status().isBadRequest())
-//        .andReturn().getResponse();
-//
-//    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
-//    assertTrue(responseMap.get("errorMessage")
-//        .equals(StringConstants
-//            .RENTED_MOVIEID_INVALID(Arrays.asList(newRental.getRentedMovies().get(0).getMovieId()))));
-//  }
+
+  @Test
+  public void saveEncounterReturns400WhenVisitCodeIsInvalid() throws Exception{
+    encounterDTO.setVisitCode("n0+ V@l1d");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.VISIT_CODE_INVALID));
+  }
+
+  @Test
+  public void saveEncounterReturns400WhenBillingCodeIsInvalid() throws Exception{
+    encounterDTO.setBillingCode("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.BILLING_CODE_INVALID));
+  }
+
+  @Test
+  public void saveEncounterReturns400WhenIcd10Invalid() throws Exception{
+    encounterDTO.setIcd10("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.ICD10_INVALID));
+  }
+
+  @Test
+  public void saveEncounterReturns400WhenTotalCostInvalid() throws Exception{
+    encounterDTO.setTotalCost(-1.00);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.COST_INVALID("Total cost")));
+  }
+
+  @Test
+  public void saveEncounterReturns400WhenCopayInvalid() throws Exception{
+    encounterDTO.setCopay(-1.00);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.COST_INVALID("Copay")));
+  }
+
+  @Test
+  public void saveEncounterReturns400PulseNotNullButInvalid() throws Exception{
+    encounterDTO.setPulse(-100);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.NUMBER_INVALID("Pulse")));
+  }
+
+  @Test
+  public void saveEncounterReturns400SystolicNotNullButInvalid() throws Exception{
+    encounterDTO.setSystolic(-100);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.NUMBER_INVALID("Systolic")));
+  }
+
+  @Test
+  public void saveEncounterReturns400DiastolicNotNullButInvalid() throws Exception{
+    encounterDTO.setDiastolic(-100);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.NUMBER_INVALID("Diastolic")));
+  }
+
+  @Test
+  public void saveEncounterReturns400WhenDateInvalid() throws Exception{
+    encounterDTO.setDate("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.DATE_INVALID));
+  }
+
+  @Test
+  public void saveEncountersReturns400WhenRequiredFieldsAreNull() throws Exception{
+    encounterDTO.setVisitCode(null);
+    encounterDTO.setTotalCost(null);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(
+        StringConstants.FIELDS_NULL(Arrays.asList("visitCode", "totalCost")))
+    );
+  }
+
+  @Test
+  public void saveEncountersReturns400WhenRequiredFieldsAreEmpty() throws Exception{
+    encounterDTO.setVisitCode("");
+    encounterDTO.setDate("");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(post(ENCOUNTERS_PATH(testPatient1.getId()))
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(
+        StringConstants.FIELDS_EMPTY(Arrays.asList("visitCode", "date")))
+    );
+  }
+
+  @Test
+  public void saveEncounterReturns400WithListOfAllErrors() throws Exception {
+    encounterDTO.setVisitCode(null);
+    encounterDTO.setBillingCode("");
+    encounterDTO.setPulse(-2);
+    encounterDTO.setDate("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+            post(ENCOUNTERS_PATH(testPatient1.getId()))
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    String[] responseErrors = responseMap.get("errorMessage").toString().split("\n");
+    List<String> errorsList = Arrays.asList(responseErrors);
+    assertTrue(errorsList.containsAll(Arrays.asList(
+        StringConstants.NUMBER_INVALID("Pulse"),
+        StringConstants.DATE_INVALID,
+        StringConstants.FIELDS_NULL(Arrays.asList("visitCode")),
+        StringConstants.FIELDS_EMPTY(Arrays.asList("billingCode")))));
+  }
 
   @Test
   public void updateEncounterReturns200WithMovieObject() throws Exception {
@@ -293,6 +318,200 @@ public class EncounterApiTest {
     Encounter returnedEncounter = mapper.readValue(response.getContentAsString(), Encounter.class);
 
     assertNotNull(returnedEncounter.getId());
+  }
+
+  @Test
+  public void updateEncounterReturns400WhenVisitCodeIsInvalid() throws Exception{
+    encounterDTO.setVisitCode("n0+ V@l1d");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.VISIT_CODE_INVALID));
+  }
+
+  @Test
+  public void updateEncounterReturns400WhenBillingCodeIsInvalid() throws Exception{
+    encounterDTO.setBillingCode("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.BILLING_CODE_INVALID));
+  }
+
+  @Test
+  public void updateEncounterReturns400WhenIcd10Invalid() throws Exception{
+    encounterDTO.setIcd10("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.ICD10_INVALID));
+  }
+
+  @Test
+  public void updateEncounterReturns400WhenTotalCostInvalid() throws Exception{
+    encounterDTO.setTotalCost(-1.00);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.COST_INVALID("Total cost")));
+  }
+
+  @Test
+  public void updateEncounterReturns400WhenCopayInvalid() throws Exception{
+    encounterDTO.setCopay(-1.00);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.COST_INVALID("Copay")));
+  }
+
+  @Test
+  public void updateEncounterReturns400PulseNotNullButInvalid() throws Exception{
+    encounterDTO.setPulse(-100);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.NUMBER_INVALID("Pulse")));
+  }
+
+  @Test
+  public void updateEncounterReturns400SystolicNotNullButInvalid() throws Exception{
+    encounterDTO.setSystolic(-100);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.NUMBER_INVALID("Systolic")));
+  }
+
+  @Test
+  public void updateEncounterReturns400DiastolicNotNullButInvalid() throws Exception{
+    encounterDTO.setDiastolic(-100);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.NUMBER_INVALID("Diastolic")));
+  }
+
+  @Test
+  public void updateEncounterReturns400WhenDateInvalid() throws Exception{
+    encounterDTO.setDate("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(StringConstants.DATE_INVALID));
+  }
+
+  @Test
+  public void updateEncountersReturns400WhenRequiredFieldsAreNull() throws Exception{
+    encounterDTO.setVisitCode(null);
+    encounterDTO.setTotalCost(null);
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(
+        StringConstants.FIELDS_NULL(Arrays.asList("visitCode", "totalCost")))
+    );
+  }
+
+  @Test
+  public void updateEncountersReturns400WhenRequiredFieldsAreEmpty() throws Exception{
+    encounterDTO.setVisitCode("");
+    encounterDTO.setDate("");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+        put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+            .contentType("application/json")
+            .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    assertTrue(responseMap.get("errorMessage").equals(
+        StringConstants.FIELDS_EMPTY(Arrays.asList("visitCode", "date")))
+    );
+  }
+
+  @Test
+  public void updateEncounterReturns400WithListOfAllErrors() throws Exception {
+    encounterDTO.setVisitCode(null);
+    encounterDTO.setBillingCode("");
+    encounterDTO.setPulse(-2);
+    encounterDTO.setDate("Invalid");
+    ObjectMapper mapper = new ObjectMapper();
+    MockHttpServletResponse response = mockMvc.perform(
+            put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(encounterDTO)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
+    HashMap responseMap = mapper.readValue(response.getContentAsString(), HashMap.class);
+    String[] responseErrors = responseMap.get("errorMessage").toString().split("\n");
+    List<String> errorsList = Arrays.asList(responseErrors);
+    assertTrue(errorsList.containsAll(Arrays.asList(
+        StringConstants.NUMBER_INVALID("Pulse"),
+        StringConstants.DATE_INVALID,
+        StringConstants.FIELDS_NULL(Arrays.asList("visitCode")),
+        StringConstants.FIELDS_EMPTY(Arrays.asList("billingCode")))));
   }
 
 

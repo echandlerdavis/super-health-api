@@ -60,15 +60,6 @@ public class EncounterServiceImplTest {
 
     when(encounterRepository.findById(anyLong())).thenReturn(Optional.of(testEncounter1));
     when(encounterRepository.save(any())).thenReturn(testEncounter1);
-//
-//  //Set rentedMovieRepository.save to add rentedMovie to testRental
-//    when(rentedMovieRepository.findByRental(any(Patient.class))).thenAnswer((l) -> {
-//      return testRental.getRentedMovies();
-//    });
-//  //Set movieRepository.findAll() to return a list of movies to cross-reference
-//    when(movieRepository.findAll()).thenAnswer((l) -> {
-//      return movieList;
-//    });
   }
 
   private void setTestMovies() {

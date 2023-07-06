@@ -216,9 +216,7 @@ public class EncounterServiceImpl implements EncounterService {
       errors.add(StringConstants.NUMBER_INVALID("Diastolic"));
     }
 
-    if(!validateDateFormat(encounter) &&
-        !emptyFields.contains("date") &&
-        !nullFields.contains("date")){
+    if(!validateDateFormat(encounter)){
     errors.add(StringConstants.DATE_INVALID);
   }
 
@@ -235,7 +233,7 @@ public class EncounterServiceImpl implements EncounterService {
   public Boolean validateVisitCodeFormat(EncounterDTO encounter) {
     String regex = "^[A-Z]\\d[A-Z] \\d[A-Z]\\d$";
     Pattern pattern = Pattern.compile(regex);
-    if (encounter.getVisitCode() != null) {
+    if (encounter.getVisitCode() != null && !encounter.getVisitCode().isEmpty()) {
       Matcher matcher = pattern.matcher(encounter.getVisitCode());
       return matcher.matches();
     }
@@ -252,7 +250,7 @@ public class EncounterServiceImpl implements EncounterService {
   public Boolean validateBillingCode(EncounterDTO encounter) {
     String regex = "^\\d{3}.\\d{3}.\\d{3}-\\d{2}$";
     Pattern pattern = Pattern.compile(regex);
-    if (encounter.getBillingCode() != null) {
+    if (encounter.getBillingCode() != null && !encounter.getBillingCode().isEmpty()) {
       Matcher matcher = pattern.matcher(encounter.getBillingCode());
       return matcher.matches();
     }
@@ -269,7 +267,7 @@ public class EncounterServiceImpl implements EncounterService {
   public Boolean validateIcd10(EncounterDTO encounter) {
     String regex = "^[A-Z]\\d{2}$";
     Pattern pattern = Pattern.compile(regex);
-    if (encounter.getIcd10() != null) {
+    if (encounter.getIcd10() != null && !encounter.getIcd10().isEmpty()) {
       Matcher matcher = pattern.matcher(encounter.getIcd10());
       return matcher.matches();
     }
@@ -292,7 +290,7 @@ public class EncounterServiceImpl implements EncounterService {
       String[] costString = String.valueOf(cost).split("\\.");
       Boolean price2Decimals = costString[1].length() <= 2;
       Boolean priceGreaterThanZero = cost > 0;
-      return priceGreaterThanZero || price2Decimals;
+      return priceGreaterThanZero && price2Decimals;
     }
     return true;
   }
@@ -306,7 +304,7 @@ public class EncounterServiceImpl implements EncounterService {
   public Boolean validateDateFormat(EncounterDTO encounter) {
     String regex = "^\\d{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])$";
     Pattern pattern = Pattern.compile(regex);
-    if (encounter.getDate() != null) {
+    if (encounter.getDate() != null && !encounter.getDate().isEmpty()) {
       Matcher matcher = pattern.matcher(encounter.getDate());
       return matcher.matches();
     }

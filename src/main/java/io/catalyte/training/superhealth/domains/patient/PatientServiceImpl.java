@@ -229,7 +229,6 @@ public class PatientServiceImpl implements PatientService {
     List<String> errors = new ArrayList<>();
     List<String> emptyFields = getPatientFieldsEmptyOrNull(patient).get("emptyFields");
     List<String> nullFields = getPatientFieldsEmptyOrNull(patient).get("nullFields");
-
     if (!nullFields.isEmpty()) {
       errors.add(StringConstants.FIELDS_NULL(nullFields));
     }

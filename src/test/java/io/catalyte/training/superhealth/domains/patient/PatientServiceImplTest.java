@@ -147,6 +147,13 @@ public class PatientServiceImplTest {
   }
 
   @Test
+  public void patientEmailAlreadyExistsThrowsServiceUnavailableWhenPatientSaved(){
+    doThrow(new DataAccessException("TEST EXCEPTION") {
+    }).when(patientRepository).findAll();
+    assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.savePatient(testPatient));
+  }
+
+  @Test
   public void updateValidPatientReturnsRental(){
     assertEquals(testPatient, patientServiceImpl.updatePatient(1L, testPatient));
   }
