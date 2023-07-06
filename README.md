@@ -1,43 +1,24 @@
-# Movie Rentals API
+# Super Health API
 
 ## Description
-This is a backend set up for a Movie Rental application. There are three classes created which
-each correspond to a Table in the SQL database:
-### 1. Movie
-        - id(Long)
-        - sku(String)
-        - title(String)
-        - genre(String)
-        - director(String)
-        - dailyRentalCost(Double)
-### 2. Rental
-        - id(Long)
-        - rentalDate(String)
-        - rentedMovies (List of Rented Movie Objects)
-        - rentalTotalCost(Double)
-### 3. Rented Movie
-        - id(Long)
-        - movieId(Long)
-        - daysRented(int)
-        - rental - this is how rented movie is connected to the Rental table, but is invisible to 
-        return objects
-    
-Using postman requests that are available as a collection in a link below, both Movie and Rental tables
-have basic CRUD functionality, within specific validation parameters. There is demo data of 20 Movies and
-10 Rentals, and when the server is started then the data will be populated, and the user can make requests
-to the postman collection. 
+This is the back-end set up for the Super Health, Inc. website where the user can view, add, update
+and patients to the database as well as associated encounters for each patient. The endpoints for 
+these actions exist to be connected to the super-health-ui to view and manipulate the date from 
+the front-end. 
 
-### Start the Server
+Each patient has a number of fields, each with validation when a user is updating or saving new 
+patient information. If valid fields are not entered, then the server will throw an appropriate 
+error and not save, update, or delete the patient should it not meet the requirements. The error 
+messages that will show up will inform the user of what is wrong with the data they entered. 
 
-Right-click AppRunner, and select "Run 'AppRunner.main()'"
+Like the patient, the encounters also have validation for adding and updating the data, and will
+throw appropriate errors with messages to inform the user of the issue. 
 
-## PostMan Collection Link
-[Link to Postman Collection](https://www.postman.com/cdavis2903/workspace/chandler-s-public-workspace/environment/26507437-5c30f867-597c-4f62-91f1-e55bd79998e9)
-
-### Connections
-
-By default, this service starts up on port 8085 and accepts cross-origin requests from `*`.
-
+## Pre-requisites
+You can operate this back end platform from Intellij, and must install necessary dependencies before
+attempting to run the server. If you are only viewing the backend, you can view the endpoints on the
+postman link below (postman must be installed), or run the front end using npm to view and 
+manipulate the date from the UI. 
 #### JDK
 
 You must have a JDK installed on your machine.
@@ -50,12 +31,26 @@ This server requires that you have Postgres installed and running on the default
 - Your username should be `postgres`
 - Your password should be `root`
 
+### Start the Server
+
+Right-click AppRunner, and select "Run 'AppRunner.main()'"
+
+## PostMan Collection Link
+[Link to Postman Collection](https://www.postman.com/cdavis2903/workspace/chandler-s-public-workspace/environment/26507437-5c30f867-597c-4f62-91f1-e55bd79998e9)
+
+### Connections
+
+By default, this service starts up on port 8085 and accepts cross-origin requests from `*`.
+
 ## Testing
 
 Right-click the testing file you wish to run. There are four options:
-    1. MovieApiTest
-    2. MovieServiceImplTest
-    3. RentalApiTest
-    4. RentalServiceImplTest
+    1. EncounterApiTest
+    2. EncounterServiceImplTest
+    3. PatientApiTEst
+    4. PatientServiceImplTest
 select "Run 'NameOfFile'" and the tests will begin.
 
+## Viewing the Front End
+Clone the super-health-ui repository to your local machine, and follow its read me instructions
+to view the application on your local host. 
