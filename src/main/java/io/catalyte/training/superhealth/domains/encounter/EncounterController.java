@@ -1,16 +1,13 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
-import static io.catalyte.training.superhealth.constants.Paths.ENCOUNTERS_PATH;
 import static io.catalyte.training.superhealth.constants.Paths.PATIENTS_PATH;
 
 import io.catalyte.training.superhealth.constants.LoggingConstants;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * The ProductController exposes endpoints for product related actions.
+ * The EncounterController exposes endpoints for encounter related actions.
  */
 @RestController
 @RequestMapping(value = PATIENTS_PATH)
@@ -49,10 +46,10 @@ public class EncounterController {
 
 
   /**
-   * Handles a POST request to /encounters. This creates a new movie object that gets saved to the
+   * Handles a POST request to patients/{patientId}/encounters. This creates a new encounter object that gets saved to the
    * database.
    *
-   * @param encounterDTO - movie object
+   * @param encounterDTO - encounter request object
    * @return encounter added to database
    */
   @PostMapping(value = "{patientId}/encounters")
@@ -62,12 +59,12 @@ public class EncounterController {
   }
 
   /**
-   * Handles a PUT request to /encounters/id. This updates an existing encounter object that gets saved to the
+   * Handles a PUT request to patients/{patientId}/encounters/{id}. This updates an existing encounter object that gets saved to the
    * database.
    *
    * @param encounter - encounter object
    * @param id - id of encounter to be updated
-   * @return encouter updated to database
+   * @return encounter updated to database
    */
   @PutMapping(value = "/{patientId}/encounters/{id}")
   public ResponseEntity<Encounter> updateEncounter(@PathVariable Long patientId, @PathVariable Long id,
@@ -75,19 +72,5 @@ public class EncounterController {
     logger.info(LoggingConstants.UPDATE_ENCOUNTER(id));
     return new ResponseEntity<>(encounterService.updateEncounter(patientId, id, encounter), HttpStatus.OK);
   }
-//
-//  /**
-//   * Handles a DELETE request to /encounters/id. This deletes an existing encounter object.
-//   *
-//   * @param id - id of encounter to be deleted
-//   * @return no content response entity
-//   */
-//  @DeleteMapping(value = "/{id}")
-//  public ResponseEntity<?> deleteEncounter(@PathVariable Long id){
-//    logger.info(LoggingConstants.DELETE_ENCOUNTER(id));
-//    encounterService.deleteEncounter(id);
-//
-//    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//  }
 
 }

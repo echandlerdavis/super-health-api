@@ -138,7 +138,7 @@ public class EncounterServiceImplTest {
     assertEquals(testEncounter1, encounterServiceImpl.saveEncounter(testEncounter1.getPatient().getId(), testEncounterDTO));
   }
   @Test
-  public void saveMovieThrowsServiceUnavailable() {
+  public void saveEncounterThrowsServiceUnavailable() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
     }).when(encounterRepository).save(any());
     assertThrows(ServiceUnavailable.class, () -> encounterServiceImpl.saveEncounter(testEncounter1.getPatient().getId(), testEncounterDTO));

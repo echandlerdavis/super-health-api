@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-//TODO: Update language in this file
 /**
  * Describes an object to hold error information that the server will return to clients.
  */

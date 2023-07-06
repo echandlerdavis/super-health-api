@@ -2,7 +2,6 @@ package io.catalyte.training.superhealth.domains.encounter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.catalyte.training.superhealth.domains.patient.Patient;
-import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
- * This class is a representation of a patient encounter.
+ * This class is a representation of an encounter.
  */
 @Entity
 public class Encounter {

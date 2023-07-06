@@ -54,8 +54,9 @@ public class EncounterApiTest {
   }
 
   /**
-   * Helper method initializes a test purchase with billing address, delivery address, credit card
-   * info, and product with id of 1 to be sent in POST method
+   * Helper method initializes a test encounter with random info and testPatient as patient,
+   * initializes a DTO to be saved.
+   *
    */
   private void setTestEncounters() {
     testPatient1 = patientFactory.createRandomPatient();
@@ -86,7 +87,7 @@ public class EncounterApiTest {
   }
 
   /**
-   * Remove rentals that were added in setup.
+   * Remove patients and encounters that were added in setup.
    */
   @After
   public void tearDown() {

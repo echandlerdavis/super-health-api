@@ -23,7 +23,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 /**
- * This class provides the implementation for the ProductService interface.
+ * This class provides the implementation for the EncounterService interface.
  */
 @Service
 public class EncounterServiceImpl implements EncounterService {
@@ -41,10 +41,11 @@ public class EncounterServiceImpl implements EncounterService {
   }
 
   /**
-   * Retrieves the product with the provided id from the database.
+   * Retrieves the encounter with the provided id and patientId from the database.
    *
-   * @param id - the id of the product to retrieve
-   * @return - the product
+   * @param patientId - id of the patient to which the encounter belongs
+   * @param id - the id of the encounter to retrieve
+   * @return - the encounter
    */
   public Encounter getEncounterById(Long patientId, Long id) {
     Encounter encounter;
@@ -58,7 +59,8 @@ public class EncounterServiceImpl implements EncounterService {
 
     if (encounter != null) {
       if(encounter.getPatient().getId() != patientId){
-        throw new BadRequest();
+        logger.error(StringConstants.PATIENT_ID_INVALID);
+        throw new BadRequest(StringConstants.PATIENT_ID_INVALID);
       }
       return encounter;
     } else {
@@ -66,19 +68,17 @@ public class EncounterServiceImpl implements EncounterService {
       throw new ResourceNotFound(LoggingConstants.GET_BY_ID_FAILURE(id));
     }
 
-    //TODO: create constants message for this bad request;
-
   }
 
-  //TODO: Test Validation.
   /**
-   * Adds a movie to the database
+   * Adds an encounter to the database
    *
    * @param encounterDTO - encounter request object
-   * @return list of movie objects that are added to database
+   * @return encounter being added to the database
 //   */
   public Encounter saveEncounter(Long patientId, EncounterDTO encounterDTO) {
     if(patientId != encounterDTO.getPatientId()){
+      logger.error(StringConstants.PATIENT_ID_INVALID);
       throw new RequestConflict(StringConstants.PATIENT_ID_INVALID);
     }
 
@@ -112,13 +112,12 @@ public class EncounterServiceImpl implements EncounterService {
 
 
   /**
-   * Updates movie in the database.
+   * Updates encounter in the database.
+   * @param patientId - id of patient to which the encounter belongs
    * @param id - id of movie to be updated
-   * @param encounter - updated movie payload
-   * @return - updated movie object
+   * @param encounter - updated encounter payload
+   * @return - updated encounter object
    */
-
-//  //TODO: Update Logging constants for Resource not found, etc.
   public Encounter updateEncounter(Long patientId, Long id, EncounterDTO encounter){
     Encounter findEncounter;
 
@@ -138,7 +137,6 @@ public class EncounterServiceImpl implements EncounterService {
       throw new ResourceNotFound(LoggingConstants.UPDATE_ENCOUNTER_FAILURE);
     }
 
-  if(findEncounter != null) {
     findEncounter.setPatient(patientService.getPatientById(encounter.getPatientId()));
     findEncounter.setNotes(encounter.getNotes());
     findEncounter.setVisitCode(encounter.getVisitCode());
@@ -152,7 +150,6 @@ public class EncounterServiceImpl implements EncounterService {
     findEncounter.setSystolic(encounter.getSystolic());
     findEncounter.setDiastolic(encounter.getDiastolic());
     findEncounter.setDate(encounter.getDate());
-  }
     List<String> encounterErrors = getEncounterErrors(encounter);
 
     if (!encounterErrors.isEmpty()) {
@@ -169,9 +166,9 @@ public class EncounterServiceImpl implements EncounterService {
 
 
   /**
-   * Helper method that reads a movie and validates its properties
+   * Helper method that reads an encounter and validates its properties
    *
-   * @param encounter movie to be validated
+   * @param encounter encounter to be validated
    * @return a list of errors
    */
   public List<String> getEncounterErrors(EncounterDTO encounter) {
@@ -228,14 +225,12 @@ public class EncounterServiceImpl implements EncounterService {
     return errors;
   }
 
-
-
   /**
    * Validates the format of a visit code to match 'LDL DLD' where L is a capital letter
    * and D is a digit.
    *
    * @param encounter encounter to be validated
-   * @return boolean if product has valid quantity
+   * @return boolean if encounter has valid visit code
    */
   public Boolean validateVisitCodeFormat(EncounterDTO encounter) {
     String regex = "^[A-Z]\\d[A-Z] \\d[A-Z]\\d$";
@@ -244,15 +239,15 @@ public class EncounterServiceImpl implements EncounterService {
       Matcher matcher = pattern.matcher(encounter.getVisitCode());
       return matcher.matches();
     }
-    return false;
-  };
+    return true;
+  }
 
   /**
    * Validates the format of a billing code to match 'DDD.DDD.DDD-DD' where
    * D is a digit.
    *
    * @param encounter encounter to be validated
-   * @return boolean if product has valid quantity
+   * @return boolean if encounter has valid billing code
    */
   public Boolean validateBillingCode(EncounterDTO encounter) {
     String regex = "^\\d{3}.\\d{3}.\\d{3}-\\d{2}$";
@@ -261,15 +256,15 @@ public class EncounterServiceImpl implements EncounterService {
       Matcher matcher = pattern.matcher(encounter.getBillingCode());
       return matcher.matches();
     }
-    return false;
-  };
+    return true;
+  }
 
   /**
    * Validates the format of an icd10 to match 'LDD' where L is a capital letter
    * and D is a digit.
    *
    * @param encounter encounter to be validated
-   * @return boolean if product has valid quantity
+   * @return boolean if encounter has valid icd10
    */
   public Boolean validateIcd10(EncounterDTO encounter) {
     String regex = "^[A-Z]\\d{2}$";
@@ -278,8 +273,8 @@ public class EncounterServiceImpl implements EncounterService {
       Matcher matcher = pattern.matcher(encounter.getIcd10());
       return matcher.matches();
     }
-    return false;
-  };
+    return true;
+  }
 
   /**
    * Checks that a cost is a double value greater than zero and does not have more than 2 digits after the
@@ -299,13 +294,43 @@ public class EncounterServiceImpl implements EncounterService {
       Boolean priceGreaterThanZero = cost > 0;
       return priceGreaterThanZero || price2Decimals;
     }
-    return false;
+    return true;
   }
 
   /**
-   * Reads a movie fields and checks for fields that are empty or null
+   * Validates the format of the date to be 'YYYY-MM-DD'
    *
-   * @param encounter movie to be validated
+   * @param encounter - encounter to be validated
+   * @return boolean if date is valid
+   */
+  public Boolean validateDateFormat(EncounterDTO encounter) {
+    String regex = "^\\d{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])$";
+    Pattern pattern = Pattern.compile(regex);
+    if (encounter.getDate() != null) {
+      Matcher matcher = pattern.matcher(encounter.getDate());
+      return matcher.matches();
+    }
+    return true;
+  }
+
+  /**
+   * Validates number is greater than zero
+   *
+   * @param number to be validated
+   * @return boolean
+   */
+  public Boolean validateNumber(Integer number){
+    if(number == null){
+      return true;
+    }
+    return number > 0;
+  }
+
+
+  /**
+   * Reads an encounter's fields and checks for fields that are empty or null
+   *
+   * @param encounter encounter to be validated
    * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
    */
   public HashMap<String, List<String>> getFieldsEmptyOrNull(EncounterDTO encounter) {
@@ -314,20 +339,20 @@ public class EncounterServiceImpl implements EncounterService {
     List<String> emptyFields = new ArrayList<>();
     List<String> nullFields = new ArrayList<>();
     HashMap<String, List<String>> results = new HashMap<>();
-    //Get product field names
+    //Get encounter field names
     encounterFields.forEach((field -> encounterFieldNames.add(field.getName())));
-    //Remove fields that will be added automatically after the save,  and optional fields
+    //Remove fields that will be added automatically after the save or optional fields
     List<String> optionalFields = new ArrayList<>(
         Arrays.asList("patientId", "notes", "pulse", "systolic", "diastolic")
     );
     encounterFieldNames.removeAll(optionalFields);
 
-    //Convert product to a HashMap
+    //Convert encounter to a HashMap
     ObjectMapper mapper = new ObjectMapper();
     Map encounterMap = mapper.convertValue(encounter, HashMap.class);
-    //Loop through each fieldName to retrieve each product mapping value of the field
+    //Loop through each fieldName to retrieve each encounter mapping value of the field
     encounterFieldNames.forEach((field) -> {
-      //Check if the value for the product's field is null or empty and place in the corresponding list
+      //Check if the value for the encounter's field is null or empty and place in the corresponding list
       if (encounterMap.get(field) == null) {
         nullFields.add(field);
       } else if (encounterMap.get(field).toString().trim() == "") {
@@ -340,22 +365,6 @@ public class EncounterServiceImpl implements EncounterService {
     return results;
   }
 
-  public Boolean validateDateFormat(EncounterDTO encounter) {
-    String regex = "^\\d{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])$";
-    Pattern pattern = Pattern.compile(regex);
-    if (encounter.getDate() != null) {
-      Matcher matcher = pattern.matcher(encounter.getDate());
-      return matcher.matches();
-    }
-    return false;
-  }
-
-  public Boolean validateNumber(Integer number){
-    if(number == null){
-      return true;
-    }
-    return number > 0;
-  }
 
 
 

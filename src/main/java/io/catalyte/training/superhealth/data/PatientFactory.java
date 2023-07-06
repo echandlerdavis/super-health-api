@@ -169,16 +169,27 @@ public class PatientFactory {
 
   /**
    * Generates random zip code
+   * @return 5 digit zip code as string
    */
   public static String getRandomPostal(){
     int number = randomGenerator.nextInt(100000);
     return String.format("%05d", number);
   }
 
+  /**
+   * Gets random insurance from list
+   *
+   * @return - an insurance string
+   */
   public static String getRandomInsurance(){
     return insurances[randomGenerator.nextInt(insurances.length)];
   }
 
+  /**
+   * Gets random gender from list
+   *
+   * @return - a gender string
+   */
   public static String getRandomGender(){
     return genders[randomGenerator.nextInt(genders.length)];
   }

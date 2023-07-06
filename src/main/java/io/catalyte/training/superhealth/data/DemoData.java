@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 /**
  * Because this class implements CommandLineRunner, the run method is executed as soon as the server
  * successfully starts and before it begins accepting requests from the outside. Here, we use this
- * as a place to run some code that generates and saves a list of random products into the
+ * as a place to run some code that generates and saves a list of random patients and encounters into the
  * database.
  */
 @Component
@@ -37,7 +37,7 @@ public class DemoData implements CommandLineRunner {
 
     try {
       // Retrieve the value of custom property in application.yml
-      loadData = Boolean.parseBoolean(env.getProperty("movies.load"));
+      loadData = Boolean.parseBoolean(env.getProperty("patients.load"));
     } catch (NumberFormatException nfe) {
       logger.error("config variable loadData could not be parsed, falling back to default");
       loadData = true;
@@ -60,10 +60,13 @@ public class DemoData implements CommandLineRunner {
     logger.info("Loading random number of encounters...");
 
     // Generate random number of encounters for each patient and persist them to the database
+    // Made an exception for id #2 to have an example to delete
     for (Patient patient : patientList){
-      List<Encounter> encounterList = encounterFactory.generateRandomEncounterList(patient);
-      patient.setEncounters(encounterList);
-      encounterRepository.saveAll(encounterList);
+      if(patient.getId() != 2L) {
+        List<Encounter> encounterList = encounterFactory.generateRandomEncounterList(patient);
+        patient.setEncounters(encounterList);
+        encounterRepository.saveAll(encounterList);
+      }
     }
 
     logger.info("Data load completed. You can make requests now.");

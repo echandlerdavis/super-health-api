@@ -3,6 +3,9 @@ package io.catalyte.training.superhealth.domains.patient;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * This interface provides an abstraction layer for the Patient Service
+ */
 public interface PatientService {
 
   List<Patient> getPatients();

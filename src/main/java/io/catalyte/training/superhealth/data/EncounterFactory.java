@@ -41,15 +41,29 @@ public class EncounterFactory {
 
   private static final Random randomGenerator = new Random();
 
-
+  /**
+   * Gets a random note between from list.
+   *
+   * @return - string, a random note
+   */
   private static String getRandomNote(){
     return notes[randomGenerator.nextInt(notes.length)];
   };
 
+  /**
+   * Gets a random capital letter to apply to visit code and icd10
+   *
+   * @return a random capital letter
+   */
   private static Character getRandomLetter(){
     String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     return letters.charAt(randomGenerator.nextInt(letters.length()));
   };
+
+  /**
+   * Generates a random visit code with format LDL DLD where L is a capital letter and D is a digit.
+   * @return
+   */
   private static String getRandomVisitCode(){
     String visitCode = "";
     while(visitCode.length() < 6){
@@ -59,10 +73,18 @@ public class EncounterFactory {
   return visitCode.substring(0, 3) + " " + visitCode.substring(3);
   };
 
+  /**
+   * Gets random provider name from the list
+   * @return provider string
+   */
   private static String getRandomProvider(){
     return providers[randomGenerator.nextInt(providers.length)];
   }
 
+  /**
+   * Generates random billing code with format DDD.DDD.DDD-DD
+   * @return billing code string
+   */
   private static String getRandomBillingCode(){
     int d1 = randomGenerator.nextInt(1000);
     int d2 = randomGenerator.nextInt(1000);
@@ -72,15 +94,29 @@ public class EncounterFactory {
 
   }
 
+  /**
+   * Generates random icd10 with format LDD where L is a capital letter and D is a digit.
+   * @return
+   */
   private static String getRandomIcd10(){
     return getRandomLetter() + (String.format("%02d", randomGenerator.nextInt(100)));
   }
 
+  /**
+   * Generates random double to serve as a price with format to two decimal places
+   * @param min minimum value
+   * @param max maximum value
+   * @return Double
+   */
   public static Double generateRandomPrice(double min, double max){
     DecimalFormat df = new DecimalFormat("0.00");
     return Double.valueOf(df.format((randomGenerator.nextDouble() * (max-min)) + min));
   }
 
+  /**
+   * Gets random chief complaint from list
+   * @return chief complaint string
+   */
   public static String getChiefComplaint(){
     return complaints[randomGenerator.nextInt(complaints.length)];
   };
@@ -102,8 +138,11 @@ public class EncounterFactory {
     return LocalDate.ofEpochDay(randomDay);
   }
 
-
-
+  /**
+   * Orchestrator method to call all random generators and create a unique encounter.
+   * @param patient Patient to which the encounter belongs
+   * @return Encounter
+   */
   public Encounter createRandomEncounter(Patient patient){
     Encounter encounter = new Encounter();
 //      Setters
@@ -124,6 +163,12 @@ public class EncounterFactory {
     return encounter;
 
   }
+
+  /**
+   * Creates a random number of encounters for a patient. Has to be larger than 1.
+   * @param patient Patient to which the encounters belong
+   * @return list of encounters.
+   */
   public List<Encounter> generateRandomEncounterList(Patient patient){
     List<Encounter> encounterList = new ArrayList<>();
     int numberOfEncounters = randomGenerator.nextInt(5) + 1;

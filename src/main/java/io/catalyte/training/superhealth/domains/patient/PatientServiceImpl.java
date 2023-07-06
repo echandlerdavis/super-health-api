@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,9 @@ public class PatientServiceImpl implements PatientService {
   }
 
   /**
-   * Retrieves all rentals from the database
+   * Retrieves all patients from the database
    *
-   * @return list of rentals
+   * @return list of patients
    */
   public List<Patient> getPatients() {
     try {
@@ -49,6 +48,10 @@ public class PatientServiceImpl implements PatientService {
     }
   }
 
+  /**
+   * Retrieves maps of patient id's and corresponding emails to compare and validate unique emails
+   * @return map of patient ids and emails
+   */
   public HashMap<Long, String> getPatientEmails(){
     List<Patient> patients;
     try{
@@ -64,10 +67,10 @@ public class PatientServiceImpl implements PatientService {
   };
 
   /**
-   * Search for single rental by rental id.
+   * Search for single patient by patient id.
    *
    * @param id Long id
-   * @return a single rental object.
+   * @return a single patient object.
    */
   public Patient getPatientById(Long id) {
     Patient patient;
@@ -88,10 +91,10 @@ public class PatientServiceImpl implements PatientService {
   }
 
   /**
-   * Persists a rental to the database
+   * Persists a patient to the database
    *
-   * @param newPatient - the rental to persist
-   * @return the persisted rental object
+   * @param newPatient - the patient to persist
+   * @return the persisted patient object
    */
   public Patient savePatient(Patient newPatient) {
     List<String> patientErrors = getPatientErrors(newPatient);
@@ -128,10 +131,10 @@ public class PatientServiceImpl implements PatientService {
 
 
   /**
-   * Updates and existing rental in the database
-   * @param id - id of the existing rental to be updated
-   * @param updatedPatient - updated rental request object
-   * @return updated Rental object
+   * Updates and existing patient in the database
+   * @param id - id of the existing patient to be updated
+   * @param updatedPatient - updated patient request object
+   * @return updated patient object
    */
   public Patient updatePatient(Long id, Patient updatedPatient){
     Patient findPatient;
@@ -186,8 +189,8 @@ public class PatientServiceImpl implements PatientService {
   }
 
   /**
-   * Deletes rental in the database.
-   * @param id - id of the rental to be deleted
+   * Deletes patient in the database.
+   * @param id - id of the patient to be deleted
    */
   public void deletePatientById(Long id){
     Patient findPatient;
@@ -217,7 +220,7 @@ public class PatientServiceImpl implements PatientService {
   }
 
   /**
-   * Helper method that reads a rental and validates its properties
+   * Helper method that reads a patient and validates its properties
    *
    * @param patient patient to be validated
    * @return a list of errors
@@ -266,29 +269,29 @@ public class PatientServiceImpl implements PatientService {
 
 
   /**
-   * Reads rental fields and checks for fields that are empty or null
+   * Reads patient fields and checks for fields that are empty or null
    *
-   * @param rental movie to be validated
+   * @param patient patient to be validated
    * @return A Hashmap {"emptyFields": List of empty fields, "nullFields": list of null fields}
    */
-  public HashMap<String, List<String>> getPatientFieldsEmptyOrNull(Patient rental) {
+  public HashMap<String, List<String>> getPatientFieldsEmptyOrNull(Patient patient) {
     List<Field> patientFields = Arrays.asList(Patient.class.getDeclaredFields());
     List<String> patientFieldNames = new ArrayList<>();
     List<String> emptyFields = new ArrayList<>();
     List<String> nullFields = new ArrayList<>();
     HashMap<String, List<String>> results = new HashMap<>();
-    //Get product field names
+    //Get patient field names
     patientFields.forEach((field -> patientFieldNames.add(field.getName())));
     //Remove id as patient will not have an id before it is saved
     patientFieldNames.remove("id");
     //Remove encounters field as it can and should be null
     patientFieldNames.remove("encounters");
-    //Convert rental to a HashMap
+    //Convert patient to a HashMap
     ObjectMapper mapper = new ObjectMapper();
-    Map patientMap = mapper.convertValue(rental, HashMap.class);
-    //Loop through each fieldName to retrieve each rental mapping value of the field
+    Map patientMap = mapper.convertValue(patient, HashMap.class);
+    //Loop through each fieldName to retrieve each patient mapping value of the field
     patientFieldNames.forEach((field) -> {
-      //Check if the value for the rental's field is null or empty and place in the corresponding list
+      //Check if the value for the patient's field is null or empty and place in the corresponding list
       if (patientMap.get(field) == null) {
         nullFields.add(field);
       } else if (patientMap.get(field).toString().trim() == "") {
@@ -302,6 +305,12 @@ public class PatientServiceImpl implements PatientService {
     return results;
   }
 
+  /**
+   * Validates the format of a name string to be alphabetic name characters
+   *
+   * @param nameString string to be validated
+   * @return boolean if the name string is valid
+   */
   public Boolean validateNameFormat(String nameString){
     String regex = "^[a-zA-Z\\s'-]+$";
     Pattern pattern = Pattern.compile(regex);
@@ -312,6 +321,12 @@ public class PatientServiceImpl implements PatientService {
     return true;
   };
 
+  /**
+   * Validates the format of a ssn
+   *
+   * @param newPatient patient to be validated
+   * @return boolean if patient has a valid ssn
+   */
   public Boolean validateSSN(Patient newPatient){
     String regex = "^\\d{3}-\\d{2}-\\d{4}$";
     Pattern pattern = Pattern.compile(regex);
@@ -322,8 +337,14 @@ public class PatientServiceImpl implements PatientService {
     return true;
   };
 
+  /**
+   * Validates the format of an email to match x@a.a where 'x' is alphanumeric and
+   * 'a' is alphabetic.
+   * @param newPatient patient to be validated
+   * @return boolean if patient's email is valid
+   */
   public Boolean validateEmailFormat(Patient newPatient){
-    String regex = "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]+$";
+    String regex = "^[A-Za-z0-9]+@[A-Za-z]+\\.[A-Za-z]+$";
     Pattern pattern = Pattern.compile(regex);
     if (newPatient.getEmail() != null && !newPatient.getEmail().isEmpty()) {
       Matcher matcher = pattern.matcher(newPatient.getEmail());
@@ -333,6 +354,12 @@ public class PatientServiceImpl implements PatientService {
 
   };
 
+  /**
+   * Validates format of a state string to be LL where 'L' is a capital letter
+   *
+   * @param newPatient patient to be validated
+   * @return boolean if patient has valid state string
+   */
   public Boolean validateStateFormat(Patient newPatient){
     String regex = "^[A-Z]{2}$";
     Pattern pattern = Pattern.compile(regex);
@@ -343,6 +370,12 @@ public class PatientServiceImpl implements PatientService {
     return true;
   };
 
+  /**
+   * Validates postal code is in format 'DDDDD' or 'DDDDD-DDDD' where D is digit.
+   *
+   * @param newPatient patient to be validated
+   * @return boolean if patient has valid postal code
+   */
   public Boolean validatePostalCode(Patient newPatient){
     String regex1 = "^\\d{5}$";
     String regex2 = "^\\d{5}-\\d{4}$";
@@ -356,10 +389,24 @@ public class PatientServiceImpl implements PatientService {
     return true;
   };
 
-  public Boolean validateNumber(int number){
+  /**
+   * Validates number is greater than zero
+   *
+   * @param number to be validated
+   * @return boolean
+   */
+  public Boolean validateNumber(Integer number){
+    if(number == null){
+      return true;
+    }
     return number > 0;
   }
 
+  /**
+   * Validates gender string is "Male", "Female" or "Other" regardless of case.
+   * @param newPatient patient to be validated
+   * @return boolean if gender is valid
+   */
   public Boolean validateGender(Patient newPatient){
     if(newPatient.getGender() != null && !newPatient.getGender().isEmpty()) {
       String gender = newPatient.getGender().toLowerCase().trim();
@@ -371,9 +418,9 @@ public class PatientServiceImpl implements PatientService {
     return true;
   };
   /**
-   * Checks whether the sku of a movie attempting to be added or updated already exists in the database.
+   * Checks whether the email attempting to be added or updated already exists in the database.
    * @param newPatient - patient to be saved
-   * @return Boolean if the sku exists already.
+   * @return Boolean if the email exists already.
    */
   public Boolean patientEmailAlreadyExists(Patient newPatient){
     List<Patient> allPatients;

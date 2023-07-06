@@ -1,18 +1,5 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.catalyte.training.superhealth.domains.patient.Patient;
-import java.time.LocalDate;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 public class EncounterDTO {
 
     private Long patientId;

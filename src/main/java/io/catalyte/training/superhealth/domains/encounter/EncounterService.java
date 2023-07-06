@@ -1,9 +1,8 @@
 package io.catalyte.training.superhealth.domains.encounter;
 
-import java.util.List;
 
 /**
- * This interface provides an abstraction layer for the Products Service
+ * This interface provides an abstraction layer for the Encounter Service
  */
 public interface EncounterService {
 
