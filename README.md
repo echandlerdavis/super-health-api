@@ -36,7 +36,7 @@ This server requires that you have Postgres installed and running on the default
 Right-click AppRunner, and select "Run 'AppRunner.main()'"
 
 ## PostMan Collection Link
-[Link to Postman Collection](https://www.postman.com/cdavis2903/workspace/chandler-s-public-workspace/environment/26507437-5c30f867-597c-4f62-91f1-e55bd79998e9)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://god.gw.postman.com/run-collection/26507437-76a0eb98-1c89-4217-a71c-3575d053f6f5?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D26507437-76a0eb98-1c89-4217-a71c-3575d053f6f5%26entityType%3Dcollection%26workspaceId%3D79fc21a9-bce6-4924-a55b-251d99c35738)
 
 ### Connections
 
