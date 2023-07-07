@@ -50,7 +50,7 @@ public class PatientServiceImplTest {
     //Initialize Mocks
     MockitoAnnotations.initMocks(this);
 
-    //Generate random movies to have movieIds to pull from;
+    //Generate random patients;
     patientFactory = new PatientFactory();
 
     // Initialize a test purchase instance and list of purchases
@@ -174,12 +174,12 @@ public class PatientServiceImplTest {
   }
 
   @Test
-  public void updateValidPatientReturnsRental(){
+  public void updateValidPatientReturnsPatient(){
     assertEquals(testPatient, patientServiceImpl.updatePatient(1L, testPatient));
   }
 
   @Test
-  public void updateRentalThrowsServiceUnavailable() {
+  public void updatePatientThrowsServiceUnavailable() {
     doThrow(new DataAccessException("TEST EXCEPTION") {
     }).when(patientRepository).save(any());
     assertThrows(ServiceUnavailable.class, () -> patientServiceImpl.updatePatient(1L, testPatient));

@@ -307,7 +307,7 @@ public class EncounterApiTest {
   }
 
   @Test
-  public void updateEncounterReturns200WithMovieObject() throws Exception {
+  public void updateEncounterReturns200WithEncounterObject() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     MockHttpServletResponse response = mockMvc.perform(put(ENCOUNTERS_PATH(testPatient1.getId()) + "/" + randomEncounterList.get(0).getId())
             .contentType("application/json")

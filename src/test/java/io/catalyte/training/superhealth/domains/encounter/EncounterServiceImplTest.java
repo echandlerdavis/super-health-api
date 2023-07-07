@@ -54,13 +54,13 @@ public class EncounterServiceImplTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
 
-    setTestMovies();
+    setTestEncounters();
 
     when(encounterRepository.findById(anyLong())).thenReturn(Optional.of(testEncounter1));
     when(encounterRepository.save(any())).thenReturn(testEncounter1);
   }
 
-  private void setTestMovies() {
+  private void setTestEncounters() {
 
     // Create Two Random Test Products
     patientFactory = new PatientFactory();
